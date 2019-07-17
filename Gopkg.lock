@@ -41,16 +41,26 @@
   revision = "368713356c71961354e09ab9b734740ebdd94784"
 
 [[projects]]
-  digest = "1:7a5875a61368e41b45f1e2732a1298cb7ff306840f94d941c7a55ff7c0f2d32f"
+  digest = "1:78af343f98aa28c74adb925595e0fb32eecc1d9a6da5b639751a5afb4a99292b"
   name = "github.com/integration-system/isp-lib"
   packages = [
+    "config/schema",
     "http",
     "logger",
+    "structure",
     "utils",
   ]
   pruneopts = "UT"
   revision = "9d583f86516f92e855d15de30ff0dd40bb2a2ab2"
   version = "v1.5.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:48f3a739fabefebf152d0196277ee89136c1fa6d88fc67fa486fc765a05b1caa"
+  name = "github.com/integration-system/jsonschema"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5475a8b08e62e41fa886641861ac225e7f91e4e5"
 
 [[projects]]
   digest = "1:e4f630893d2bbf8c268eba14e7cc92ef8844ee259a45e21ea77cf7656544cb7e"
@@ -197,7 +207,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9322129898822a4ca1922b129648a5385d1db6a9d61d1893ef5d2dd0c4423fae"
+  digest = "1:14263f971ab2057d9d8e0e47a5c9af0ae482c4d2530c47f86e8a247046d5df8e"
   name = "github.com/valyala/fasthttp"
   packages = [
     ".",
@@ -205,7 +215,7 @@
     "stackless",
   ]
   pruneopts = "UT"
-  revision = "ccaae97f5bb5886a037f5e8ca871d0e977a91df9"
+  revision = "55ea350c55431331ff77defe5f450331577f64dd"
 
 [[projects]]
   digest = "1:39a425f98fb19427061a693fe6bf0683c9bddec4b25b17067e34fdb465e39cb9"
@@ -251,7 +261,7 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "3bdd9d9f5532d75d09efb230bd767d265245cfe5"
+  revision = "c506a9f9061087022822e8da603a52fc387115a8"
 
 [[projects]]
   digest = "1:caa836d207326da987daf8eb4404ef80806fb843056367d2c3c1636f57ede119"
@@ -282,10 +292,14 @@
   analyzer-version = 1
   input-imports = [
     "github.com/codegangsta/cli",
+    "github.com/integration-system/isp-lib/config/schema",
     "github.com/integration-system/isp-lib/http",
+    "github.com/integration-system/isp-lib/structure",
     "github.com/olekukonko/tablewriter",
     "github.com/tidwall/gjson",
+    "github.com/tidwall/pretty",
     "github.com/tidwall/sjson",
+    "github.com/valyala/fasthttp",
     "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"
