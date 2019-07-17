@@ -24,9 +24,6 @@ func checkFlags(c *cli.Context) error {
 		color = c.GlobalBool(colorFlag[1])
 	}
 	service.ColorService.Enable = color
-
-	service.ColorService.Print(nil)
-
 	hostFlag := strings.Split(flag.GateHostName, ", ")
 	if c.GlobalString(hostFlag[0]) != "" {
 		host = c.GlobalString(hostFlag[0])

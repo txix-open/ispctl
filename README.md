@@ -19,7 +19,8 @@ yum install ispctl
 gateHost: 127.0.0.1:0000
 instanceUuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
-
+* `gateHost` - адрес любого isp-convert-service в кластере
+* `instanceUuid` - UUID  - идентификатор экземпляра приложений
 
 ## Использование
 ```bash
@@ -49,14 +50,14 @@ ispctl delete  [flag...]  module_name  property_path
 |-----------------|---------------------------------------------------------------------------------------------------|
 | `module_name`   | Модуль с которым происходит взаимодействие                                                        |
 | `proprtry_path` | Путь к объекту конфигурации, при значении `.` работа происходит со всей конфигурацией модуля      |
-| `new_object`    | Новый объект, должен быть экранирован с помощью `' '`, при отсутствии будет инициализирован ввод  |
+| `new_object`    | Новый объект, должен быть экранирован с помощью `' '`, при отсутсвии ожидается ввод из stdin      |
 |                 |                                                                                                   |
 
 
 ## Пример
 ### ispctl status
 `ispctl status  [flag...]`
-________
+
 Запрос
 ```bash
 ispctl status
@@ -71,15 +72,14 @@ ispctl status
   converter              | CONNECTED     | 127.0.0.1       
   journal                | NOT_CONNECTED |                     
 ```
-____________
+
 ### ispctl get
 `ispctl get     [flag...]  module_name  property_path`
-___________
 * Получение полной конфигурации
 
 Запрос
 ```bash
-ispctl get mdm-elect-voter .
+ispctl get example .
 ```
 Ответ
 ```bash
@@ -89,7 +89,7 @@ ispctl get mdm-elect-voter .
         "compress": true,
         "enable": false,
         "enableRemoteTransfer": true,
-        "filename": "/var/log/mdm-elect-voter-service/runtime.log",
+        "filename": "/var/log/example-service/runtime.log",
         "maxSizeMb": 512,
         "rotateTimeoutMs": 86400000
     },
@@ -104,12 +104,12 @@ ispctl get mdm-elect-voter .
     }
 }
 ```
-__________________
+
 * Получение конкретного объекта конфигурации
 
 Запрос
 ```bash
-ispctl get mdm-elect-voter .metrics.address
+ispctl get example .metrics.address
 ```
 Ответ
 ```bash
@@ -119,17 +119,17 @@ ispctl get mdm-elect-voter .metrics.address
     "port": 1
 }
 ```
-_________________
+
 ### ispctl set
 `ispctl set     [flag...]  module_name  property_path  [new_object]`
 
-При указании `new_object` необходимо его экранировать
-________________
+При указании `new_object` необходимо его экранировать. При его отсутсвии ожидается ввод из stdin
+
 * Вставка нового поля в объект конфигурации
 
 Запрос
 ```bash
-ispctl set mdm-elect-voter .motrics.newField '"1000"'
+ispctl set example .metrics.newField '"1000"'
 ```
 Ответ 
 ```bash
@@ -139,7 +139,7 @@ ispctl set mdm-elect-voter .motrics.newField '"1000"'
         "compress": true,
         "enable": false,
         "enableRemoteTransfer": true,
-        "filename": "/var/log/mdm-elect-voter-service/runtime.log",
+        "filename": "/var/log/example-service/runtime.log",
         "maxSizeMb": 512,
         "rotateTimeoutMs": 86400000
     },
@@ -155,12 +155,11 @@ ispctl set mdm-elect-voter .motrics.newField '"1000"'
     }
 }
 ```
-_____________________
 * Изменение объекта конфигурации
 
 Запрос
 ```bash
-ispctl set mdm-elect-voter .metrics '{"address":{"ip":"198.0.0.1","newField":"100","port":1},"gc":1,"memory":false}'
+ispctl set example .metrics '{"address":{"ip":"198.0.0.1","newField":"100","port":1},"gc":1,"memory":false}'
 ```
 Ответ 
 ```bash
@@ -170,7 +169,7 @@ ispctl set mdm-elect-voter .metrics '{"address":{"ip":"198.0.0.1","newField":"10
         "compress": true,
         "enable": false,
         "enableRemoteTransfer": true,
-        "filename": "/var/log/mdm-elect-voter-service/runtime.log",
+        "filename": "/var/log/example-service/runtime.log",
         "maxSizeMb": 512,
         "rotateTimeoutMs": 86400000
     },
@@ -185,12 +184,11 @@ ispctl set mdm-elect-voter .metrics '{"address":{"ip":"198.0.0.1","newField":"10
     }
 }
 ```
-_________
 * Полное обновление конфигурации
 
 Запрос
 ```bash
-ispctl set mdm-elect-voter . '{"journal":{"bufferSize":1111,"compress":false,"enable":true,"filename":"/var/log/mdm-elect-voter-service/runtime.log","newField":"1000"},"metrics":{"address":{"ip":"198.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
+ispctl set example . '{"journal":{"bufferSize":1111,"compress":false,"enable":true,"filename":"/var/log/example-service/runtime.log","newField":"1000"},"metrics":{"address":{"ip":"198.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
 ```
 Ответ 
 ```bash
@@ -199,7 +197,7 @@ ispctl set mdm-elect-voter . '{"journal":{"bufferSize":1111,"compress":false,"en
         "bufferSize": 1111,
         "compress": false,
         "enable": true,
-        "filename": "/var/log/mdm-elect-voter-service/runtime.log",
+        "filename": "/var/log/example-service/runtime.log",
         "newField": "1000"
     },
     "metrics": {
@@ -213,15 +211,13 @@ ispctl set mdm-elect-voter . '{"journal":{"bufferSize":1111,"compress":false,"en
     }
 }
 ```
-_________________
 ### ispctl delete
 `ispctl delete  [flag...]  module_name  property_path`
-____________
 * Удаление объекта конфигурации
 
 Запрос
 ```bash
-ispctl delete mdm-elect-voter .journal
+ispctl delete example .journal
 ```
 Ответ 
 ```bash
@@ -237,12 +233,11 @@ ispctl delete mdm-elect-voter .journal
     }
 }
 ```
-___________________
 * Удаление поля из конфигурации
 
 Запрос
 ```bash
-ispctl delete mdm-elect-voter .metrics.address.ip
+ispctl delete example .metrics.address.ip
 ```
 Ответ 
 ```bash
@@ -257,12 +252,11 @@ ispctl delete mdm-elect-voter .metrics.address.ip
     }
 }
 ```
-____________
 * Удаление конфигурации
 
 Запрос
 ```bash
-ispctl delete mdm-elect-voter .
+ispctl delete example .
 ```
 Ответ 
 ```bash
@@ -270,11 +264,9 @@ ispctl delete mdm-elect-voter .
 ```
 
 ### Запрос с флагами
-* При указании флагов `-g` и `-u` игнорируется файл конфигурации утилиты
-
 Запрос
 ```bash
-ispctl -u 00000000-1111-2222-3333-444444444444 -g 127.0.0.1:0000 -c set mdm-elect-voter . '{"metrics":{"address":{"ip":"127.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
+ispctl -u 00000000-1111-2222-3333-444444444444 -g 127.0.0.1:0000 -c set example . '{"metrics":{"address":{"ip":"127.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
 ```
 Ответ
 ```json

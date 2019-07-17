@@ -34,7 +34,6 @@ func (statusCommand) action(c *cli.Context) {
 		fmt.Println(err)
 		return
 	}
-
 	if arrayOfModules, err := service.ConfigClient.GetAvailableConfigs(); err != nil {
 		fmt.Println(err)
 	} else {

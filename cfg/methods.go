@@ -2,7 +2,6 @@ package cfg
 
 import (
 	"github.com/integration-system/isp-lib/http"
-	"isp-config-service/domain"
 )
 
 const (
@@ -31,8 +30,8 @@ func (c *configClient) ReceiveConfig(gateHost, instanceUuid string) {
 	c.gateHost = scheme + gateHost
 }
 
-func (c *configClient) GetAvailableConfigs() ([]domain.ModuleInfo, error) {
-	response := make([]domain.ModuleInfo, 0)
+func (c *configClient) GetAvailableConfigs() ([]ModuleInfo, error) {
+	response := make([]ModuleInfo, 0)
 	if err := c.client.Invoke("POST", c.gateHost+getAvailableConfigs, c.headers, nil, &response); err != nil {
 		return nil, err
 	}
