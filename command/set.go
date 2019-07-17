@@ -13,7 +13,7 @@ import (
 func Set() cli.Command {
 	return cli.Command{
 		Name:   "set",
-		Usage:  "set configuration info",
+		Usage:  "set configuration by module_name",
 		Action: set.action,
 	}
 }
@@ -34,6 +34,11 @@ func (s setCommand) action(c *cli.Context) {
 
 	moduleConfiguration, jsonObject := getModuleConfiguration(moduleName)
 	if moduleConfiguration == nil {
+		return
+	}
+
+	pathObject, ok := checkPath(pathObject)
+	if !ok {
 		return
 	}
 

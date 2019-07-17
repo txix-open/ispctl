@@ -10,7 +10,7 @@ import (
 func Get() cli.Command {
 	return cli.Command{
 		Name:   "get",
-		Usage:  "get configuration info by module_name",
+		Usage:  "get configuration by module_name",
 		Action: get.action,
 	}
 }
@@ -29,6 +29,11 @@ func (g getCommand) action(c *cli.Context) {
 
 	moduleConfiguration, jsonObject := getModuleConfiguration(moduleName)
 	if moduleConfiguration == nil {
+		return
+	}
+
+	pathObject, ok := checkPath(pathObject)
+	if !ok {
 		return
 	}
 

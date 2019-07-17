@@ -9,7 +9,7 @@ import (
 func Delete() cli.Command {
 	return cli.Command{
 		Name:   "delete",
-		Usage:  "delete configuration info by module_name",
+		Usage:  "delete configuration by module_name",
 		Action: deleteComm.action,
 	}
 }
@@ -28,6 +28,11 @@ func (d deleteCommand) action(c *cli.Context) {
 
 	moduleConfiguration, jsonObject := getModuleConfiguration(moduleName)
 	if moduleConfiguration == nil {
+		return
+	}
+
+	pathObject, ok := checkPath(pathObject)
+	if !ok {
 		return
 	}
 

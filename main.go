@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+var (
+	version = "1.0.0"
+)
+
 func main() {
 	defineConfigurationPath()
 	initCommands()
@@ -16,12 +20,14 @@ func main() {
 
 func initCommands() {
 	app := cli.NewApp()
-	app.Usage = "cfg updater"
+	app.Usage = "isp configurations updater"
 	app.UsageText =
 		`	ispctl status 		[flag...]
-	ispctl get 		[flag...]	module_name [property_path]
-	ispctl set 		[flag...]	module_name [property_path] [new_object]
-	ispctl delete 		[flag...]	module_name [property_path]`
+	ispctl get 		[flag...]	module_name  property_path
+	ispctl set 		[flag...]	module_name  property_path  [new_object]
+	ispctl delete 		[flag...]	module_name  property_path`
+
+	app.Version = version
 
 	app.Flags = []cli.Flag{
 		flag.Host,
