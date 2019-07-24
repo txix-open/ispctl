@@ -70,7 +70,6 @@ func (s setCommand) action(c *cli.Context) {
 }
 
 func (s setCommand) parseObject(argument string) interface{} {
-	argument = strings.Replace(argument, " ", "", -1)
 	tryParse := []byte(argument)
 	if tryParse[0] == '"' && tryParse[len(tryParse)-1] == '"' {
 		tryParse = tryParse[1 : len(tryParse)-1]
