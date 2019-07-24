@@ -7,7 +7,6 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
 	"os"
-	"strings"
 )
 
 func Set() cli.Command {
