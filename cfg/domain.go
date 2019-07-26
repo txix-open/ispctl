@@ -11,6 +11,10 @@ type getModuleByUuidAndNameRequest struct {
 	Uuid string
 }
 
+type getSchemaByModuleIdRequest struct {
+	ModuleId int32
+}
+
 type Config struct {
 	Id          int64
 	Name        string
@@ -41,4 +45,13 @@ type ModuleInfo struct {
 	Configs            []Config       `json:",omitempty"`
 	ConfigSchema       *schema.Schema `json:",omitempty"`
 	Status             []Connection   `json:",omitempty"`
+}
+
+type ConfigSchema struct {
+	Id        int32
+	Version   string
+	ModuleId  int32
+	Schema    schema.Schema
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

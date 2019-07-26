@@ -54,3 +54,12 @@ func (c *configClient) CreateUpdateConfig(request Config) (*Config, error) {
 	}
 	return response, nil
 }
+
+func (c *configClient) GetSchemaByModuleId(moduleId int32) (*ConfigSchema, error) {
+	request := &getSchemaByModuleIdRequest{ModuleId: moduleId}
+	response := new(ConfigSchema)
+	if err := c.client.Invoke("POST", c.gateHost+getSchemaByModuleId, c.headers, &request, response); err != nil {
+		return nil, err
+	}
+	return response, nil
+}

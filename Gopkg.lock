@@ -41,7 +41,7 @@
   revision = "368713356c71961354e09ab9b734740ebdd94784"
 
 [[projects]]
-  digest = "1:78af343f98aa28c74adb925595e0fb32eecc1d9a6da5b639751a5afb4a99292b"
+  digest = "1:cd9785ed4d12c737f23ec65b08fffa4e235cbf8689290211dd95eeb0f1ae7e15"
   name = "github.com/integration-system/isp-lib"
   packages = [
     "config/schema",
@@ -51,8 +51,8 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "9d583f86516f92e855d15de30ff0dd40bb2a2ab2"
-  version = "v1.5.1"
+  revision = "d2cc77b8fb8648ae7f8efdf1d1b834e8e57b56d7"
+  version = "v1.5.2"
 
 [[projects]]
   branch = "master"
@@ -63,15 +63,15 @@
   revision = "5475a8b08e62e41fa886641861ac225e7f91e4e5"
 
 [[projects]]
-  digest = "1:e4f630893d2bbf8c268eba14e7cc92ef8844ee259a45e21ea77cf7656544cb7e"
+  digest = "1:ac7f1061abc812a5d0de6df7e3f477cef942aef503848f436da0f0eb2603bfbf"
   name = "github.com/json-iterator/go"
   packages = [
     ".",
     "extra",
   ]
   pruneopts = "UT"
-  revision = "0ff49de124c6f76f8494e194af75bde0f1a49a29"
-  version = "v1.1.6"
+  revision = "27518f6661eba504be5a7a9a9f6d9460d892ade3"
+  version = "v1.1.7"
 
 [[projects]]
   digest = "1:823dc0f8e4cdad8d91e6aba4cdd985a035596a8aa02e9d2abf1bec347894c41f"
@@ -227,6 +227,30 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:f4e5276a3b356f4692107047fd2890f2fe534f4feeb6b1fd2f6dfbd87f1ccf54"
+  name = "github.com/xeipuuv/gojsonpointer"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "4e3ac2762d5f479393488629ee9370b50873b3a6"
+
+[[projects]]
+  branch = "master"
+  digest = "1:dc6a6c28ca45d38cfce9f7cb61681ee38c5b99ec1425339bfc1e1a7ba769c807"
+  name = "github.com/xeipuuv/gojsonreference"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "bd5ef7bd5415a7ac448318e64f11a24cd21e594b"
+
+[[projects]]
+  digest = "1:1c898ea6c30c16e8d55fdb6fe44c4bee5f9b7d68aa260cfdfc3024491dcc7bea"
+  name = "github.com/xeipuuv/gojsonschema"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f971f3cd73b2899de6923801c147f075263e0c50"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
   digest = "1:bbe51412d9915d64ffaa96b51d409e070665efc5194fcf145c4a27d4133107a4"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
@@ -239,18 +263,18 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "da137c7871d730100384dbcf36e6f8fa493aef5b"
+  revision = "ca1201d0de80cfde86cb01aea620983605dfe99b"
 
 [[projects]]
   branch = "master"
-  digest = "1:31d44814b45607afa77c6e8ef20ea8bacc1d1053fe084440c874f311732e7ec3"
+  digest = "1:f99b0e9035cf86cdc14cb2848308e831193d5e19ab9a23a8493cd925bdc3952b"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fae7ac547cb717d141c433a2a173315e216b64c4"
+  revision = "fc99dfbffb4e5ed5758a37e31dd861afe285406b"
 
 [[projects]]
   branch = "master"
@@ -276,8 +300,8 @@
     "status",
   ]
   pruneopts = "UT"
-  revision = "1d89a3c832915b2314551c1d2a506874d62e53f7"
-  version = "v1.22.0"
+  revision = "045159ad57f3781d409358e3ade910a018c16b30"
+  version = "v1.22.1"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
@@ -300,6 +324,7 @@
     "github.com/tidwall/pretty",
     "github.com/tidwall/sjson",
     "github.com/valyala/fasthttp",
+    "github.com/xeipuuv/gojsonschema",
     "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"

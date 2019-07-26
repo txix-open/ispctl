@@ -41,19 +41,22 @@ func (statusCommand) action(c *cli.Context) {
 		table.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
 		table.SetHeader([]string{tableHeaderModuleName, tableHeaderStatus, tableHeaderAddresses})
 		for _, module := range arrayOfModules {
-			arrayOfAddress := ""
+			addresses := ""
 			connection := tableNotConnectedStatus
 			for _, value := range module.Status {
-				if arrayOfAddress == "" {
-					arrayOfAddress = fmt.Sprintf("%s", value.Address.IP)
+				if value.Address.IP == "" && value.Address.Port == "" {
+					continue
+				}
+				if addresses == "" {
+					addresses = fmt.Sprintf("%s:%s;", value.Address.IP, value.Address.Port)
 				} else {
-					arrayOfAddress = fmt.Sprintf("%s, %s", arrayOfAddress, value.Address)
+					addresses = fmt.Sprintf("%s\n%s:%s;", addresses, value.Address.IP, value.Address.Port)
 				}
 			}
-			if arrayOfAddress != "" {
+			if addresses != "" {
 				connection = tableConnectedStatus
 			}
-			table.Append([]string{module.Name, connection, arrayOfAddress})
+			table.Append([]string{module.Name, connection, addresses})
 		}
 		table.Render()
 	}

@@ -14,8 +14,8 @@ import (
 
 func checkFlags(c *cli.Context) error {
 	var (
-		uuid, host string
-		color      bool
+		uuid, host    string
+		color, unsafe bool
 	)
 	colorFlag := strings.Split(flag.ColorName, ", ")
 	if c.GlobalBool(colorFlag[0]) != false {
@@ -24,6 +24,15 @@ func checkFlags(c *cli.Context) error {
 		color = c.GlobalBool(colorFlag[1])
 	}
 	service.ColorService.Enable = color
+
+	unsafeFlag := strings.Split(flag.UnsafeName, ", ")
+	if c.GlobalBool(unsafeFlag[0]) != false {
+		unsafe = true
+	} else {
+		unsafe = c.GlobalBool(unsafeFlag[1])
+	}
+	service.UnsafeService.Enable = unsafe
+
 	hostFlag := strings.Split(flag.GateHostName, ", ")
 	if c.GlobalString(hostFlag[0]) != "" {
 		host = c.GlobalString(hostFlag[0])
@@ -118,6 +127,14 @@ func createUpdateConfig(stringToChange string, configuration *cfg.Config) {
 			return
 		}
 	}
+
+	if ok, err := service.UnsafeService.CheckConfigurationSchema(configuration.ModuleId, newData); err != nil {
+		fmt.Println(err)
+		return
+	} else if !ok {
+		return
+	}
+
 	configuration.Data = newData
 	if resp, err := service.ConfigClient.CreateUpdateConfig(*configuration); err != nil {
 		fmt.Println(err)
