@@ -14,8 +14,8 @@ import (
 
 func checkFlags(c *cli.Context) error {
 	var (
-		uuid, host    string
-		color, unsafe bool
+		uuid, host string
+		color      bool
 	)
 	colorFlag := strings.Split(flag.ColorName, ", ")
 	if c.GlobalBool(colorFlag[0]) != false {
@@ -24,14 +24,7 @@ func checkFlags(c *cli.Context) error {
 		color = c.GlobalBool(colorFlag[1])
 	}
 	service.ColorService.Enable = color
-
-	unsafeFlag := strings.Split(flag.UnsafeName, ", ")
-	if c.GlobalBool(unsafeFlag[0]) != false {
-		unsafe = true
-	} else {
-		unsafe = c.GlobalBool(unsafeFlag[1])
-	}
-	service.UnsafeService.Enable = unsafe
+	service.UnsafeService.Enable = c.GlobalBool(flag.UnsafeName)
 
 	hostFlag := strings.Split(flag.GateHostName, ", ")
 	if c.GlobalString(hostFlag[0]) != "" {
