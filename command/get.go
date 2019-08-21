@@ -10,9 +10,10 @@ import (
 
 func Get() cli.Command {
 	return cli.Command{
-		Name:   "get",
-		Usage:  "get configuration by module_name",
-		Action: get.action,
+		Name:         "get",
+		Usage:        "get configuration by module_name",
+		Action:       get.action,
+		BashComplete: bash.run,
 	}
 }
 

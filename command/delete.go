@@ -7,9 +7,10 @@ import (
 
 func Delete() cli.Command {
 	return cli.Command{
-		Name:   "delete",
-		Usage:  "delete configuration by module_name",
-		Action: deleteComm.action,
+		Name:         "delete",
+		Usage:        "delete configuration by module_name",
+		Action:       deleteComm.action,
+		BashComplete: bash.run,
 	}
 }
 

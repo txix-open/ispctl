@@ -27,14 +27,13 @@ func initCommands() {
 	ispctl [flag...] schema		module_name  [local_flag]`
 
 	app.Version = version
-
 	app.Flags = []cli.Flag{
 		flag.Host,
 		flag.Uuid,
 		flag.Color,
 		flag.Unsafe,
 	}
-
+	app.EnableBashCompletion = true
 	app.Commands = []cli.Command{
 		command.Status(),
 		command.Get(),

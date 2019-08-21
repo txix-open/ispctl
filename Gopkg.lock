@@ -34,6 +34,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:2cf4ff28b309c93a52b3329c7a22d5375b137249d4ed63c9d40707a1b253f7df"
+  name = "github.com/integration-system/bellows"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "244325e8836c364c86f308e3aef7e979cb007114"
+
+[[projects]]
+  branch = "master"
   digest = "1:abd0cd78d6d27a98080f2b2a7fd39bb2f3d3eef6aa20c720093129f04fb41d78"
   name = "github.com/integration-system/gowsdl"
   packages = ["soap"]
@@ -41,7 +49,7 @@
   revision = "368713356c71961354e09ab9b734740ebdd94784"
 
 [[projects]]
-  digest = "1:cd9785ed4d12c737f23ec65b08fffa4e235cbf8689290211dd95eeb0f1ae7e15"
+  digest = "1:ecb402b81b0ed58f59ee14a1587f94c9cef1d8710f0eac3e1cbbbc2cb254f8e8"
   name = "github.com/integration-system/isp-lib"
   packages = [
     "config/schema",
@@ -51,8 +59,8 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "d2cc77b8fb8648ae7f8efdf1d1b834e8e57b56d7"
-  version = "v1.5.2"
+  revision = "d8ea213ec2182662432624bf09cf6726b56f12c4"
+  version = "v1.6.0"
 
 [[projects]]
   branch = "master"
@@ -316,8 +324,10 @@
   analyzer-version = 1
   input-imports = [
     "github.com/codegangsta/cli",
+    "github.com/integration-system/bellows",
     "github.com/integration-system/isp-lib/config/schema",
     "github.com/integration-system/isp-lib/http",
+    "github.com/integration-system/isp-lib/logger",
     "github.com/integration-system/isp-lib/structure",
     "github.com/olekukonko/tablewriter",
     "github.com/tidwall/gjson",

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
+	convert "github.com/integration-system/isp-lib/config/schema"
 	"html/template"
 	"isp-ctl/flag"
 	"isp-ctl/service"
@@ -18,6 +19,7 @@ func Schema() cli.Command {
 		Flags: []cli.Flag{
 			flag.OutPrint,
 		},
+		BashComplete: bashSchema.run,
 	}
 }
 
@@ -36,7 +38,6 @@ func (s schemaCommand) action(c *cli.Context) {
 		schema := make(map[string]interface{})
 		schema["title"] = moduleName
 		schema["schema"] = schemaConfig
-
 		switch c.String(flag.OutPrint.Name) {
 		case flag.OutPrintJsonValue:
 			printAnswer(schema)
@@ -56,7 +57,7 @@ func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {
 		printError(err)
 		return nil
 	} else {
-		return schema.Schema
+		return convert.DereferenceSchema(schema.Schema)
 	}
 }
 
