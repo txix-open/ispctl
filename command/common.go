@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/integration-system/isp-lib/http"
@@ -17,23 +18,23 @@ func checkFlags(c *cli.Context) error {
 		uuid, host string
 		color      bool
 	)
-	colorFlag := strings.Split(flag.ColorName, ", ")
+	colorFlag := strings.Split(flag.Color.Name, ", ")
 	if c.GlobalBool(colorFlag[0]) != false {
 		color = true
 	} else {
 		color = c.GlobalBool(colorFlag[1])
 	}
 	service.ColorService.Enable = color
-	service.UnsafeService.Enable = c.GlobalBool(flag.UnsafeName)
+	service.UnsafeService.Enable = c.GlobalBool(flag.Unsafe.Name)
 
-	hostFlag := strings.Split(flag.GateHostName, ", ")
+	hostFlag := strings.Split(flag.Host.Name, ", ")
 	if c.GlobalString(hostFlag[0]) != "" {
 		host = c.GlobalString(hostFlag[0])
 	} else {
 		host = c.GlobalString(hostFlag[1])
 	}
 
-	uuidFlag := strings.Split(flag.InstanceUuidName, ", ")
+	uuidFlag := strings.Split(flag.Uuid.Name, ", ")
 	if c.GlobalString(uuidFlag[0]) != "" {
 		uuid = c.GlobalString(uuidFlag[0])
 	} else {
@@ -60,7 +61,7 @@ func checkPath(pathObject string) (string, bool) {
 	str := strings.Split(pathObject, ".")
 	pathObject = ""
 	if len(str) == 1 || str[0] != "" {
-		fmt.Println("Path must start with '.'")
+		printError(errors.New("path must start with '.'"))
 		return pathObject, false
 	}
 	for key, value := range str {
@@ -78,7 +79,7 @@ func checkPath(pathObject string) (string, bool) {
 
 func printAnswer(data interface{}) {
 	if answer, err := json.MarshalIndent(data, "", "    "); err != nil {
-		fmt.Println(err)
+		printError(err)
 	} else {
 		service.ColorService.Print(answer)
 	}
@@ -86,7 +87,7 @@ func printAnswer(data interface{}) {
 
 func getModuleConfiguration(moduleName string) (*cfg.Config, []byte) {
 	if moduleName == "" {
-		fmt.Println("Need module name. Use 'info' for get module names")
+		printError(errors.New("need module name. Use 'schema' for get module names"))
 		return nil, nil
 	}
 
@@ -94,18 +95,18 @@ func getModuleConfiguration(moduleName string) (*cfg.Config, []byte) {
 	if err != nil {
 		if errorResponse, ok := err.(http.ErrorResponse); ok {
 			if errorResponse.StatusCode == fasthttp.StatusNotFound {
-				fmt.Printf("Module '%s' not found\n", moduleName)
+				printError(errors.New(fmt.Sprintf("module '%s' not found\n", moduleName)))
 			} else {
-				fmt.Println(err)
+				printError(err)
 			}
 		} else {
-			fmt.Println(err)
+			printError(err)
 		}
 		return nil, nil
 	}
 
 	if jsonObject, err := json.Marshal(moduleConfiguration.Data); err != nil {
-		fmt.Println(err)
+		printError(err)
 		return nil, nil
 	} else {
 		return moduleConfiguration, jsonObject
@@ -116,13 +117,13 @@ func createUpdateConfig(stringToChange string, configuration *cfg.Config) {
 	newData := make(map[string]interface{})
 	if stringToChange != "" {
 		if err := json.Unmarshal([]byte(stringToChange), &newData); err != nil {
-			fmt.Println(err)
+			printError(err)
 			return
 		}
 	}
 
 	if ok, err := service.UnsafeService.CheckConfigurationSchema(configuration.ModuleId, newData); err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	} else if !ok {
 		return
@@ -130,8 +131,12 @@ func createUpdateConfig(stringToChange string, configuration *cfg.Config) {
 
 	configuration.Data = newData
 	if resp, err := service.ConfigClient.CreateUpdateConfig(*configuration); err != nil {
-		fmt.Println(err)
+		printError(err)
 	} else {
 		printAnswer(resp.Data)
 	}
+}
+
+func printError(err error) {
+	fmt.Println("ERROR", err)
 }

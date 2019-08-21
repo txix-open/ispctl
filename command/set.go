@@ -3,6 +3,7 @@ package command
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
@@ -23,7 +24,7 @@ type setCommand struct{}
 
 func (s setCommand) action(c *cli.Context) {
 	if err := checkFlags(c); err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
 
@@ -49,7 +50,7 @@ func (s setCommand) action(c *cli.Context) {
 	}
 
 	if changeObject == "" {
-		fmt.Println("Error. Expected argument")
+		printError(errors.New("expected argument"))
 		return
 	}
 
@@ -59,7 +60,7 @@ func (s setCommand) action(c *cli.Context) {
 	} else {
 		changeArgument := s.parseObject(changeObject)
 		if stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument); err != nil {
-			fmt.Println(err)
+			printError(err)
 			return
 		} else {
 			createUpdateConfig(stringToChange, moduleConfiguration)

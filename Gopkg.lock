@@ -10,12 +10,12 @@
   version = "v9"
 
 [[projects]]
-  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
+  digest = "1:ca4df663ad76879ad38dbd736493679cbb1aa596c6d479fd9fc5e959e5ceb4fb"
   name = "github.com/codegangsta/cli"
   packages = ["."]
   pruneopts = "UT"
-  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
-  version = "v1.20.0"
+  revision = "e6cf83ec39f6e1158ced1927d4ed14578fda8edb"
+  version = "v1.21.0"
 
 [[projects]]
   digest = "1:07f4fafe81587b642166199f41c3edcca12929fcfcc0261b00be5dea2f968f44"
@@ -74,7 +74,7 @@
   version = "v1.1.7"
 
 [[projects]]
-  digest = "1:823dc0f8e4cdad8d91e6aba4cdd985a035596a8aa02e9d2abf1bec347894c41f"
+  digest = "1:836838f1466d370fc7678c927e5b7473f38ba12c2e571f8eca957bd0a102c2db"
   name = "github.com/klauspost/compress"
   packages = [
     "flate",
@@ -82,8 +82,8 @@
     "zlib",
   ]
   pruneopts = "UT"
-  revision = "23256797d1e4ccac36fad828362cdfef5b3aeb90"
-  version = "v1.7.4"
+  revision = "4030f0cdb60476e7065ab476972fcfd43670cd86"
+  version = "v1.7.6"
 
 [[projects]]
   digest = "1:923c4d7194b42e054b2eb8a6c62824ac55e23ececc1c7e48d4da69c971c55954"
@@ -110,12 +110,12 @@
   version = "v0.1.2"
 
 [[projects]]
-  digest = "1:9b90c7639a41697f3d4ad12d7d67dfacc9a7a4a6e0bbfae4fc72d0da57c28871"
+  digest = "1:36325ebb862e0382f2f14feef409ba9351271b89ada286ae56836c603d43b59c"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "1311e847b0cb909da63b5fecfb5370aa66236465"
-  version = "v0.0.8"
+  revision = "e1f7b56ace729e4a73a29a6b4fac6cd5fcda7ab3"
+  version = "v0.0.9"
 
 [[projects]]
   digest = "1:0356f3312c9bd1cbeda81505b7fd437501d8e778ab66998ef69f00d7f9b3a0d7"
@@ -207,7 +207,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:14263f971ab2057d9d8e0e47a5c9af0ae482c4d2530c47f86e8a247046d5df8e"
+  digest = "1:9ac1027203be1e5f4bc35bc822f0938d07716f8c83ba5ffd3a331682335ab24b"
   name = "github.com/valyala/fasthttp"
   packages = [
     ".",
@@ -215,7 +215,7 @@
     "stackless",
   ]
   pruneopts = "UT"
-  revision = "55ea350c55431331ff77defe5f450331577f64dd"
+  revision = "c5413ffda8a3203d573900b871da46234fcf9466"
 
 [[projects]]
   digest = "1:39a425f98fb19427061a693fe6bf0683c9bddec4b25b17067e34fdb465e39cb9"
@@ -227,11 +227,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f4e5276a3b356f4692107047fd2890f2fe534f4feeb6b1fd2f6dfbd87f1ccf54"
+  digest = "1:d9464a87e24a9703fd6b9b27b3592559eb7f5886285d724cb0acd62d00a5ddbf"
   name = "github.com/xeipuuv/gojsonpointer"
   packages = ["."]
   pruneopts = "UT"
-  revision = "4e3ac2762d5f479393488629ee9370b50873b3a6"
+  revision = "df4f5c81cb3b310899c091852a576ea7d178aedb"
 
 [[projects]]
   branch = "master"
@@ -255,7 +255,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "4def268fd1a49955bfb3dda92fe3db4f924f2285"
+  revision = "60c769a6c58655dab1b9adac0d58967dd517cfba"
 
 [[projects]]
   branch = "master"
@@ -263,18 +263,18 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "ca1201d0de80cfde86cb01aea620983605dfe99b"
+  revision = "74dc4d7220e7acc4e100824340f3e66577424772"
 
 [[projects]]
   branch = "master"
-  digest = "1:f99b0e9035cf86cdc14cb2848308e831193d5e19ab9a23a8493cd925bdc3952b"
+  digest = "1:d52ccbb025caf0a2166e0204ed934567b8d0dfdd23a09d947f1f040708888a0a"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fc99dfbffb4e5ed5758a37e31dd861afe285406b"
+  revision = "fde4db37ae7ad8191b03d30d27f258b5291ae4e3"
 
 [[projects]]
   branch = "master"
@@ -285,10 +285,10 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "c506a9f9061087022822e8da603a52fc387115a8"
+  revision = "24fa4b261c55da65468f2abfdae2b024eef27dfb"
 
 [[projects]]
-  digest = "1:caa836d207326da987daf8eb4404ef80806fb843056367d2c3c1636f57ede119"
+  digest = "1:42de3e9a8a8d7d0c7dc0e832f03786c3993c6d97b0e4a18268fb0142cd65e247"
   name = "google.golang.org/grpc"
   packages = [
     "codes",
@@ -300,8 +300,8 @@
     "status",
   ]
   pruneopts = "UT"
-  revision = "045159ad57f3781d409358e3ade910a018c16b30"
-  version = "v1.22.1"
+  revision = "6eaf6f47437a6b4e2153a190160ef39a92c7eceb"
+  version = "v1.23.0"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"

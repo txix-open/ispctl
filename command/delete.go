@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
 )
@@ -20,7 +19,7 @@ type deleteCommand struct{}
 
 func (d deleteCommand) action(c *cli.Context) {
 	if err := checkFlags(c); err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
 	moduleName := c.Args().First()
@@ -40,7 +39,7 @@ func (d deleteCommand) action(c *cli.Context) {
 		createUpdateConfig("", moduleConfiguration)
 	} else {
 		if stringToChange, err := sjson.Delete(string(jsonObject), pathObject); err != nil {
-			fmt.Println(err)
+			printError(err)
 			return
 		} else {
 			createUpdateConfig(stringToChange, moduleConfiguration)

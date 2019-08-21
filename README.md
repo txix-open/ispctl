@@ -28,16 +28,18 @@ ispctl [flag...]  status
 ispctl [flag...]  get      module_name  property_path
 ispctl [flag...]  set      module_name  property_path  [new_object]
 ispctl [flag...]  delete   module_name  property_path
+ispctl [flag...]  schema   module_name  [local_flag]
 ```
 ## Описание
 
-| Команды   | Описание                                                                                    |
-|-----------|---------------------------------------------------------------------------------------------|
-| `status`  | возвращает доступные конфигурации модулей, их состояния и подключения                       |
-| `get`     | возвращает объект конфигурации указанного модуля                                            |
-| `set`     | изменяет объект конфигурации указанного модуля                                              |
-| `delete`  | удаляет объект конфигурации указанного модуля                                               |
-|           |                                                                                             |
+| Команды     | Описание                                                                                    |
+|-------------|---------------------------------------------------------------------------------------------|
+| `status`    | возвращает доступные конфигурации модулей, их состояния и подключения                       |
+| `get`       | возвращает объект конфигурации указанного модуля                                            |
+| `set`       | изменяет объект конфигурации указанного модуля                                              |
+| `delete`    | удаляет объект конфигурации указанного модуля                                               |
+| `schema`    | возвращает схему конфигурации указанного модуля                                             |
+|             |                                                                                             |
 
 | Флаги       | Параметры | Описание                                                         |
 |-------------|-----------|------------------------------------------------------------------|
@@ -54,10 +56,14 @@ ispctl [flag...]  delete   module_name  property_path
 | `new_object`    | Новый объект, должен быть экранирован с помощью `' '`, при отсутсвии ожидается ввод из stdin      |
 |                 |                                                                                                   |
 
+| Локальные флаги | Параметры | Описание                                                                                         |
+|-----------------|-----------|--------------------------------------------------------------------------------------------------|
+| `-o`            | string    | определяет формат вывода схемы в stdout; по умолчанию `json`; возможные значения `json`, `html`  |
+|                 |           |                                                                                                  |
 
 ## Пример
 ### ispctl status
-`ispctl status  [flag...]`
+`ispctl [flag...]  status`
 
 Запрос
 ```bash
@@ -75,7 +81,7 @@ ispctl status
 ```
 
 ### ispctl get
-`ispctl get     [flag...]  module_name  property_path`
+`ispctl [flag...]  get      module_name  property_path`
 * Получение полной конфигурации
 
 Запрос
@@ -122,7 +128,7 @@ ispctl get example .metrics.address
 ```
 
 ### ispctl set
-`ispctl set     [flag...]  module_name  property_path  [new_object]`
+`ispctl [flag...]  set      module_name  property_path  [new_object]`
 
 При указании `new_object` необходимо его экранировать. При его отсутсвии ожидается ввод из stdin
 
@@ -213,7 +219,7 @@ ispctl set example . '{"journal":{"bufferSize":1111,"compress":false,"enable":tr
 }
 ```
 ### ispctl delete
-`ispctl delete  [flag...]  module_name  property_path`
+`ispctl [flag...]  delete   module_name  property_path`
 * Удаление объекта конфигурации
 
 Запрос
@@ -263,6 +269,55 @@ ispctl delete example .
 ```bash
 {}
 ```
+
+### ispctl schema
+`ispctl [flag...]  schema   module_name  [local_flag]`
+* Получение схемы конфигурации
+
+Запрос
+```bash
+ispctl schema example
+```
+Ответ
+```bash
+{
+    "title": "example"
+    "schema": {
+        "title": "Remote config",
+        "type": "object",
+        "required": [
+            "journal",
+        ],
+         ...
+         ...
+         ...
+    }
+}
+```
+Запрос
+```bash
+ispctl schema example -o html
+```
+Ответ
+```bash
+<html>
+<head>
+    ...
+    ...
+    ...
+<body>
+<div class="results"></div>
+<script>
+    var schema = [
+            {"schema":{"required":["journal"]...
+    ...
+    ...
+</script>
+</body>
+</html>
+  
+```
+
 
 ### Запрос с флагами
 Запрос

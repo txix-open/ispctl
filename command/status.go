@@ -31,11 +31,11 @@ type statusCommand struct{}
 
 func (statusCommand) action(c *cli.Context) {
 	if err := checkFlags(c); err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
 	if arrayOfModules, err := service.ConfigClient.GetAvailableConfigs(); err != nil {
-		fmt.Println(err)
+		printError(err)
 	} else {
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})

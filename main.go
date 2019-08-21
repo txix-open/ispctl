@@ -23,7 +23,8 @@ func initCommands() {
 		`	ispctl [flag...] status
 	ispctl [flag...] get 		module_name  property_path
 	ispctl [flag...] set 		module_name  property_path  [new_object]
-	ispctl [flag...] delete 		module_name  property_path`
+	ispctl [flag...] delete 		module_name  property_path
+	ispctl [flag...] schema		module_name  [local_flag]`
 
 	app.Version = version
 
@@ -39,6 +40,7 @@ func initCommands() {
 		command.Get(),
 		command.Set(),
 		command.Delete(),
+		command.Schema(),
 	}
 
 	err := app.Run(os.Args)

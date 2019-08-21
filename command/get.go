@@ -2,6 +2,7 @@ package command
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/gjson"
@@ -21,7 +22,7 @@ type getCommand struct{}
 
 func (g getCommand) action(c *cli.Context) {
 	if err := checkFlags(c); err != nil {
-		fmt.Println(err)
+		printError(err)
 		return
 	}
 	moduleName := c.Args().First()
@@ -47,11 +48,11 @@ func (g getCommand) action(c *cli.Context) {
 func (g getCommand) checkObject(jsonObject []byte, depth string) {
 	jsonString := gjson.Get(string(jsonObject), depth)
 	if jsonString.Raw == "" {
-		fmt.Printf("Path '%s' not found\n", depth)
+		printError(errors.New(fmt.Sprintf("Path '%s' not found\n", depth)))
 	} else {
 		var data interface{}
 		if err := json.Unmarshal([]byte(jsonString.Raw), &data); err != nil {
-			fmt.Println(err)
+			printError(err)
 		} else {
 			printAnswer(data)
 		}
