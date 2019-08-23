@@ -1,3 +1,6 @@
+## v1.2.1
+* fix bash complete with flag
+* fix schema display to html
 ## v1.2.0
 * add new command `schema`
 * add bash complete

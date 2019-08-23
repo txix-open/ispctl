@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
+	"isp-ctl/bash"
+	"isp-ctl/flag"
+	"isp-ctl/service"
 	"os"
 )
 
@@ -15,7 +18,7 @@ func Set() cli.Command {
 		Name:         "set",
 		Usage:        "set configuration by module_name",
 		Action:       set.action,
-		BashComplete: bash.run,
+		BashComplete: bash.ModuleNameAndConfigurationPath.Complete,
 	}
 }
 
@@ -23,23 +26,25 @@ var set setCommand
 
 type setCommand struct{}
 
-func (s setCommand) action(c *cli.Context) {
-	if err := checkFlags(c); err != nil {
+func (s setCommand) action(ctx *cli.Context) {
+	if err := flag.CheckGlobal(ctx); err != nil {
 		printError(err)
 		return
 	}
 
-	moduleName := c.Args().First()
-	pathObject := c.Args().Get(1)
-	changeObject := c.Args().Get(2)
+	moduleName := ctx.Args().First()
+	pathObject := ctx.Args().Get(1)
+	changeObject := ctx.Args().Get(2)
 
-	moduleConfiguration, jsonObject := getModuleConfiguration(moduleName)
-	if moduleConfiguration == nil {
+	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	if err != nil {
+		printError(err)
 		return
 	}
 
-	pathObject, ok := checkPath(pathObject)
-	if !ok {
+	pathObject, err = checkPath(pathObject)
+	if err != nil {
+		printError(err)
 		return
 	}
 

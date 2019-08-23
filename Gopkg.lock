@@ -49,7 +49,8 @@
   revision = "368713356c71961354e09ab9b734740ebdd94784"
 
 [[projects]]
-  digest = "1:ecb402b81b0ed58f59ee14a1587f94c9cef1d8710f0eac3e1cbbbc2cb254f8e8"
+  branch = "master"
+  digest = "1:8a49bb9fcaddea94bdee797ead2f2355534f6736e6a69c88378d52185b41e45c"
   name = "github.com/integration-system/isp-lib"
   packages = [
     "config/schema",
@@ -59,8 +60,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "d8ea213ec2182662432624bf09cf6726b56f12c4"
-  version = "v1.6.0"
+  revision = "e553b3a815fb9ce5d79aba955ec4ed528f83ec09"
 
 [[projects]]
   branch = "master"
@@ -156,6 +156,14 @@
   pruneopts = "UT"
   revision = "4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd"
   version = "1.0.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:84bd7f8a2e0bcd53ddc33c3b47c34c1fe340c8632cbe928f7f8ae10ec6ecdd62"
+  name = "github.com/mohae/deepcopy"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c48cc78d482608239f6c4c92a4abd87eb8761c90"
 
 [[projects]]
   digest = "1:abcdbf03ca6ca13d3697e2186edc1f33863bbdac2b3a44dfa39015e8903f7409"
@@ -327,7 +335,6 @@
     "github.com/integration-system/bellows",
     "github.com/integration-system/isp-lib/config/schema",
     "github.com/integration-system/isp-lib/http",
-    "github.com/integration-system/isp-lib/logger",
     "github.com/integration-system/isp-lib/structure",
     "github.com/olekukonko/tablewriter",
     "github.com/tidwall/gjson",

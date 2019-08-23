@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/olekukonko/tablewriter"
+	"isp-ctl/flag"
 	"isp-ctl/service"
 	"os"
 )
@@ -29,12 +30,12 @@ var status statusCommand
 
 type statusCommand struct{}
 
-func (statusCommand) action(c *cli.Context) {
-	if err := checkFlags(c); err != nil {
+func (statusCommand) action(ctx *cli.Context) {
+	if err := flag.CheckGlobal(ctx); err != nil {
 		printError(err)
 		return
 	}
-	if arrayOfModules, err := service.ConfigClient.GetAvailableConfigs(); err != nil {
+	if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
 		printError(err)
 	} else {
 		table := tablewriter.NewWriter(os.Stdout)

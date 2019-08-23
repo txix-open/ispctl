@@ -4,10 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
-	convert "github.com/integration-system/isp-lib/config/schema"
 	"html/template"
+	"isp-ctl/bash"
 	"isp-ctl/flag"
 	"isp-ctl/service"
+	"isp-ctl/tmpl"
 	"os"
 )
 
@@ -19,7 +20,7 @@ func Schema() cli.Command {
 		Flags: []cli.Flag{
 			flag.OutPrint,
 		},
-		BashComplete: bashSchema.run,
+		BashComplete: bash.ModuleName.Complete,
 	}
 }
 
@@ -27,18 +28,18 @@ var schema schemaCommand
 
 type schemaCommand struct{}
 
-func (s schemaCommand) action(c *cli.Context) {
-	if err := checkFlags(c); err != nil {
+func (s schemaCommand) action(ctx *cli.Context) {
+	if err := flag.CheckGlobal(ctx); err != nil {
 		printError(err)
 		return
 	}
-	moduleName := c.Args().First()
+	moduleName := ctx.Args().First()
 
 	if schemaConfig := s.getSchemaConfig(moduleName); schemaConfig != nil {
 		schema := make(map[string]interface{})
 		schema["title"] = moduleName
 		schema["schema"] = schemaConfig
-		switch c.String(flag.OutPrint.Name) {
+		switch ctx.String(flag.OutPrint.Name) {
 		case flag.OutPrintJsonValue:
 			printAnswer(schema)
 		case flag.OutPrintHtmlValue:
@@ -51,18 +52,19 @@ func (s schemaCommand) action(c *cli.Context) {
 }
 
 func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {
-	if configuration, _ := getModuleConfiguration(moduleName); configuration == nil {
+	if configuration, _, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName); err != nil {
+		printError(err)
 		return nil
-	} else if schema, err := service.ConfigClient.GetSchemaByModuleId(configuration.ModuleId); err != nil {
+	} else if schema, err := service.Config.GetSchemaByModuleId(configuration.ModuleId); err != nil {
 		printError(err)
 		return nil
 	} else {
-		return convert.DereferenceSchema(schema.Schema)
+		return schema
 	}
 }
 
 func (s schemaCommand) printHtml(schema map[string]interface{}) {
-	if temp, err := template.New("template").Parse(htmlTemplate); err != nil {
+	if temp, err := template.New("template").Parse(tmpl.HtmlFile); err != nil {
 		printError(err)
 		return
 	} else {

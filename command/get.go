@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/gjson"
+	"isp-ctl/bash"
+	"isp-ctl/flag"
+	"isp-ctl/service"
 )
 
 func Get() cli.Command {
@@ -13,7 +16,7 @@ func Get() cli.Command {
 		Name:         "get",
 		Usage:        "get configuration by module_name",
 		Action:       get.action,
-		BashComplete: bash.run,
+		BashComplete: bash.ModuleNameAndConfigurationPath.Complete,
 	}
 }
 
@@ -21,21 +24,23 @@ var get getCommand
 
 type getCommand struct{}
 
-func (g getCommand) action(c *cli.Context) {
-	if err := checkFlags(c); err != nil {
+func (g getCommand) action(ctx *cli.Context) {
+	if err := flag.CheckGlobal(ctx); err != nil {
 		printError(err)
 		return
 	}
-	moduleName := c.Args().First()
-	pathObject := c.Args().Get(1)
+	moduleName := ctx.Args().First()
+	pathObject := ctx.Args().Get(1)
 
-	moduleConfiguration, jsonObject := getModuleConfiguration(moduleName)
-	if moduleConfiguration == nil {
+	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	if err != nil {
+		printError(err)
 		return
 	}
 
-	pathObject, ok := checkPath(pathObject)
-	if !ok {
+	pathObject, err = checkPath(pathObject)
+	if err != nil {
+		printError(err)
 		return
 	}
 

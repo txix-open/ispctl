@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/codegangsta/cli"
 	"isp-ctl/command"
 	"isp-ctl/flag"
@@ -40,6 +41,11 @@ func initCommands() {
 		command.Set(),
 		command.Delete(),
 		command.Schema(),
+	}
+	app.BashComplete = func(context *cli.Context) {
+		for _, command := range app.Commands {
+			fmt.Println(command.Name)
+		}
 	}
 
 	err := app.Run(os.Args)

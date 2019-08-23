@@ -32,3 +32,7 @@
 [[override]]
   name = "github.com/valyala/fasthttp"
   branch = "master"
+
+[[override]]
+  name = "github.com/integration-system/isp-lib"
+  branch = "master"

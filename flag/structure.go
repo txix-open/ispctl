@@ -1,6 +1,10 @@
 package flag
 
-import "github.com/codegangsta/cli"
+import (
+	"github.com/codegangsta/cli"
+	"isp-ctl/service"
+	"strings"
+)
 
 var (
 	//---global---
@@ -11,3 +15,49 @@ var (
 	//---local---
 	OutPrint = cli.StringFlag{Name: outPrintName, Usage: outPrintUsage, Value: OutPrintJsonValue}
 )
+
+func CheckGlobal(c *cli.Context) error {
+	var (
+		uuid, host string
+		color      bool
+	)
+	colorFlag := strings.Split(Color.Name, ", ")
+	if c.GlobalBool(colorFlag[0]) != false {
+		color = true
+	} else {
+		color = c.GlobalBool(colorFlag[1])
+	}
+	service.ColorService.Enable = color
+	service.Config.UnsafeEnable = c.GlobalBool(Unsafe.Name)
+
+	hostFlag := strings.Split(Host.Name, ", ")
+	if c.GlobalString(hostFlag[0]) != "" {
+		host = c.GlobalString(hostFlag[0])
+	} else {
+		host = c.GlobalString(hostFlag[1])
+	}
+
+	uuidFlag := strings.Split(Uuid.Name, ", ")
+	if c.GlobalString(uuidFlag[0]) != "" {
+		uuid = c.GlobalString(uuidFlag[0])
+	} else {
+		uuid = c.GlobalString(uuidFlag[1])
+	}
+
+	uuid = strings.Replace(uuid, "'", "", -1)
+	host = strings.Replace(host, "'", "", -1)
+	if uuid == "" || host == "" {
+		if configuration, err := service.YamlService.Parse(); err != nil {
+			return err
+		} else {
+			if uuid == "" {
+				uuid = configuration.InstanceUuid
+			}
+			if host == "" {
+				host = configuration.GateHost
+			}
+		}
+	}
+	service.Config.ReceiveConfiguration(host, uuid)
+	return nil
+}

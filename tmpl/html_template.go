@@ -1,8 +1,8 @@
-package command
+package tmpl
 
-const htmlTemplate = `<html>
+const HtmlFile = `<html>
 <head>
-
+	 <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/json-schema-view-js@2.0.1/dist/bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/json-schema-view-js@2.0.1/dist/style.min.css">
     <style>
