@@ -50,7 +50,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8a49bb9fcaddea94bdee797ead2f2355534f6736e6a69c88378d52185b41e45c"
+  digest = "1:163b4d7aa5e5912f5a95d78ecce65f7fb111595458c9c039b0671fd75b2145b2"
   name = "github.com/integration-system/isp-lib"
   packages = [
     "config/schema",
@@ -60,7 +60,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "e553b3a815fb9ce5d79aba955ec4ed528f83ec09"
+  revision = "983829e2356d7b6d1fba809d4afe75229d33e49c"
 
 [[projects]]
   branch = "master"
