@@ -1,3 +1,5 @@
+## v1.2.2
+* fix stack overflow
 ## v1.2.1
 * fix bash complete with flag
 * fix schema display to html

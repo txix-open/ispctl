@@ -50,7 +50,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:163b4d7aa5e5912f5a95d78ecce65f7fb111595458c9c039b0671fd75b2145b2"
+  digest = "1:a2401f29961144c17cd60b909a7fb1601ecd9213d717ed6804f7dda6624630bb"
   name = "github.com/integration-system/isp-lib"
   packages = [
     "config/schema",
@@ -60,7 +60,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "983829e2356d7b6d1fba809d4afe75229d33e49c"
+  revision = "11002a9e4c7e71c029ab4c831bd3593697e43178"
 
 [[projects]]
   branch = "master"
@@ -82,7 +82,7 @@
   version = "v1.1.7"
 
 [[projects]]
-  digest = "1:836838f1466d370fc7678c927e5b7473f38ba12c2e571f8eca957bd0a102c2db"
+  digest = "1:caa1da085cc12cd39d3ddb267434902f621050e1b46f7e9477b2b933df680193"
   name = "github.com/klauspost/compress"
   packages = [
     "flate",
@@ -90,8 +90,8 @@
     "zlib",
   ]
   pruneopts = "UT"
-  revision = "4030f0cdb60476e7065ab476972fcfd43670cd86"
-  version = "v1.7.6"
+  revision = "2c38f6d2dc5a6a21b6851f2414f4e10adf8e3eee"
+  version = "v1.8.1"
 
 [[projects]]
   digest = "1:923c4d7194b42e054b2eb8a6c62824ac55e23ececc1c7e48d4da69c971c55954"
@@ -223,7 +223,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9ac1027203be1e5f4bc35bc822f0938d07716f8c83ba5ffd3a331682335ab24b"
+  digest = "1:30fe8021645a9d9966fcede2a59c2e2f498d433687fc5cddd7de85a6a0a44c28"
   name = "github.com/valyala/fasthttp"
   packages = [
     ".",
@@ -231,7 +231,7 @@
     "stackless",
   ]
   pruneopts = "UT"
-  revision = "c5413ffda8a3203d573900b871da46234fcf9466"
+  revision = "1241ed7a910a835656961bf69fb8f1fa9cc8b88e"
 
 [[projects]]
   digest = "1:39a425f98fb19427061a693fe6bf0683c9bddec4b25b17067e34fdb465e39cb9"
@@ -283,14 +283,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d52ccbb025caf0a2166e0204ed934567b8d0dfdd23a09d947f1f040708888a0a"
+  digest = "1:c5b5d55096b762e29d0b887ce73932d06ddcf9def4285f1abd09f801176878ec"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "fde4db37ae7ad8191b03d30d27f258b5291ae4e3"
+  revision = "c7b8b68b14567162c6602a7c5659ee0f26417c18"
 
 [[projects]]
   branch = "master"
