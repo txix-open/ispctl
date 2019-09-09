@@ -15,13 +15,11 @@ for status in $statusResponse; do
     IFS=$'  '
     read -ra ADDR <<<"$status"
     for module_name in "${ADDR[0]}"; do
-
         if [ -n "$*" ]; then
-          echo $(isp-ctl $* schema $module_name -o html) >schemas/$module_name.html
+          isp-ctl $* schema $module_name -o html > schemas/$module_name.html
         else
-          echo $(isp-ctl schema $module_name -o html) >schemas/$module_name.html
+          isp-ctl schema $module_name -o html > schemas/$module_name.html
         fi
-
       break
     done
   fi

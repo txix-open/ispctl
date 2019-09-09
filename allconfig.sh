@@ -16,9 +16,9 @@ for status in $statusResponse; do
     read -ra ADDR <<<"$status"
     for module_name in "${ADDR[0]}"; do
       if [ -n "$*" ]; then
-        echo $(isp-ctl $* get $module_name .) >configs/$module_name.json
+        isp-ctl $* get $module_name . > configs/$module_name.json
       else
-        echo $(isp-ctl get $module_name .) >configs/$module_name.json
+        isp-ctl get $module_name . > configs/$module_name.json
       fi
       break
     done
