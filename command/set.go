@@ -1,12 +1,11 @@
 package command
 
 import (
-	"bufio"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
+	"io/ioutil"
 	"isp-ctl/bash"
 	"isp-ctl/flag"
 	"isp-ctl/service"
@@ -49,12 +48,13 @@ func (s setCommand) action(ctx *cli.Context) {
 	}
 
 	if changeObject == "" {
-		fmt.Print("Enter new value: ")
-		scanner := bufio.NewScanner(os.Stdin)
-		scanner.Scan()
-		changeObject = scanner.Text()
+		bytes, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			printError(err)
+			return
+		}
+		changeObject = string(bytes)
 	}
-
 	if changeObject == "" {
 		printError(errors.New("expected argument"))
 		return

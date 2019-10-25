@@ -1,3 +1,5 @@
+## v1.2.3
+* read configuration from `stdin` till `EOF`
 ## v1.2.2
 * fix stack overflow
 ## v1.2.1

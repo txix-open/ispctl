@@ -36,3 +36,7 @@
 [[override]]
   name = "github.com/integration-system/isp-lib"
   branch = "master"
+
+[[override]]
+  name = "github.com/russross/blackfriday"
+  version = "v1.5.2"
