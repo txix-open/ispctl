@@ -130,7 +130,7 @@ ispctl get example .metrics.address
 ### ispctl set
 `ispctl [flag...]  set      module_name  property_path  [new_object]`
 
-При указании `new_object` необходимо его экранировать. При его отсутсвии ожидается ввод из stdin
+При указании `new_object` необходимо его экранировать. При его отсутсвии ожидается ввод из `stdin` до `EOF`
 
 * Вставка нового поля в объект конфигурации
 
