@@ -50,19 +50,26 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:abd0cd78d6d27a98080f2b2a7fd39bb2f3d3eef6aa20c720093129f04fb41d78"
-  name = "github.com/integration-system/gowsdl"
-  packages = ["soap"]
+  digest = "1:c4f3970d1f30f5e9bc1751b62b7ea6127256e59fd63a3d36e166fe1121250c57"
+  name = "github.com/integration-system/go-cmp"
+  packages = [
+    "cmp",
+    "cmp/internal/diff",
+    "cmp/internal/function",
+    "cmp/internal/value",
+  ]
   pruneopts = "UT"
-  revision = "368713356c71961354e09ab9b734740ebdd94784"
+  revision = "ac5582987a2f25e8743e0ebb7259312adda05c23"
 
 [[projects]]
   branch = "master"
-  digest = "1:95c2d64f7a0ec98156d5b970f7cef94d418025ec4b4324d81318743db2a158fc"
+  digest = "1:2c5074a55f97c23cd89581a5d66fa82c26ee1fa01bffad0d3f540e8d28b131e5"
   name = "github.com/integration-system/isp-lib"
   packages = [
+    "backend",
     "config/schema",
-    "http",
+    "proto/stubs",
+    "streaming",
     "structure",
     "utils",
   ]
@@ -98,18 +105,6 @@
   pruneopts = "UT"
   revision = "03217c3e97663914aec3faafde50d081f197a0a2"
   version = "1.1.8"
-
-[[projects]]
-  digest = "1:acfc228fb5fbfb82645c121e3224bd546ed68aef6dfc87f63e2d8de099a3822b"
-  name = "github.com/klauspost/compress"
-  packages = [
-    "flate",
-    "gzip",
-    "zlib",
-  ]
-  pruneopts = "UT"
-  revision = "a41f1a10bd3b167958ff6df80b800fe2969dd3ca"
-  version = "v1.9.0"
 
 [[projects]]
   digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
@@ -158,6 +153,14 @@
   pruneopts = "UT"
   revision = "e6d60cf7ba1f42d86d54cdf5508611c4aafb3970"
   version = "v0.0.1"
+
+[[projects]]
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:b36a0ede02c4c2aef7df7f91cbbb7bb88a98b5d253509d4f997dda526e50c88c"
@@ -216,26 +219,6 @@
   version = "v1.22.0"
 
 [[projects]]
-  digest = "1:c468422f334a6b46a19448ad59aaffdfc0a36b08fdcc1c749a0b29b6453d7e59"
-  name = "github.com/valyala/bytebufferpool"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:77f7e2f75e4c44ede24f47aca6c514f24f06c6a0ee3c47c8d7ce2b77b49ac482"
-  name = "github.com/valyala/fasthttp"
-  packages = [
-    ".",
-    "fasthttputil",
-    "stackless",
-  ]
-  pruneopts = "UT"
-  revision = "9bc6da12192c610a272a9289b9574eb5d8cfdfe1"
-
-[[projects]]
   branch = "master"
   digest = "1:87fe9bca786484cef53d52adeec7d1c52bc2bfbee75734eddeb75fc5c7023871"
   name = "github.com/xeipuuv/gojsonpointer"
@@ -261,19 +244,52 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:76ee51c3f468493aff39dbacc401e8831fbb765104cbf613b89bef01cf4bad70"
+  digest = "1:c124e945335a9c62ede3a565f3198c5ae9a5ecc39fddd85871138362d128fb74"
   name = "golang.org/x/net"
-  packages = ["context"]
+  packages = [
+    "context",
+    "http/httpguts",
+    "http2",
+    "http2/hpack",
+    "idna",
+    "internal/timeseries",
+    "trace",
+  ]
   pruneopts = "UT"
-  revision = "ec77196f6094c3492a8b61f2c11cf937f78992ae"
+  revision = "fe3aa8a4527195a6057b3fad46619d7d090e99b5"
 
 [[projects]]
   branch = "master"
-  digest = "1:56068728488986584e5a2f3576cb84d52bad7ec7fbe63a14b0d3b26bfdb41b8b"
+  digest = "1:89c4223950671f7afdc98761c6a601b83594865490c71b434194b6cacf208e6a"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "6c3a3bfe00aeca2b8685f04a482824367e7d2135"
+  revision = "f8518d3b3627146e88bd43ca73045e1b8d8eb6c6"
+
+[[projects]]
+  digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/language",
+    "internal/language/compact",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable",
+  ]
+  pruneopts = "UT"
+  revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
+  version = "v0.3.2"
 
 [[projects]]
   branch = "master"
@@ -287,16 +303,42 @@
   revision = "548a555dbc03994223efbaba0090152849259498"
 
 [[projects]]
-  digest = "1:42de3e9a8a8d7d0c7dc0e832f03786c3993c6d97b0e4a18268fb0142cd65e247"
+  digest = "1:6cd77d0b616d2dcebd363dfecba593f27b0151fc82cdb5fbfb96c5a7cfbc95b5"
   name = "google.golang.org/grpc"
   packages = [
+    ".",
+    "balancer",
+    "balancer/base",
+    "balancer/roundrobin",
+    "binarylog/grpc_binarylog_v1",
     "codes",
     "connectivity",
+    "credentials",
+    "credentials/internal",
+    "encoding",
+    "encoding/proto",
     "grpclog",
     "internal",
+    "internal/backoff",
+    "internal/balancerload",
+    "internal/binarylog",
+    "internal/channelz",
+    "internal/envconfig",
+    "internal/grpcrand",
+    "internal/grpcsync",
+    "internal/syscall",
+    "internal/transport",
+    "keepalive",
     "metadata",
+    "naming",
+    "peer",
+    "resolver",
+    "resolver/dns",
+    "resolver/passthrough",
+    "serviceconfig",
     "stats",
     "status",
+    "tap",
   ]
   pruneopts = "UT"
   revision = "f6d0f9ee430895e87ef1ceb5ac8f39725bafceef"
@@ -316,15 +358,19 @@
   input-imports = [
     "github.com/codegangsta/cli",
     "github.com/integration-system/bellows",
+    "github.com/integration-system/isp-lib/backend",
     "github.com/integration-system/isp-lib/config/schema",
-    "github.com/integration-system/isp-lib/http",
     "github.com/integration-system/isp-lib/structure",
     "github.com/olekukonko/tablewriter",
+    "github.com/pkg/errors",
     "github.com/tidwall/gjson",
     "github.com/tidwall/pretty",
     "github.com/tidwall/sjson",
-    "github.com/valyala/fasthttp",
     "github.com/xeipuuv/gojsonschema",
+    "google.golang.org/grpc",
+    "google.golang.org/grpc/codes",
+    "google.golang.org/grpc/metadata",
+    "google.golang.org/grpc/status",
     "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"

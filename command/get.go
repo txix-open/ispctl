@@ -2,9 +2,8 @@ package command
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 	"isp-ctl/bash"
 	"isp-ctl/flag"
@@ -54,7 +53,7 @@ func (g getCommand) action(ctx *cli.Context) {
 func (g getCommand) checkObject(jsonObject []byte, depth string) {
 	jsonString := gjson.Get(string(jsonObject), depth)
 	if jsonString.Raw == "" {
-		printError(errors.New(fmt.Sprintf("Path '%s' not found\n", depth)))
+		printError(errors.Errorf("Path '%s' not found\n", depth))
 	} else {
 		var data interface{}
 		if err := json.Unmarshal([]byte(jsonString.Raw), &data); err != nil {

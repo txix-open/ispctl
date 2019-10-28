@@ -1,3 +1,5 @@
+## v1.2.4
+* migrate invoke to config service
 ## v1.2.3
 * read configuration from `stdin` till `EOF`
 ## v1.2.2

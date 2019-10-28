@@ -2,8 +2,8 @@ package command
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"isp-ctl/cfg"
 	"isp-ctl/service"
 	"strings"

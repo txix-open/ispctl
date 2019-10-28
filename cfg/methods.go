@@ -1,65 +1,98 @@
 package cfg
 
 import (
-	"github.com/integration-system/isp-lib/http"
+	"github.com/integration-system/isp-lib/backend"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 const (
 	instanceIdHeader = "x-instance-identity"
-	scheme           = "http://"
+	callerId         = 1
 )
 
-func NewConfigClient(client http.RestClient) *configClient {
+func NewConfigClient() *configClient {
 	return &configClient{
-		client:  client,
-		headers: make(map[string]string),
+		cli:     &backend.InternalGrpcClient{},
+		headers: make(map[string][]string),
 	}
 }
 
 type configClient struct {
-	client  http.RestClient
-	headers map[string]string
+	cli     *backend.InternalGrpcClient
+	headers metadata.MD
 
-	gateHost     string
+	address      string
 	instanceUuid string
 }
 
-func (c *configClient) ReceiveConfig(gateHost, instanceUuid string) {
+func (c *configClient) ReceiveConfig(address, instanceUuid string) error {
+	var err error
+	c.cli, err = backend.NewGrpcClient(address, grpc.WithInsecure())
+	if err != nil {
+		return err
+	}
+
+	c.address = address
 	c.instanceUuid = instanceUuid
-	c.headers[instanceIdHeader] = instanceUuid
-	c.gateHost = scheme + gateHost
+	c.headers[instanceIdHeader] = []string{instanceUuid}
+	return nil
 }
 
 func (c *configClient) GetAvailableConfigs() ([]ModuleInfo, error) {
 	response := make([]ModuleInfo, 0)
-	if err := c.client.Invoke("POST", c.gateHost+getAvailableConfigs, c.headers, nil, &response); err != nil {
-		return nil, err
+	err := c.cli.Invoke(getAvailableConfigs, callerId, nil, &response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
 	}
-	return response, nil
 }
 
 func (c *configClient) GetConfigByModuleName(name string) (*Config, error) {
 	request := &getModuleByUuidAndNameRequest{Name: name, Uuid: c.instanceUuid}
 	response := new(Config)
-	if err := c.client.Invoke("POST", c.gateHost+getConfigByModuleName, c.headers, request, response); err != nil {
-		return nil, err
+	err := c.cli.Invoke(getConfigByModuleName, callerId, request, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
 	}
-	return response, nil
 }
 
 func (c *configClient) CreateUpdateConfig(request Config) (*Config, error) {
 	response := new(Config)
-	if err := c.client.Invoke("POST", c.gateHost+createUpdateConfig, c.headers, &request, response); err != nil {
-		return nil, err
+	err := c.cli.Invoke(createUpdateConfig, callerId, &request, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
 	}
-	return response, nil
 }
 
 func (c *configClient) GetSchemaByModuleId(moduleId int32) (*ConfigSchema, error) {
 	request := &getSchemaByModuleIdRequest{ModuleId: moduleId}
 	response := new(ConfigSchema)
-	if err := c.client.Invoke("POST", c.gateHost+getSchemaByModuleId, c.headers, &request, response); err != nil {
-		return nil, err
+	err := c.cli.Invoke(getSchemaByModuleId, callerId, &request, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
 	}
-	return response, nil
+}
+
+func (c *configClient) errorHandler(err error) error {
+	errStatus, ok := status.FromError(err)
+	if !ok {
+		return err
+	}
+	switch errStatus.Code() {
+	case codes.Unavailable:
+		return errors.Errorf("config service didn't connection on %s", c.address)
+	default:
+		return err
+	}
 }
