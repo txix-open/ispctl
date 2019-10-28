@@ -58,6 +58,5 @@ func CheckGlobal(c *cli.Context) error {
 			}
 		}
 	}
-	service.Config.ReceiveConfiguration(host, uuid)
-	return nil
+	return service.Config.ReceiveConfiguration(host, uuid)
 }

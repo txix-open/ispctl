@@ -2,8 +2,8 @@ package command
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/codegangsta/cli"
+	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
 	"io/ioutil"
 	"isp-ctl/bash"

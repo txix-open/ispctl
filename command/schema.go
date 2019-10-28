@@ -1,9 +1,8 @@
 package command
 
 import (
-	"errors"
-	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/pkg/errors"
 	"html/template"
 	"isp-ctl/bash"
 	"isp-ctl/flag"
@@ -45,8 +44,8 @@ func (s schemaCommand) action(ctx *cli.Context) {
 		case flag.OutPrintHtmlValue:
 			s.printHtml(schema)
 		default:
-			printError(errors.New(fmt.Sprintf(
-				"invalid flag value, expected %s or %s", flag.OutPrintJsonValue, flag.OutPrintHtmlValue)))
+			printError(errors.Errorf(
+				"invalid flag value, expected %s or %s", flag.OutPrintJsonValue, flag.OutPrintHtmlValue))
 		}
 	}
 }

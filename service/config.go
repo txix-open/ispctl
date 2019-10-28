@@ -2,39 +2,47 @@ package service
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/integration-system/isp-lib/config/schema"
-	"github.com/integration-system/isp-lib/http"
-	"github.com/valyala/fasthttp"
+	"github.com/pkg/errors"
 	"github.com/xeipuuv/gojsonschema"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"isp-ctl/cfg"
 )
 
 var (
-	configClient = cfg.NewConfigClient(http.NewJsonRestClient())
-	Config       configService
+	configClient = cfg.NewConfigClient()
+	Config       = &configService{}
 )
 
 type configService struct {
 	UnsafeEnable bool
 }
 
-func (configService) ReceiveConfiguration(host, uuid string) {
-	configClient.ReceiveConfig(host, uuid)
+func (c *configService) ReceiveConfiguration(host, uuid string) error {
+	return configClient.ReceiveConfig(host, uuid)
 }
 
-func (configService) GetAvailableConfigs() ([]cfg.ModuleInfo, error) {
-	return configClient.GetAvailableConfigs()
+func (c *configService) GetAvailableConfigs() ([]cfg.ModuleInfo, error) {
+	if moduleInfo, err := configClient.GetAvailableConfigs(); err != nil {
+		return nil, err
+	} else {
+		return moduleInfo, nil
+	}
 }
 
-func (configService) GetConfigurationAndJsonByModuleName(moduleName string) (*cfg.Config, []byte, error) {
+func (c *configService) GetConfigurationAndJsonByModuleName(moduleName string) (*cfg.Config, []byte, error) {
 	if moduleName == "" {
 		return nil, nil, errors.New("need module name")
 	}
+
 	if moduleConfiguration, err := configClient.GetConfigByModuleName(moduleName); err != nil {
-		if errorResponse, ok := err.(http.ErrorResponse); ok && errorResponse.StatusCode == fasthttp.StatusNotFound {
-			return nil, nil, errors.New(fmt.Sprintf("module '%s' not found", moduleName))
+		if errorStatus, ok := status.FromError(err); ok {
+			switch errorStatus.Code() {
+			case codes.NotFound:
+				return nil, nil, errors.Errorf("module '%s' not found", moduleName)
+			}
 		}
 		return nil, nil, err
 	} else if jsonObject, err := json.Marshal(moduleConfiguration.Data); err != nil {
@@ -44,7 +52,7 @@ func (configService) GetConfigurationAndJsonByModuleName(moduleName string) (*cf
 	}
 }
 
-func (configService) GetSchemaByModuleId(moduleId int32) (schema.Schema, error) {
+func (c *configService) GetSchemaByModuleId(moduleId int32) (schema.Schema, error) {
 	if configSchema, err := configClient.GetSchemaByModuleId(moduleId); err != nil {
 		return nil, err
 	} else {
@@ -53,7 +61,7 @@ func (configService) GetSchemaByModuleId(moduleId int32) (schema.Schema, error) 
 	}
 }
 
-func (c configService) CreateUpdateConfig(stringToChange string, configuration *cfg.Config) (map[string]interface{}, error) {
+func (c *configService) CreateUpdateConfig(stringToChange string, configuration *cfg.Config) (map[string]interface{}, error) {
 	newData := make(map[string]interface{})
 	if stringToChange != "" {
 		if err := json.Unmarshal([]byte(stringToChange), &newData); err != nil {
@@ -75,7 +83,7 @@ func (c configService) CreateUpdateConfig(stringToChange string, configuration *
 	}
 }
 
-func (c configService) checkSchema(moduleId int32, object map[string]interface{}) (bool, error) {
+func (c *configService) checkSchema(moduleId int32, object map[string]interface{}) (bool, error) {
 	if c.UnsafeEnable {
 		return true, nil
 	}
