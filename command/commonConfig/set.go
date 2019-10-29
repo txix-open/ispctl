@@ -2,12 +2,11 @@ package commonConfig
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/codegangsta/cli"
-	"github.com/integration-system/bellows"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
 	"io/ioutil"
+	"isp-ctl/bash"
 	"isp-ctl/cfg"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
@@ -20,7 +19,7 @@ func Set() cli.Command {
 		Name:         "set",
 		Usage:        "set common configurations",
 		Action:       set.action,
-		BashComplete: set.bashComplete,
+		BashComplete: bash.CommonConfig.GetSetDelete,
 	}
 }
 
@@ -92,28 +91,6 @@ func (g setCommand) action(ctx *cli.Context) {
 		} else {
 			utils.CreateUpdateCommonConfig(stringToChange, config)
 			return
-		}
-	}
-}
-
-func (g setCommand) bashComplete(ctx *cli.Context) {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return
-	}
-	commonConfigs, err := service.Config.GetMapCommonConfigByName()
-	if err != nil {
-		return
-	}
-	switch ctx.NArg() {
-	case 0:
-		for _, config := range commonConfigs {
-			fmt.Println(config.Name)
-		}
-	case 1:
-		if config, ok := commonConfigs[ctx.Args().First()]; ok {
-			for key, _ := range bellows.Flatten(config.Data) {
-				fmt.Printf(".%v\n", key)
-			}
 		}
 	}
 }

@@ -13,7 +13,7 @@ func Get() cli.Command {
 		Name:         "get",
 		Usage:        "get configuration by module_name",
 		Action:       get.action,
-		BashComplete: bash.ModuleNameAndConfigurationPath.Complete,
+		BashComplete: bash.Module.GetSetDelete,
 	}
 }
 

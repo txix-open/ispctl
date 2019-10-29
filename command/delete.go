@@ -14,7 +14,7 @@ func Delete() cli.Command {
 		Name:         "delete",
 		Usage:        "delete configuration by module_name",
 		Action:       deleteComm.action,
-		BashComplete: bash.ModuleNameAndConfigurationPath.Complete,
+		BashComplete: bash.Module.GetSetDelete,
 	}
 }
 

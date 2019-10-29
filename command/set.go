@@ -17,7 +17,7 @@ func Set() cli.Command {
 		Name:         "set",
 		Usage:        "set configuration by module_name",
 		Action:       set.action,
-		BashComplete: bash.ModuleNameAndConfigurationPath.Complete,
+		BashComplete: bash.Module.GetSetDelete,
 	}
 }
 

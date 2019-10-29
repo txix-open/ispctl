@@ -20,7 +20,7 @@ func Schema() cli.Command {
 		Flags: []cli.Flag{
 			flag.OutPrint,
 		},
-		BashComplete: bash.ModuleName.Complete,
+		BashComplete: bash.Module.Schema,
 	}
 }
 

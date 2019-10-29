@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
+	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
@@ -14,7 +15,7 @@ func Remove() cli.Command {
 		Name:         "remove",
 		Usage:        "remove common configurations",
 		Action:       remove.action,
-		BashComplete: remove.bashComplete,
+		BashComplete: bash.CommonConfig.Remove,
 	}
 }
 
@@ -51,21 +52,5 @@ func (g removeCommand) action(ctx *cli.Context) {
 		utils.PrintError(err)
 	} else {
 		fmt.Printf("count deleted config: %d\n", deleted)
-	}
-}
-
-func (g removeCommand) bashComplete(ctx *cli.Context) {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return
-	}
-	commonConfigs, err := service.Config.GetMapCommonConfigByName()
-	if err != nil {
-		return
-	}
-	switch ctx.NArg() {
-	case 0:
-		for _, config := range commonConfigs {
-			fmt.Println(config.Name)
-		}
 	}
 }

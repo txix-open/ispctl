@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
+	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
@@ -14,7 +15,7 @@ func Link() cli.Command {
 		Name:         "link",
 		Usage:        "link common configurations to module configuration",
 		Action:       link.action,
-		BashComplete: link.bashComplete,
+		BashComplete: bash.CommonConfig.LinkUnlink,
 	}
 }
 
@@ -87,29 +88,5 @@ func (g linkCommand) action(ctx *cli.Context) {
 			fmt.Printf("[%s] ", ccIdNameMap[name])
 		}
 		fmt.Printf("\n")
-	}
-}
-
-func (g linkCommand) bashComplete(ctx *cli.Context) {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return
-	}
-	commonConfigs, err := service.Config.GetMapCommonConfigByName()
-	if err != nil {
-		return
-	}
-	switch ctx.NArg() {
-	case 0:
-		for _, config := range commonConfigs {
-			fmt.Println(config.Name)
-		}
-	case 1:
-		if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
-			return
-		} else {
-			for _, module := range arrayOfModules {
-				fmt.Println(module.Name)
-			}
-		}
 	}
 }

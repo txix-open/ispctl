@@ -25,7 +25,8 @@ func initCommands() {
 	ispctl [flag...] get 		module_name  property_path
 	ispctl [flag...] set 		module_name  property_path  [new_object]
 	ispctl [flag...] delete 		module_name  property_path
-	ispctl [flag...] schema		module_name  [local_flag]`
+	ispctl [flag...] schema		module_name  [local_flag]
+	ispctl [flag...] common	`
 
 	app.Version = version
 	app.Flags = []cli.Flag{
@@ -44,8 +45,8 @@ func initCommands() {
 		command.CommonConfig(),
 	}
 	app.BashComplete = func(context *cli.Context) {
-		for _, command := range app.Commands {
-			fmt.Println(command.Name)
+		for _, appCommand := range app.Commands {
+			fmt.Println(appCommand.Name)
 		}
 	}
 
