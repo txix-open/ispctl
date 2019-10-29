@@ -11,28 +11,21 @@ import (
 	"isp-ctl/cfg"
 )
 
-var (
-	configClient = cfg.NewConfigClient()
-	Config       = &configService{}
-)
+var Config configService
 
 type configService struct {
 	UnsafeEnable bool
 }
 
-func (c *configService) ReceiveConfiguration(host, uuid string) error {
+func (c configService) ReceiveConfiguration(host, uuid string) error {
 	return configClient.ReceiveConfig(host, uuid)
 }
 
-func (c *configService) GetAvailableConfigs() ([]cfg.ModuleInfo, error) {
-	if moduleInfo, err := configClient.GetAvailableConfigs(); err != nil {
-		return nil, err
-	} else {
-		return moduleInfo, nil
-	}
+func (c configService) GetAvailableConfigs() ([]cfg.ModuleInfo, error) {
+	return configClient.GetAvailableConfigs()
 }
 
-func (c *configService) GetConfigurationAndJsonByModuleName(moduleName string) (*cfg.Config, []byte, error) {
+func (c configService) GetConfigurationAndJsonByModuleName(moduleName string) (*cfg.Config, []byte, error) {
 	if moduleName == "" {
 		return nil, nil, errors.New("need module name")
 	}
@@ -52,7 +45,7 @@ func (c *configService) GetConfigurationAndJsonByModuleName(moduleName string) (
 	}
 }
 
-func (c *configService) GetSchemaByModuleId(moduleId int32) (schema.Schema, error) {
+func (c configService) GetSchemaByModuleId(moduleId string) (schema.Schema, error) {
 	if configSchema, err := configClient.GetSchemaByModuleId(moduleId); err != nil {
 		return nil, err
 	} else {
@@ -61,7 +54,7 @@ func (c *configService) GetSchemaByModuleId(moduleId int32) (schema.Schema, erro
 	}
 }
 
-func (c *configService) CreateUpdateConfig(stringToChange string, configuration *cfg.Config) (map[string]interface{}, error) {
+func (c configService) CreateUpdateConfig(stringToChange string, configuration *cfg.Config) (map[string]interface{}, error) {
 	newData := make(map[string]interface{})
 	if stringToChange != "" {
 		if err := json.Unmarshal([]byte(stringToChange), &newData); err != nil {
@@ -83,7 +76,47 @@ func (c *configService) CreateUpdateConfig(stringToChange string, configuration 
 	}
 }
 
-func (c *configService) checkSchema(moduleId int32, object map[string]interface{}) (bool, error) {
+func (c configService) UpdateConfigAndGetLinkCommon(configuration cfg.Config) ([]string, error) {
+	if resp, err := configClient.CreateUpdateConfig(configuration); err != nil {
+		return nil, err
+	} else {
+		return resp.CommonConfigs, nil
+	}
+}
+
+func (c configService) GetMapCommonConfigByName() (map[string]cfg.CommonConfig, error) {
+	collection, err := configClient.GetCommonConfigs([]string{})
+	if err != nil {
+		return nil, err
+	}
+	response := make(map[string]cfg.CommonConfig)
+	for _, config := range collection {
+		response[config.Name] = config
+	}
+	return response, nil
+}
+
+func (c configService) CreateUpdateCommonConfig(stringToChange string, config cfg.CommonConfig) (map[string]interface{}, error) {
+	newData := make(map[string]interface{})
+	if stringToChange != "" {
+		if err := json.Unmarshal([]byte(stringToChange), &newData); err != nil {
+			return nil, err
+		}
+	}
+
+	config.Data = newData
+	if resp, err := configClient.CreateUpdateCommonConfig(config); err != nil {
+		return nil, err
+	} else {
+		return resp.Data, nil
+	}
+}
+
+func (c configService) DeleteCommonConfig(configId string) (int, error) {
+	return configClient.DeleteCommonConfig([]string{configId})
+}
+
+func (c configService) checkSchema(moduleId string, object map[string]interface{}) (bool, error) {
 	if c.UnsafeEnable {
 		return true, nil
 	}

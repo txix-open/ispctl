@@ -1,3 +1,5 @@
+## v1.3.0
+* add commands for common configs
 ## v1.2.4
 * migrate invoke to config service
 ## v1.2.3

@@ -4,6 +4,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
 	"isp-ctl/bash"
+	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
@@ -23,7 +24,7 @@ type deleteCommand struct{}
 
 func (d deleteCommand) action(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 	moduleName := ctx.Args().First()
@@ -31,24 +32,24 @@ func (d deleteCommand) action(ctx *cli.Context) {
 
 	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
 	if err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 
-	pathObject, err = checkPath(pathObject)
+	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 
 	if pathObject == "" {
-		createUpdateConfig("", moduleConfiguration)
+		utils.CreateUpdateConfig("", moduleConfiguration)
 	} else {
 		if stringToChange, err := sjson.Delete(string(jsonObject), pathObject); err != nil {
-			printError(err)
+			utils.PrintError(err)
 			return
 		} else {
-			createUpdateConfig(stringToChange, moduleConfiguration)
+			utils.CreateUpdateConfig(stringToChange, moduleConfiguration)
 		}
 	}
 }

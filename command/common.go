@@ -1,49 +1,44 @@
 package command
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
-	"isp-ctl/cfg"
-	"isp-ctl/service"
-	"strings"
+	"github.com/codegangsta/cli"
+	"isp-ctl/command/commonConfig"
 )
 
-func checkPath(pathObject string) (string, error) {
-	str := strings.Split(pathObject, ".")
-	pathObject = ""
-	if len(str) == 1 || str[0] != "" {
-		return pathObject, errors.New("path must start with '.'")
+func CommonConfig() cli.Command {
+	return cli.Command{
+		Name:         "common",
+		Usage:        "access to common configs commands",
+		Action:       cc.action,
+		BashComplete: cc.bachComplete,
+		Subcommands: []cli.Command{
+			commonConfig.Get(),
+			commonConfig.Set(),
+			commonConfig.Delete(),
+			commonConfig.Remove(),
+			commonConfig.Link(),
+			commonConfig.UnLink(),
+		},
 	}
-	for key, value := range str {
-		if key == 0 {
-			continue
+}
+
+var cc commonConfigCommand
+
+type commonConfigCommand struct{}
+
+func (g commonConfigCommand) action(ctx *cli.Context) {
+	if ctx.Args().First() == "" {
+		fmt.Print("need use command: ")
+		for _, comm := range CommonConfig().Subcommands {
+			fmt.Printf("[%s] ", comm.Name)
 		}
-		if key == 1 {
-			pathObject = fmt.Sprintf("%s", value)
-			continue
-		}
-		pathObject = fmt.Sprintf("%s.%s", pathObject, value)
-	}
-	return pathObject, nil
-}
-
-func createUpdateConfig(stringToChange string, configuration *cfg.Config) {
-	if answer, err := service.Config.CreateUpdateConfig(stringToChange, configuration); err != nil {
-		printError(err)
-	} else if answer != nil {
-		printAnswer(answer)
+		fmt.Printf("\n")
 	}
 }
 
-func printAnswer(data interface{}) {
-	if answer, err := json.MarshalIndent(data, "", "    "); err != nil {
-		printError(err)
-	} else {
-		service.ColorService.Print(answer)
+func (g commonConfigCommand) bachComplete(ctx *cli.Context) {
+	for _, command := range CommonConfig().Subcommands {
+		fmt.Println(command.Name)
 	}
-}
-
-func printError(err error) {
-	fmt.Println("ERROR:", err)
 }

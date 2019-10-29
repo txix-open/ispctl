@@ -1,11 +1,9 @@
 package command
 
 import (
-	"encoding/json"
 	"github.com/codegangsta/cli"
-	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
 	"isp-ctl/bash"
+	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
@@ -25,7 +23,7 @@ type getCommand struct{}
 
 func (g getCommand) action(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 	moduleName := ctx.Args().First()
@@ -33,33 +31,19 @@ func (g getCommand) action(ctx *cli.Context) {
 
 	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
 	if err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 
-	pathObject, err = checkPath(pathObject)
+	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 
 	if pathObject == "" {
-		printAnswer(moduleConfiguration.Data)
+		utils.PrintAnswer(moduleConfiguration.Data)
 	} else {
-		g.checkObject(jsonObject, pathObject)
-	}
-}
-
-func (g getCommand) checkObject(jsonObject []byte, depth string) {
-	jsonString := gjson.Get(string(jsonObject), depth)
-	if jsonString.Raw == "" {
-		printError(errors.Errorf("Path '%s' not found\n", depth))
-	} else {
-		var data interface{}
-		if err := json.Unmarshal([]byte(jsonString.Raw), &data); err != nil {
-			printError(err)
-		} else {
-			printAnswer(data)
-		}
+		utils.CheckObject(jsonObject, pathObject)
 	}
 }

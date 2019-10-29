@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"html/template"
 	"isp-ctl/bash"
+	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 	"isp-ctl/tmpl"
@@ -29,7 +30,7 @@ type schemaCommand struct{}
 
 func (s schemaCommand) action(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 	moduleName := ctx.Args().First()
@@ -40,11 +41,11 @@ func (s schemaCommand) action(ctx *cli.Context) {
 		schema["schema"] = schemaConfig
 		switch ctx.String(flag.OutPrint.Name) {
 		case flag.OutPrintJsonValue:
-			printAnswer(schema)
+			utils.PrintAnswer(schema)
 		case flag.OutPrintHtmlValue:
 			s.printHtml(schema)
 		default:
-			printError(errors.Errorf(
+			utils.PrintError(errors.Errorf(
 				"invalid flag value, expected %s or %s", flag.OutPrintJsonValue, flag.OutPrintHtmlValue))
 		}
 	}
@@ -52,10 +53,10 @@ func (s schemaCommand) action(ctx *cli.Context) {
 
 func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {
 	if configuration, _, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName); err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return nil
 	} else if schema, err := service.Config.GetSchemaByModuleId(configuration.ModuleId); err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return nil
 	} else {
 		return schema
@@ -64,11 +65,11 @@ func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {
 
 func (s schemaCommand) printHtml(schema map[string]interface{}) {
 	if temp, err := template.New("template").Parse(tmpl.HtmlFile); err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	} else {
 		if err := temp.ExecuteTemplate(os.Stdout, "template", schema); err != nil {
-			printError(err)
+			utils.PrintError(err)
 			return
 		}
 	}

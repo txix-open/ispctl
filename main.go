@@ -41,6 +41,7 @@ func initCommands() {
 		command.Set(),
 		command.Delete(),
 		command.Schema(),
+		command.CommonConfig(),
 	}
 	app.BashComplete = func(context *cli.Context) {
 		for _, command := range app.Commands {
