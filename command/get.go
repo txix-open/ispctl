@@ -14,7 +14,7 @@ func Get() cli.Command {
 		Name:         "get",
 		Usage:        "get configuration by module_name",
 		Action:       get.action,
-		BashComplete: bash.Module.ModuleName_ModuleData,
+		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 		Flags: []cli.Flag{
 			flag.WithCommonConfig,
 		},

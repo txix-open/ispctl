@@ -1,4 +1,4 @@
-package commonConfig
+package common_config
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func Remove() cli.Command {
 		Name:         "remove",
 		Usage:        "remove common configurations",
 		Action:       remove.action,
-		BashComplete: bash.CommonConfig.ConfigName,
+		BashComplete: bash.Get(bash.CommonConfigName, bash.Empty).Complete,
 	}
 }
 
@@ -29,22 +29,16 @@ func (g removeCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	ccName := ctx.Args().First()
+	configName := ctx.Args().First()
 
-	if ccName == "" {
+	if configName == "" {
 		utils.PrintError(errors.New("empty common config name"))
 		return
 	}
 
-	commonConfigs, err := service.Config.GetMapCommonConfigByName()
+	config, err := service.Config.GetCommonConfigByName(configName)
 	if err != nil {
 		utils.PrintError(err)
-		return
-	}
-
-	config, ok := commonConfigs[ccName]
-	if !ok {
-		utils.PrintError(errors.Errorf("common config [%s] not found", ccName))
 		return
 	}
 
@@ -53,8 +47,9 @@ func (g removeCommand) action(ctx *cli.Context) {
 		utils.PrintError(err)
 		return
 	}
+
 	if deleted {
-		fmt.Printf("config [%s] deleted", config.Name)
+		fmt.Printf("config [%s] deleted\n", config.Name)
 	} else {
 		fmt.Printf("config [%s] not deleted, need unlink in next modules:\n%v\n", config.Name, links)
 	}

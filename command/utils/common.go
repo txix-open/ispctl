@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
+	"io/ioutil"
 	"isp-ctl/service"
+	"os"
 	"strings"
 )
 
@@ -28,6 +30,21 @@ func CheckPath(pathObject string) (string, error) {
 	return pathObject, nil
 }
 
+func CheckChangeObject(changeObject string) (string, error) {
+	if changeObject == "" {
+		bytes, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			return "", err
+		}
+		changeObject = string(bytes)
+	}
+	if changeObject == "" {
+		return "", errors.New("expected argument")
+	} else {
+		return changeObject, nil
+	}
+}
+
 func PrintAnswer(data interface{}) {
 	if answer, err := json.MarshalIndent(data, "", "    "); err != nil {
 		PrintError(err)
@@ -38,6 +55,7 @@ func PrintAnswer(data interface{}) {
 
 func PrintError(err error) {
 	fmt.Println("ERROR:", err)
+	os.Exit(-1)
 }
 
 func ParseSetObject(argument string) interface{} {

@@ -82,7 +82,17 @@ func (c configService) UpdateConfigAndGetLinkCommon(configuration cfg.Config) ([
 	}
 }
 
-func (c configService) GetMapCommonConfigByName() (map[string]cfg.CommonConfig, error) {
+func (c configService) GetCommonConfigByName(configName string) (cfg.CommonConfig, error) {
+	if commonConfigs, err := c.GetMapNameCommonConfig(); err != nil {
+		return cfg.CommonConfig{}, err
+	} else if config, ok := commonConfigs[configName]; !ok {
+		return cfg.CommonConfig{}, errors.Errorf("common config [%s] not found", configName)
+	} else {
+		return config, nil
+	}
+}
+
+func (c configService) GetMapNameCommonConfig() (map[string]cfg.CommonConfig, error) {
 	collection, err := configClient.GetCommonConfigs([]string{})
 	if err != nil {
 		return nil, err
@@ -148,6 +158,94 @@ func (c configService) CompileDataWithCommonConfigs(
 	} else {
 		return data, nil
 	}
+}
+
+func (c configService) UnlinkCommonConfigFromModule(configName, moduleName string) error {
+	return c.linked(configName, moduleName,
+		func(configId string, configIdentities []string) (bool, []string) {
+			needUnlink := false
+			for i, id := range configIdentities {
+				if configId == id {
+					copy(configIdentities[i:], configIdentities[i+1:])
+					configIdentities[len(configIdentities)-1] = ""
+					configIdentities = configIdentities[:len(configIdentities)-1]
+					needUnlink = true
+					break
+				}
+			}
+			return needUnlink, configIdentities
+		})
+}
+
+func (c configService) LinkCommonConfigToModule(configName, moduleName string) error {
+	return c.linked(configName, moduleName,
+		func(configId string, configIdentities []string) (bool, []string) {
+			needLink := true
+			for _, id := range configIdentities {
+				if configId == id {
+					needLink = false
+					break
+				}
+			}
+			if needLink {
+				configIdentities = append(configIdentities, configId)
+			}
+			return needLink, configIdentities
+		})
+}
+
+func (c configService) linked(configName, moduleName string,
+	linkHandler func(configId string, configIdentities []string) (bool, []string)) error {
+
+	if configName == "" {
+		return errors.New("empty config name")
+	}
+
+	if moduleName == "" {
+		return errors.New("empty module name")
+	}
+
+	commonConfigs, err := c.GetMapNameCommonConfig()
+	if err != nil {
+		return err
+	}
+
+	config, ok := commonConfigs[configName]
+	if !ok {
+		return errors.Errorf("common config [%s] not found", configName)
+	}
+
+	moduleConfig, err := c.GetConfigurationByModuleName(moduleName)
+	if err != nil {
+		return err
+	}
+
+	configIdConfigNameMap := make(map[string]string)
+	for name, value := range commonConfigs {
+		configIdConfigNameMap[value.Id] = name
+	}
+
+	needUpdate, newCommonConfigs := linkHandler(config.Id, moduleConfig.CommonConfigs)
+
+	if needUpdate {
+		moduleConfig.CommonConfigs = newCommonConfigs
+		if linked, err := c.UpdateConfigAndGetLinkCommon(*moduleConfig); err != nil {
+			return err
+		} else {
+			fmt.Printf("module [%s] have next link:\n", moduleName)
+			for _, name := range linked {
+				fmt.Printf("[%s] ", configIdConfigNameMap[name])
+			}
+			fmt.Printf("\n")
+		}
+	} else {
+		fmt.Printf("module [%s] have next link:\n", moduleName)
+		for _, name := range moduleConfig.CommonConfigs {
+			fmt.Printf("[%s] ", configIdConfigNameMap[name])
+		}
+		fmt.Printf("\n")
+	}
+	return nil
 }
 
 func (c configService) checkSchema(moduleId string, object map[string]interface{}) (bool, error) {

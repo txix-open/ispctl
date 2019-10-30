@@ -15,7 +15,7 @@ func Delete() cli.Command {
 		Name:         "delete",
 		Usage:        "delete configuration by module_name",
 		Action:       deleteComm.action,
-		BashComplete: bash.Module.ModuleName_ModuleData,
+		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}
 }
 
@@ -54,7 +54,6 @@ func (d deleteCommand) action(ctx *cli.Context) {
 
 		if stringToChange, err := sjson.Delete(string(jsonObject), pathObject); err != nil {
 			utils.PrintError(err)
-			return
 		} else {
 			utils.CreateUpdateConfig(stringToChange, moduleConfiguration)
 		}

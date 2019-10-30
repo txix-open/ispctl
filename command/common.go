@@ -3,7 +3,7 @@ package command
 import (
 	"fmt"
 	"github.com/codegangsta/cli"
-	"isp-ctl/command/commonConfig"
+	"isp-ctl/command/common_config"
 )
 
 func CommonConfig() cli.Command {
@@ -13,13 +13,13 @@ func CommonConfig() cli.Command {
 		Action:       cc.action,
 		BashComplete: cc.bachComplete,
 		Subcommands: []cli.Command{
-			commonConfig.Get(),
-			commonConfig.Set(),
-			commonConfig.Delete(),
-			commonConfig.Remove(),
-			commonConfig.Link(),
-			commonConfig.UnLink(),
-			commonConfig.Contain(),
+			common_config.Get(),
+			common_config.Set(),
+			common_config.Delete(),
+			common_config.Remove(),
+			common_config.Link(),
+			common_config.UnLink(),
+			common_config.Contain(),
 		},
 	}
 }

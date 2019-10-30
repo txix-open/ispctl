@@ -1,4 +1,4 @@
-package commonConfig
+package common_config
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ func Delete() cli.Command {
 		Name:         "delete",
 		Usage:        "set common configurations",
 		Action:       deleteComm.action,
-		BashComplete: bash.CommonConfig.ConfigName_ConfigData,
+		BashComplete: bash.Get(bash.CommonConfigName, bash.CommonConfigData).Complete,
 	}
 }
 
@@ -30,10 +30,10 @@ func (g deleteCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	ccName := ctx.Args().First()
+	configName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
-	if ccName == "" {
+	if configName == "" {
 		utils.PrintError(errors.New("empty config name"))
 		return
 	}
@@ -44,15 +44,9 @@ func (g deleteCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	commonConfigs, err := service.Config.GetMapCommonConfigByName()
+	config, err := service.Config.GetCommonConfigByName(configName)
 	if err != nil {
 		utils.PrintError(err)
-		return
-	}
-
-	config, ok := commonConfigs[ccName]
-	if !ok {
-		utils.PrintError(errors.Errorf("common config [%s] not found", ccName))
 		return
 	}
 

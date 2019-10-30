@@ -1,4 +1,4 @@
-package commonConfig
+package common_config
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ func Get() cli.Command {
 		Name:         "get",
 		Usage:        "get common configurations",
 		Action:       get.action,
-		BashComplete: bash.CommonConfig.ConfigName_ConfigData,
+		BashComplete: bash.Get(bash.CommonConfigName, bash.CommonConfigData).Complete,
 	}
 }
 
@@ -30,18 +30,19 @@ func (g getCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	ccName := ctx.Args().First()
+	configName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
-	commonConfigs, err := service.Config.GetMapCommonConfigByName()
+	commonConfigs, err := service.Config.GetMapNameCommonConfig()
 	if err != nil {
 		utils.PrintError(err)
 		return
 	}
 
-	if ccName == "" {
+	if configName == "" {
+		fmt.Printf("available next common configs:\n")
 		for name := range commonConfigs {
-			fmt.Printf("%s ", name)
+			fmt.Printf("[%s] ", name)
 		}
 		fmt.Println()
 		return
@@ -53,9 +54,9 @@ func (g getCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	config, ok := commonConfigs[ccName]
+	config, ok := commonConfigs[configName]
 	if !ok {
-		utils.PrintError(errors.Errorf("common config [%s] not found", ccName))
+		utils.PrintError(errors.Errorf("common config [%s] not found", configName))
 		return
 	}
 

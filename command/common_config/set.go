@@ -1,17 +1,15 @@
-package commonConfig
+package common_config
 
 import (
 	"encoding/json"
 	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
-	"io/ioutil"
 	"isp-ctl/bash"
 	"isp-ctl/cfg"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
-	"os"
 )
 
 func Set() cli.Command {
@@ -19,7 +17,7 @@ func Set() cli.Command {
 		Name:         "set",
 		Usage:        "set common configurations",
 		Action:       set.action,
-		BashComplete: bash.CommonConfig.ConfigName_ConfigData,
+		BashComplete: bash.Get(bash.CommonConfigName, bash.CommonConfigData).Complete,
 	}
 }
 
@@ -33,25 +31,25 @@ func (g setCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	ccName := ctx.Args().First()
+	configName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 	changeObject := ctx.Args().Get(2)
 
-	if ccName == "" {
+	if configName == "" {
 		utils.PrintError(errors.New("empty config name"))
 		return
 	}
 
-	mapConfigByName, err := service.Config.GetMapCommonConfigByName()
+	mapConfigByName, err := service.Config.GetMapNameCommonConfig()
 	if err != nil {
 		utils.PrintError(err)
 		return
 	}
 
-	config, ok := mapConfigByName[ccName]
+	config, ok := mapConfigByName[configName]
 	if !ok {
 		config = cfg.CommonConfig{
-			Name: ccName,
+			Name: configName,
 		}
 	}
 
@@ -61,36 +59,25 @@ func (g setCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	if changeObject == "" {
-		bytes, err := ioutil.ReadAll(os.Stdin)
-		if err != nil {
-			utils.PrintError(err)
-			return
-		}
-		changeObject = string(bytes)
-	}
-	if changeObject == "" {
-		utils.PrintError(errors.New("expected argument"))
+	changeObject, err = utils.CheckChangeObject(changeObject)
+	if err != nil {
+		utils.PrintError(err)
 		return
 	}
 
 	if pathObject == "" {
 		utils.CreateUpdateCommonConfig(changeObject, config)
-		return
 	} else {
 		jsonObject, err := json.Marshal(config.Data)
 		if err != nil {
 			utils.PrintError(err)
 			return
 		}
-
 		changeArgument := utils.ParseSetObject(changeObject)
 		if stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument); err != nil {
 			utils.PrintError(err)
-			return
 		} else {
 			utils.CreateUpdateCommonConfig(stringToChange, config)
-			return
 		}
 	}
 }

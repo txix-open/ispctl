@@ -1,7 +1,28 @@
 # ispctl
 
-## Описание
 Консольная утилита для получения и переопределения конфигруации модулей isp
+
+* [Требования](#Требования)
+* [Установка](#Установка)
+* [Конифгурация](#Конифгурация)
+* [Использование](#Использование)
+* [Описание](#Описание)
+* [Примеры](#Пример)
+    - [ispctl status](#ispctl-status)
+    - [ispctl get](#ispctl-get)
+    - [ispctl set](#ispctl-set)
+    - [ispctl delete](#ispctl-delete)
+    - [ispctl schema](#ispctl-schema)
+    - [ispctl common](#ispctl-common)
+        * [set](#ispctl-common-set)
+        * [get](#ispctl-common-get)
+        * [delete](#ispctl-common-delete)
+        * [remove](#ispctl-common-remove)
+        * [link](#ispctl-common-link)
+        * [unlink](#ispctl-common-unlink)
+        * [contain](#ispctl-common-contain)
+    - [запрос с флагами](#Запрос-с-флагами)
+
 
 ## Требования
 * Linux
@@ -344,7 +365,7 @@ ispctl schema example -o html
 ```
 
 ### ispctl common
-#### get
+#### ispctl common get
 Возвращает список названий общих конфигураций или, если в первом аргументе указано название общей конфигурации, возвращает объект общей конфигурации по указанному пути
 
 Запрос
@@ -365,7 +386,7 @@ ispctl common get test .
     "test": null
 }
 ```
-#### set
+#### ispctl common set
 Добавляет объект в общую конфигурацию по указанному пути
 
 Запрос
@@ -381,7 +402,7 @@ ispctl common set test .test '{"a":"a","b":"b"}'
     }
 }
 ```
-#### delete
+#### ispctl common delete
 Удаляет объект из общей конфигурации по указанному пути
 
 Запрос
@@ -396,7 +417,7 @@ ispctl common delete test .test.a
     }
 }
 ```
-#### link
+#### ispctl common link
 Связывает 'common_config' к конфигурации модуля по 'module_name'. Возвращает список общих конфигураций, которые связаны с модулем
 
 Запрос
@@ -407,7 +428,7 @@ ispctl common link test module_example
 ```bash
 [test] [second_common_config]
 ```
-#### remove
+#### ispctl common remove
 Удаляет объект общий конфигурации, если он не связан с конфигурациями модулей. Если общая конфигурация имеет связи, выводит список модулей с которыми установлена связь
 
 Запрос
@@ -419,7 +440,7 @@ ispctl common remove test
 config [test] not deleted, need unlink in next modules:
 [module_example]
 ```
-#### unlink
+#### ispctl common unlink
 Отвязывает 'common_config' от конфигурации модуля по 'module_name'. Возвращает список общих конфигураций, которые связаны с модулем
 
 Запрос
@@ -431,7 +452,7 @@ ispctl common unlink test module_example
 ```bash
 [second_common_config]
 ```
-#### contain
+#### ispctl common contain
 Возвращает список названий модулей, с которыми имеет связь общая конфигурация
 
 Запрос

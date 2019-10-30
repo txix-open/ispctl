@@ -3,14 +3,11 @@ package command
 import (
 	"encoding/json"
 	"github.com/codegangsta/cli"
-	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
-	"io/ioutil"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
-	"os"
 )
 
 func Set() cli.Command {
@@ -18,7 +15,7 @@ func Set() cli.Command {
 		Name:         "set",
 		Usage:        "set configuration by module_name",
 		Action:       set.action,
-		BashComplete: bash.Module.ModuleName_ModuleData,
+		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}
 }
 
@@ -36,7 +33,7 @@ func (s setCommand) action(ctx *cli.Context) {
 	pathObject := ctx.Args().Get(1)
 	changeObject := ctx.Args().Get(2)
 
-	moduleConfiguration, err := service.Config.GetConfigurationByModuleName(moduleName)
+	config, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		utils.PrintError(err)
 		return
@@ -48,24 +45,16 @@ func (s setCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	if changeObject == "" {
-		bytes, err := ioutil.ReadAll(os.Stdin)
-		if err != nil {
-			utils.PrintError(err)
-			return
-		}
-		changeObject = string(bytes)
-	}
-	if changeObject == "" {
-		utils.PrintError(errors.New("expected argument"))
+	changeObject, err = utils.CheckChangeObject(changeObject)
+	if err != nil {
+		utils.PrintError(err)
 		return
 	}
 
 	if pathObject == "" {
-		utils.CreateUpdateConfig(changeObject, moduleConfiguration)
-		return
+		utils.CreateUpdateConfig(changeObject, config)
 	} else {
-		jsonObject, err := json.Marshal(moduleConfiguration.Data)
+		jsonObject, err := json.Marshal(config.Data)
 		if err != nil {
 			utils.PrintError(err)
 			return
@@ -74,10 +63,8 @@ func (s setCommand) action(ctx *cli.Context) {
 		changeArgument := utils.ParseSetObject(changeObject)
 		if stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument); err != nil {
 			utils.PrintError(err)
-			return
 		} else {
-			utils.CreateUpdateConfig(stringToChange, moduleConfiguration)
-			return
+			utils.CreateUpdateConfig(stringToChange, config)
 		}
 	}
 }
