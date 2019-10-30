@@ -10,20 +10,20 @@ import (
 	"isp-ctl/service"
 )
 
-func Remove() cli.Command {
+func Contain() cli.Command {
 	return cli.Command{
-		Name:         "remove",
-		Usage:        "remove common configurations",
-		Action:       remove.action,
+		Name:         "contain",
+		Usage:        "availability common configuration in module",
+		Action:       contain.action,
 		BashComplete: bash.CommonConfig.ConfigName,
 	}
 }
 
-var remove removeCommand
+var contain containCommand
 
-type removeCommand struct{}
+type containCommand struct{}
 
-func (g removeCommand) action(ctx *cli.Context) {
+func (g containCommand) action(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		utils.PrintError(err)
 		return
@@ -48,14 +48,10 @@ func (g removeCommand) action(ctx *cli.Context) {
 		return
 	}
 
-	links, deleted, err := service.Config.DeleteCommonConfig(config.Id)
+	links, err := service.Config.GetLinksCommonConfig(config.Id)
 	if err != nil {
 		utils.PrintError(err)
-		return
-	}
-	if deleted {
-		fmt.Printf("config [%s] deleted", config.Name)
 	} else {
-		fmt.Printf("config [%s] not deleted, need unlink in next modules:\n%v\n", config.Name, links)
+		fmt.Printf("%v\n", links)
 	}
 }

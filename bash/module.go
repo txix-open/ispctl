@@ -12,7 +12,7 @@ var Module module
 
 type module struct{}
 
-func (module) GetSetDelete(ctx *cli.Context) {
+func (module) ModuleName_ModuleData(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		return
 	}
@@ -26,7 +26,8 @@ func (module) GetSetDelete(ctx *cli.Context) {
 			}
 		}
 	case 1:
-		if moduleConfiguration, _, err := service.Config.GetConfigurationAndJsonByModuleName(ctx.Args().Get(1)); err != nil {
+		moduleConfiguration, err := service.Config.GetConfigurationByModuleName(ctx.Args().Get(1))
+		if err != nil {
 			return
 		} else {
 			for key, _ := range bellows.Flatten(moduleConfiguration.Data) {
@@ -36,7 +37,7 @@ func (module) GetSetDelete(ctx *cli.Context) {
 	}
 }
 
-func (module) Schema(ctx *cli.Context) {
+func (module) ModuleName(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		return
 	}

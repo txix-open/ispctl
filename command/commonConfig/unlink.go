@@ -15,7 +15,7 @@ func UnLink() cli.Command {
 		Name:         "unlink",
 		Usage:        "unlink common configurations from module configuration",
 		Action:       unlink.action,
-		BashComplete: bash.CommonConfig.LinkUnlink,
+		BashComplete: bash.CommonConfig.ConfigName_ModuleName,
 	}
 }
 
@@ -50,11 +50,11 @@ func (g unlinkCommand) action(ctx *cli.Context) {
 
 	config, ok := commonConfigs[configName]
 	if !ok {
-		utils.PrintError(errors.Errorf("common config %s not found", configName))
+		utils.PrintError(errors.Errorf("common config [%s] not found", configName))
 		return
 	}
 
-	moduleConfig, _, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	moduleConfig, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		utils.PrintError(err)
 		return

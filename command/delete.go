@@ -1,6 +1,7 @@
 package command
 
 import (
+	"encoding/json"
 	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
 	"isp-ctl/bash"
@@ -14,7 +15,7 @@ func Delete() cli.Command {
 		Name:         "delete",
 		Usage:        "delete configuration by module_name",
 		Action:       deleteComm.action,
-		BashComplete: bash.Module.GetSetDelete,
+		BashComplete: bash.Module.ModuleName_ModuleData,
 	}
 }
 
@@ -30,7 +31,7 @@ func (d deleteCommand) action(ctx *cli.Context) {
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
-	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	moduleConfiguration, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		utils.PrintError(err)
 		return
@@ -45,6 +46,12 @@ func (d deleteCommand) action(ctx *cli.Context) {
 	if pathObject == "" {
 		utils.CreateUpdateConfig("", moduleConfiguration)
 	} else {
+		jsonObject, err := json.Marshal(moduleConfiguration.Data)
+		if err != nil {
+			utils.PrintError(err)
+			return
+		}
+
 		if stringToChange, err := sjson.Delete(string(jsonObject), pathObject); err != nil {
 			utils.PrintError(err)
 			return

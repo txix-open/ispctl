@@ -12,7 +12,7 @@ var CommonConfig commonConfig
 
 type commonConfig struct{}
 
-func (commonConfig) LinkUnlink(ctx *cli.Context) {
+func (commonConfig) ConfigName_ModuleName(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		return
 	}
@@ -36,7 +36,7 @@ func (commonConfig) LinkUnlink(ctx *cli.Context) {
 	}
 }
 
-func (commonConfig) GetSetDelete(ctx *cli.Context) {
+func (commonConfig) ConfigName_ConfigData(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		return
 	}
@@ -58,7 +58,7 @@ func (commonConfig) GetSetDelete(ctx *cli.Context) {
 	}
 }
 
-func (commonConfig) Remove(ctx *cli.Context) {
+func (commonConfig) ConfigName(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		return
 	}

@@ -20,7 +20,7 @@ func Schema() cli.Command {
 		Flags: []cli.Flag{
 			flag.OutPrint,
 		},
-		BashComplete: bash.Module.Schema,
+		BashComplete: bash.Module.ModuleName,
 	}
 }
 
@@ -46,13 +46,13 @@ func (s schemaCommand) action(ctx *cli.Context) {
 			s.printHtml(schema)
 		default:
 			utils.PrintError(errors.Errorf(
-				"invalid flag value, expected %s or %s", flag.OutPrintJsonValue, flag.OutPrintHtmlValue))
+				"invalid flag value, expected [%s] or [%s]", flag.OutPrintJsonValue, flag.OutPrintHtmlValue))
 		}
 	}
 }
 
 func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {
-	if configuration, _, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName); err != nil {
+	if configuration, err := service.Config.GetConfigurationByModuleName(moduleName); err != nil {
 		utils.PrintError(err)
 		return nil
 	} else if schema, err := service.Config.GetSchemaByModuleId(configuration.ModuleId); err != nil {

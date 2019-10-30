@@ -19,6 +19,7 @@ func CommonConfig() cli.Command {
 			commonConfig.Remove(),
 			commonConfig.Link(),
 			commonConfig.UnLink(),
+			commonConfig.Contain(),
 		},
 	}
 }

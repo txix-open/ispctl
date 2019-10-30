@@ -104,13 +104,35 @@ func (c *configClient) CreateUpdateCommonConfig(req CommonConfig) (*CommonConfig
 	}
 }
 
-func (c *configClient) DeleteCommonConfig(req []string) (int, error) {
-	response := new(deleted)
-	err := c.cli.Invoke(deleteCommonConfig, callerId, req, response, backend.WithMetadata(c.headers))
+func (c *configClient) DeleteCommonConfig(id string) (*Deleted, error) {
+	request := identityRequest{Id: id}
+	response := new(Deleted)
+	err := c.cli.Invoke(deleteCommonConfig, callerId, request, response, backend.WithMetadata(c.headers))
 	if err != nil {
-		return 0, c.errorHandler(err)
+		return nil, c.errorHandler(err)
 	} else {
-		return response.Deleted, nil
+		return response, nil
+	}
+}
+
+func (c *configClient) GetLinksCommonConfig(id string) (*Links, error) {
+	request := identityRequest{Id: id}
+	response := new(Links)
+	err := c.cli.Invoke(getLinksCommonConfig, callerId, request, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
+	}
+}
+
+func (c *configClient) CompileCommonConfigs(request CompileConfigs) (map[string]interface{}, error) {
+	response := make(map[string]interface{})
+	err := c.cli.Invoke(compileCommonConfigs, callerId, request, &response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
 	}
 }
 

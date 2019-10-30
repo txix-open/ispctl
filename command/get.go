@@ -1,6 +1,7 @@
 package command
 
 import (
+	"encoding/json"
 	"github.com/codegangsta/cli"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
@@ -13,7 +14,10 @@ func Get() cli.Command {
 		Name:         "get",
 		Usage:        "get configuration by module_name",
 		Action:       get.action,
-		BashComplete: bash.Module.GetSetDelete,
+		BashComplete: bash.Module.ModuleName_ModuleData,
+		Flags: []cli.Flag{
+			flag.WithCommonConfig,
+		},
 	}
 }
 
@@ -29,10 +33,18 @@ func (g getCommand) action(ctx *cli.Context) {
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
-	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	config, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		utils.PrintError(err)
 		return
+	}
+
+	data := config.Data
+	if ctx.Bool(flag.WithCommonConfig.Name) {
+		if data, err = service.Config.CompileDataWithCommonConfigs(data, config.CommonConfigs); err != nil {
+			utils.PrintError(err)
+			return
+		}
 	}
 
 	pathObject, err = utils.CheckPath(pathObject)
@@ -42,8 +54,13 @@ func (g getCommand) action(ctx *cli.Context) {
 	}
 
 	if pathObject == "" {
-		utils.PrintAnswer(moduleConfiguration.Data)
+		utils.PrintAnswer(data)
 	} else {
+		jsonObject, err := json.Marshal(data)
+		if err != nil {
+			utils.PrintError(err)
+			return
+		}
 		utils.CheckObject(jsonObject, pathObject)
 	}
 }

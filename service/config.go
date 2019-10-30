@@ -25,23 +25,21 @@ func (c configService) GetAvailableConfigs() ([]cfg.ModuleInfo, error) {
 	return configClient.GetAvailableConfigs()
 }
 
-func (c configService) GetConfigurationAndJsonByModuleName(moduleName string) (*cfg.Config, []byte, error) {
+func (c configService) GetConfigurationByModuleName(moduleName string) (*cfg.Config, error) {
 	if moduleName == "" {
-		return nil, nil, errors.New("need module name")
+		return nil, errors.New("need module name")
 	}
 
 	if moduleConfiguration, err := configClient.GetConfigByModuleName(moduleName); err != nil {
 		if errorStatus, ok := status.FromError(err); ok {
 			switch errorStatus.Code() {
 			case codes.NotFound:
-				return nil, nil, errors.Errorf("module '%s' not found", moduleName)
+				return nil, errors.Errorf("module [%s] not found", moduleName)
 			}
 		}
-		return nil, nil, err
-	} else if jsonObject, err := json.Marshal(moduleConfiguration.Data); err != nil {
-		return nil, nil, err
+		return nil, err
 	} else {
-		return moduleConfiguration, jsonObject, nil
+		return moduleConfiguration, nil
 	}
 }
 
@@ -112,8 +110,44 @@ func (c configService) CreateUpdateCommonConfig(stringToChange string, config cf
 	}
 }
 
-func (c configService) DeleteCommonConfig(configId string) (int, error) {
-	return configClient.DeleteCommonConfig([]string{configId})
+func (c configService) DeleteCommonConfig(configId string) ([]string, bool, error) {
+	deletedInfo, err := configClient.DeleteCommonConfig(configId)
+	if err != nil {
+		return nil, false, err
+	}
+	arrayOfModuleName := make([]string, 0)
+	for moduleName := range deletedInfo.Links {
+		arrayOfModuleName = append(arrayOfModuleName, moduleName)
+	}
+	return arrayOfModuleName, deletedInfo.Deleted, nil
+}
+
+func (c configService) GetLinksCommonConfig(configId string) ([]string, error) {
+	link, err := configClient.GetLinksCommonConfig(configId)
+	if err != nil {
+		return nil, err
+	}
+	arrayOfModuleName := make([]string, 0)
+	for moduleName := range *link {
+		arrayOfModuleName = append(arrayOfModuleName, moduleName)
+	}
+	return arrayOfModuleName, nil
+}
+
+func (c configService) CompileDataWithCommonConfigs(
+	data map[string]interface{}, commonConfigs []string) (map[string]interface{}, error) {
+
+	req := cfg.CompileConfigs{
+		Data:                data,
+		CommonConfigsIdList: commonConfigs,
+	}
+	var err error
+	data, err = configClient.CompileCommonConfigs(req)
+	if err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
 }
 
 func (c configService) checkSchema(moduleId string, object map[string]interface{}) (bool, error) {

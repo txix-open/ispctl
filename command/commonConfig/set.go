@@ -19,7 +19,7 @@ func Set() cli.Command {
 		Name:         "set",
 		Usage:        "set common configurations",
 		Action:       set.action,
-		BashComplete: bash.CommonConfig.GetSetDelete,
+		BashComplete: bash.CommonConfig.ConfigName_ConfigData,
 	}
 }
 

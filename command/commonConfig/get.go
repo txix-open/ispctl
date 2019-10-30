@@ -16,7 +16,7 @@ func Get() cli.Command {
 		Name:         "get",
 		Usage:        "get common configurations",
 		Action:       get.action,
-		BashComplete: bash.CommonConfig.GetSetDelete,
+		BashComplete: bash.CommonConfig.ConfigName_ConfigData,
 	}
 }
 
@@ -55,7 +55,7 @@ func (g getCommand) action(ctx *cli.Context) {
 
 	config, ok := commonConfigs[ccName]
 	if !ok {
-		utils.PrintError(errors.Errorf("common config %s not found", ccName))
+		utils.PrintError(errors.Errorf("common config [%s] not found", ccName))
 		return
 	}
 

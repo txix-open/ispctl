@@ -16,7 +16,7 @@ func Delete() cli.Command {
 		Name:         "delete",
 		Usage:        "set common configurations",
 		Action:       deleteComm.action,
-		BashComplete: bash.CommonConfig.GetSetDelete,
+		BashComplete: bash.CommonConfig.ConfigName_ConfigData,
 	}
 }
 
@@ -52,7 +52,7 @@ func (g deleteCommand) action(ctx *cli.Context) {
 
 	config, ok := commonConfigs[ccName]
 	if !ok {
-		utils.PrintError(errors.Errorf("common config %s not found", ccName))
+		utils.PrintError(errors.Errorf("common config [%s] not found", ccName))
 		return
 	}
 

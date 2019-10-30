@@ -15,7 +15,7 @@ func Link() cli.Command {
 		Name:         "link",
 		Usage:        "link common configurations to module configuration",
 		Action:       link.action,
-		BashComplete: bash.CommonConfig.LinkUnlink,
+		BashComplete: bash.CommonConfig.ConfigName_ModuleName,
 	}
 }
 
@@ -50,11 +50,11 @@ func (g linkCommand) action(ctx *cli.Context) {
 
 	config, ok := commonConfigs[configName]
 	if !ok {
-		utils.PrintError(errors.Errorf("common config %s not found", configName))
+		utils.PrintError(errors.Errorf("common config [%s] not found", configName))
 		return
 	}
 
-	moduleConfiguration, _, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	moduleConfiguration, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		utils.PrintError(err)
 		return

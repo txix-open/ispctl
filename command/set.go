@@ -1,6 +1,7 @@
 package command
 
 import (
+	"encoding/json"
 	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
@@ -17,7 +18,7 @@ func Set() cli.Command {
 		Name:         "set",
 		Usage:        "set configuration by module_name",
 		Action:       set.action,
-		BashComplete: bash.Module.GetSetDelete,
+		BashComplete: bash.Module.ModuleName_ModuleData,
 	}
 }
 
@@ -35,7 +36,7 @@ func (s setCommand) action(ctx *cli.Context) {
 	pathObject := ctx.Args().Get(1)
 	changeObject := ctx.Args().Get(2)
 
-	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	moduleConfiguration, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		utils.PrintError(err)
 		return
@@ -64,6 +65,12 @@ func (s setCommand) action(ctx *cli.Context) {
 		utils.CreateUpdateConfig(changeObject, moduleConfiguration)
 		return
 	} else {
+		jsonObject, err := json.Marshal(moduleConfiguration.Data)
+		if err != nil {
+			utils.PrintError(err)
+			return
+		}
+
 		changeArgument := utils.ParseSetObject(changeObject)
 		if stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument); err != nil {
 			utils.PrintError(err)

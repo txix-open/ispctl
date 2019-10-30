@@ -8,4 +8,6 @@ const (
 	getCommonConfigs         = "config/common_config/get_configs"
 	createUpdateCommonConfig = "config/common_config/create_update_config"
 	deleteCommonConfig       = "config/common_config/delete_config"
+	getLinksCommonConfig     = "config/common_config/get_links"
+	compileCommonConfigs     = "config/common_config/compile"
 )

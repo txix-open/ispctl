@@ -18,6 +18,9 @@ const (
 	outPrintName      = "o"
 	OutPrintJsonValue = "json"
 	OutPrintHtmlValue = "html"
+
+	withCommonConfigName  = "full"
+	withCommonConfigUsage = "compile data with common configs"
 )
 
 var (
