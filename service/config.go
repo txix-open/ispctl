@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/integration-system/isp-lib/config/schema"
 	"github.com/pkg/errors"
-	"github.com/xeipuuv/gojsonschema"
+	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"isp-ctl/cfg"
@@ -60,14 +60,25 @@ func (c configService) CreateUpdateConfig(stringToChange string, configuration *
 		}
 	}
 
-	if ok, err := c.checkSchema(configuration.ModuleId, newData); err != nil {
-		return nil, err
-	} else if !ok {
-		return nil, nil
-	}
-
+	configuration.Unsafe = c.UnsafeEnable
 	configuration.Data = newData
 	if resp, err := configClient.CreateUpdateConfig(*configuration); err != nil {
+		if errorStatus, ok := status.FromError(err); ok {
+			switch errorStatus.Code() {
+			case codes.InvalidArgument:
+				fmt.Print("doesn't match with schema:\n")
+				for _, value := range errorStatus.Details() {
+					if a, ok := value.(*epb.BadRequest); ok {
+						for _, value := range a.FieldViolations {
+							fmt.Printf("%s | %s\n", value.Field, value.Description)
+						}
+					} else {
+						fmt.Println(value)
+					}
+					return nil, nil
+				}
+			}
+		}
 		return nil, err
 	} else {
 		return resp.Data, nil
@@ -246,28 +257,4 @@ func (c configService) linked(configName, moduleName string,
 		fmt.Printf("\n")
 	}
 	return nil
-}
-
-func (c configService) checkSchema(moduleId string, object map[string]interface{}) (bool, error) {
-	if c.UnsafeEnable {
-		return true, nil
-	}
-
-	if resp, err := configClient.GetSchemaByModuleId(moduleId); err != nil {
-		return false, err
-	} else {
-		schemaLoader := gojsonschema.NewGoLoader(resp.Schema)
-		documentLoader := gojsonschema.NewGoLoader(object)
-
-		if result, err := gojsonschema.Validate(schemaLoader, documentLoader); err != nil {
-			return false, err
-		} else if result.Valid() {
-			return true, nil
-		} else {
-			for _, desc := range result.Errors() {
-				fmt.Printf("- %s\n", desc)
-			}
-			return false, nil
-		}
-	}
 }

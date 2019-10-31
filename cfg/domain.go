@@ -26,6 +26,7 @@ type Config struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 	Data          map[string]interface{}
+	Unsafe        bool
 }
 
 type CommonConfig struct {
