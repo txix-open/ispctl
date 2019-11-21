@@ -1,5 +1,5 @@
-## v1.3.0
-* add commands for common configs
+## v2.0.0
+* add integration with isp-config-service 2.0
 ## v1.2.4
 * migrate invoke to config service
 ## v1.2.3
