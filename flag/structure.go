@@ -13,7 +13,8 @@ var (
 	Color  = cli.BoolFlag{Name: colorName, Usage: colorUsage}
 	Unsafe = cli.BoolFlag{Name: unsafeName, Usage: unsafeUsage}
 	//---local---
-	OutPrint = cli.StringFlag{Name: outPrintName, Usage: outPrintUsage, Value: OutPrintJsonValue}
+	OutPrint         = cli.StringFlag{Name: outPrintName, Usage: outPrintUsage, Value: OutPrintJsonValue}
+	WithCommonConfig = cli.BoolFlag{Name: withCommonConfigName, Usage: withCommonConfigUsage}
 )
 
 func CheckGlobal(c *cli.Context) error {

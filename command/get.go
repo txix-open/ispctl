@@ -3,9 +3,8 @@ package command
 import (
 	"encoding/json"
 	"github.com/codegangsta/cli"
-	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
 	"isp-ctl/bash"
+	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
@@ -15,7 +14,10 @@ func Get() cli.Command {
 		Name:         "get",
 		Usage:        "get configuration by module_name",
 		Action:       get.action,
-		BashComplete: bash.ModuleNameAndConfigurationPath.Complete,
+		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
+		Flags: []cli.Flag{
+			flag.WithCommonConfig,
+		},
 	}
 }
 
@@ -25,41 +27,40 @@ type getCommand struct{}
 
 func (g getCommand) action(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
-	moduleConfiguration, jsonObject, err := service.Config.GetConfigurationAndJsonByModuleName(moduleName)
+	config, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 
-	pathObject, err = checkPath(pathObject)
+	data := config.Data
+	if ctx.Bool(flag.WithCommonConfig.Name) {
+		if data, err = service.Config.CompileDataWithCommonConfigs(data, config.CommonConfigs); err != nil {
+			utils.PrintError(err)
+			return
+		}
+	}
+
+	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		printError(err)
+		utils.PrintError(err)
 		return
 	}
 
 	if pathObject == "" {
-		printAnswer(moduleConfiguration.Data)
+		utils.PrintAnswer(data)
 	} else {
-		g.checkObject(jsonObject, pathObject)
-	}
-}
-
-func (g getCommand) checkObject(jsonObject []byte, depth string) {
-	jsonString := gjson.Get(string(jsonObject), depth)
-	if jsonString.Raw == "" {
-		printError(errors.Errorf("Path '%s' not found\n", depth))
-	} else {
-		var data interface{}
-		if err := json.Unmarshal([]byte(jsonString.Raw), &data); err != nil {
-			printError(err)
-		} else {
-			printAnswer(data)
+		jsonObject, err := json.Marshal(data)
+		if err != nil {
+			utils.PrintError(err)
+			return
 		}
+		utils.CheckObject(jsonObject, pathObject)
 	}
 }

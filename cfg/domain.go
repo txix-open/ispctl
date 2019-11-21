@@ -7,21 +7,32 @@ import (
 )
 
 type getModuleByUuidAndNameRequest struct {
-	Name string
-	Uuid string
+	ModuleName string
+	Uuid       string
 }
 
 type getSchemaByModuleIdRequest struct {
-	ModuleId int32
+	ModuleId string
 }
 
 type Config struct {
-	Id          int64
+	Id            string
+	Name          string
+	CommonConfigs []string
+	Description   string
+	ModuleId      string
+	Version       int32
+	Active        bool
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Data          map[string]interface{}
+	Unsafe        bool
+}
+
+type CommonConfig struct {
+	Id          string
 	Name        string
 	Description string
-	ModuleId    int32
-	Version     int32
-	Active      bool
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Data        map[string]interface{}
@@ -36,7 +47,7 @@ type Connection struct {
 }
 
 type ModuleInfo struct {
-	Id                 int32
+	Id                 string
 	Name               string
 	Active             bool
 	CreatedAt          time.Time
@@ -48,10 +59,26 @@ type ModuleInfo struct {
 }
 
 type ConfigSchema struct {
-	Id        int32
+	Id        string
 	Version   string
-	ModuleId  int32
+	ModuleId  string
 	Schema    schema.Schema
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type Deleted struct {
+	Deleted bool
+	Links   Links
+}
+
+type Links map[string][]string
+
+type identityRequest struct {
+	Id string
+}
+
+type CompileConfigs struct {
+	Data                map[string]interface{}
+	CommonConfigsIdList []string
 }

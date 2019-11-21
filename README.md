@@ -1,7 +1,28 @@
 # ispctl
 
-## Описание
 Консольная утилита для получения и переопределения конфигруации модулей isp
+
+* [Требования](#Требования)
+* [Установка](#Установка)
+* [Конифгурация](#Конифгурация)
+* [Использование](#Использование)
+* [Описание](#Описание)
+* [Примеры](#Пример)
+    - [ispctl status](#ispctl-status)
+    - [ispctl get](#ispctl-get)
+    - [ispctl set](#ispctl-set)
+    - [ispctl delete](#ispctl-delete)
+    - [ispctl schema](#ispctl-schema)
+    - [ispctl common](#ispctl-common)
+        * [set](#ispctl-common-set)
+        * [get](#ispctl-common-get)
+        * [delete](#ispctl-common-delete)
+        * [remove](#ispctl-common-remove)
+        * [link](#ispctl-common-link)
+        * [unlink](#ispctl-common-unlink)
+        * [contain](#ispctl-common-contain)
+    - [запрос с флагами](#Запрос-с-флагами)
+
 
 ## Требования
 * Linux
@@ -25,11 +46,13 @@ instanceUuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ## Использование
 ```bash
 ispctl [flag...]  status
-ispctl [flag...]  get      module_name  property_path
+ispctl [flag...]  get      module_name  property_path  [local_flag]
 ispctl [flag...]  set      module_name  property_path  [new_object]
 ispctl [flag...]  delete   module_name  property_path
 ispctl [flag...]  schema   module_name  [local_flag]
+ispctl [flag...]  common   sub_command
 ```
+
 ## Описание
 
 | Команды     | Описание                                                                                    |
@@ -39,6 +62,7 @@ ispctl [flag...]  schema   module_name  [local_flag]
 | `set`       | изменяет объект конфигурации указанного модуля                                              |
 | `delete`    | удаляет объект конфигурации указанного модуля                                               |
 | `schema`    | возвращает схему конфигурации указанного модуля                                             |
+| `common`    | комманда для взаимодействие с общими конфигурациями                                         |
 |             |                                                                                             |
 
 | Флаги       | Параметры | Описание                                                                                                            |
@@ -51,15 +75,37 @@ ispctl [flag...]  schema   module_name  [local_flag]
 
 | Аргументы       | Описание                                                                                                    |
 |-----------------|-------------------------------------------------------------------------------------------------------------|
-| `module_name`   | Модуль с которым происходит взаимодействие                                                                  |
+| `module_name`   | Название модуля с которым происходит взаимодействие                                                         |
 | `proprtry_path` | Путь к объекту конфигурации, при значении `.` работа происходит со всей конфигурацией модуля                |
 | `new_object`    | Новый объект, значение должно быть экранировано с помощью `' '`, при отсутсвии ожидается ввод из stdin      |
 |                 |                                                                                                             |
 
-| Локальные флаги | Параметры | Описание                                                                                         |
-|-----------------|-----------|--------------------------------------------------------------------------------------------------|
-| `-o`            | string    | определяет формат вывода схемы в stdout; по умолчанию `json`; возможные значения `json`, `html`  |
-|                 |           |                                                                                                  |
+| Локальные флаги | Параметры | Команды | Описание                                                                                                                        |
+|-----------------|-----------|---------|---------------------------------------------------------------------------------------------------------------------------------|
+| `-o`            | string    | schema  | определяет формат вывода схемы в stdout; по умолчанию `json`; возможные значения `json`, `html`                                 |
+| `-full`         | bool      | get     | осуществляет взаимодействие с объектами конфигурации модуля с учетом объектом общих конфигураций, которые имеют связь с модулем |
+|                 |           |         |                                                                                                                                 |
+
+### sub_command
+#### common
+```bash
+ispctl [flag...]  common   set      config_name      property_path   [new_object]
+ispctl [flag...]  common   get      [config_name]    property_path
+ispctl [flag...]  common   delete   config_name      property_path
+ispctl [flag...]  common   remove   config_name
+ispctl [flag...]  common   link     config_name      module_name
+ispctl [flag...]  common   unlink   config_name      module_name
+ispctl [flag...]  common   contain  config_name
+```
+
+| Аргументы       | Описание                                                                                                    |
+|-----------------|-------------------------------------------------------------------------------------------------------------|
+| `config_name`   | Названия конфига с которым происходит взаимодействие                                                        |
+| `module_name`   | Название модуля с которым происходит взаимодействие                                                         |
+| `proprtry_path` | Путь к объекту конфигурации, при значении `.` работа происходит со всей конфигурацией модуля                |
+| `new_object`    | Новый объект, значение должно быть экранировано с помощью `' '`, при отсутсвии ожидается ввод из stdin      |
+|                 |                                                                                                             |
+
 
 ## Пример
 ### ispctl status
@@ -318,6 +364,106 @@ ispctl schema example -o html
   
 ```
 
+### ispctl common
+#### ispctl common get
+Возвращает список названий общих конфигураций или, если в первом аргументе указано название общей конфигурации, возвращает объект общей конфигурации по указанному пути
+
+Запрос
+```bash
+ispctl common get 
+```
+Ответ
+```bash
+test b c 
+```
+Запрос
+```bash
+ispctl common get test .
+```
+Ответ
+```bash
+{
+    "test": null
+}
+```
+#### ispctl common set
+Добавляет объект в общую конфигурацию по указанному пути
+
+Запрос
+```bash
+ispctl common set test .test '{"a":"a","b":"b"}'
+```
+Ответ
+```bash
+{
+    "test": {
+            "a": "a",
+            "b": "b"
+    }
+}
+```
+#### ispctl common delete
+Удаляет объект из общей конфигурации по указанному пути
+
+Запрос
+```bash
+ispctl common delete test .test.a 
+```
+Ответ
+```bash
+{
+    "test": {
+            "b": "b"
+    }
+}
+```
+#### ispctl common link
+Связывает 'common_config' к конфигурации модуля по 'module_name'. Возвращает список общих конфигураций, которые связаны с модулем
+
+Запрос
+```bash
+ispctl common link test module_example
+```
+Ответ
+```bash
+[test] [second_common_config]
+```
+#### ispctl common remove
+Удаляет объект общий конфигурации, если он не связан с конфигурациями модулей. Если общая конфигурация имеет связи, выводит список модулей с которыми установлена связь
+
+Запрос
+```bash
+ispctl common remove test
+```
+Ответ
+```bash
+config [test] not deleted, need unlink in next modules:
+[module_example]
+```
+#### ispctl common unlink
+Отвязывает 'common_config' от конфигурации модуля по 'module_name'. Возвращает список общих конфигураций, которые связаны с модулем
+
+Запрос
+```bash
+ispctl common unlink test module_example
+```
+Ответ
+Ответ
+```bash
+[second_common_config]
+```
+#### ispctl common contain
+Возвращает список названий модулей, с которыми имеет связь общая конфигурация
+
+Запрос
+```bash
+isp-ctl common contain second_common_config
+```
+Ответ
+Ответ
+```bash
+[module_example]
+```
 
 ### Запрос с флагами
 Запрос

@@ -53,7 +53,7 @@ func (c *configClient) GetAvailableConfigs() ([]ModuleInfo, error) {
 }
 
 func (c *configClient) GetConfigByModuleName(name string) (*Config, error) {
-	request := &getModuleByUuidAndNameRequest{Name: name, Uuid: c.instanceUuid}
+	request := &getModuleByUuidAndNameRequest{ModuleName: name, Uuid: c.instanceUuid}
 	response := new(Config)
 	err := c.cli.Invoke(getConfigByModuleName, callerId, request, response, backend.WithMetadata(c.headers))
 	if err != nil {
@@ -73,10 +73,62 @@ func (c *configClient) CreateUpdateConfig(request Config) (*Config, error) {
 	}
 }
 
-func (c *configClient) GetSchemaByModuleId(moduleId int32) (*ConfigSchema, error) {
+func (c *configClient) GetSchemaByModuleId(moduleId string) (*ConfigSchema, error) {
 	request := &getSchemaByModuleIdRequest{ModuleId: moduleId}
 	response := new(ConfigSchema)
 	err := c.cli.Invoke(getSchemaByModuleId, callerId, &request, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
+	}
+}
+
+func (c *configClient) GetCommonConfigs(req []string) ([]CommonConfig, error) {
+	response := make([]CommonConfig, 0)
+	err := c.cli.Invoke(getCommonConfigs, callerId, req, &response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
+	}
+}
+
+func (c *configClient) CreateUpdateCommonConfig(req CommonConfig) (*CommonConfig, error) {
+	response := new(CommonConfig)
+	err := c.cli.Invoke(createUpdateCommonConfig, callerId, req, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
+	}
+}
+
+func (c *configClient) DeleteCommonConfig(id string) (*Deleted, error) {
+	request := identityRequest{Id: id}
+	response := new(Deleted)
+	err := c.cli.Invoke(deleteCommonConfig, callerId, request, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
+	}
+}
+
+func (c *configClient) GetLinksCommonConfig(id string) (*Links, error) {
+	request := identityRequest{Id: id}
+	response := new(Links)
+	err := c.cli.Invoke(getLinksCommonConfig, callerId, request, response, backend.WithMetadata(c.headers))
+	if err != nil {
+		return nil, c.errorHandler(err)
+	} else {
+		return response, nil
+	}
+}
+
+func (c *configClient) CompileCommonConfigs(request CompileConfigs) (map[string]interface{}, error) {
+	response := make(map[string]interface{})
+	err := c.cli.Invoke(compileCommonConfigs, callerId, request, &response, backend.WithMetadata(c.headers))
 	if err != nil {
 		return nil, c.errorHandler(err)
 	} else {
