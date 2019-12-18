@@ -37,7 +37,7 @@ yum install ispctl
 
 Содержимое файла:
 ```yaml
-gateHost: 127.0.0.1:0000
+gateHost: 127.0.0.1:9002
 instanceUuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 * `gateHost` - адрес и порт GRPC любого isp-config-service в кластере
