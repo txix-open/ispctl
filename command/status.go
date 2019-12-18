@@ -8,6 +8,7 @@ import (
 	"isp-ctl/flag"
 	"isp-ctl/service"
 	"os"
+	"strings"
 )
 
 const (
@@ -45,16 +46,11 @@ func (statusCommand) action(ctx *cli.Context) {
 		for _, module := range arrayOfModules {
 			addresses := ""
 			connection := tableNotConnectedStatus
+			instanceList := make([]string, 0, len(module.Status))
 			for _, value := range module.Status {
-				if value.Address.IP == "" && value.Address.Port == "" {
-					continue
-				}
-				if addresses == "" {
-					addresses = fmt.Sprintf("%s:%s;", value.Address.IP, value.Address.Port)
-				} else {
-					addresses = fmt.Sprintf("%s\n%s:%s;", addresses, value.Address.IP, value.Address.Port)
-				}
+				instanceList = append(instanceList, fmt.Sprintf("%s %s", value.Address.GetAddress(), value.Version))
 			}
+			addresses = strings.Join(instanceList, "\n")
 			if addresses != "" {
 				connection = tableConnectedStatus
 			}

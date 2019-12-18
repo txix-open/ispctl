@@ -1,3 +1,5 @@
+## v2.0.1
+* print module version in `status` command
 ## v2.0.0
 * add integration with isp-config-service 2.0
 ## v1.2.4
