@@ -18,7 +18,7 @@ func Schema() cli.Command {
 		Usage:  "get schema configuration by module_name",
 		Action: schema.action,
 		Flags: []cli.Flag{
-			flag.OutPrint,
+			flag.OutPrintSchema,
 		},
 		BashComplete: bash.Get(bash.ModuleName, bash.Empty).Complete,
 	}
@@ -39,7 +39,7 @@ func (s schemaCommand) action(ctx *cli.Context) {
 		schema := make(map[string]interface{})
 		schema["title"] = moduleName
 		schema["schema"] = schemaConfig
-		switch ctx.String(flag.OutPrint.Name) {
+		switch ctx.String(flag.OutPrintSchema.Name) {
 		case flag.OutPrintJsonValue:
 			utils.PrintAnswer(schema)
 		case flag.OutPrintHtmlValue:

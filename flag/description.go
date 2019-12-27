@@ -24,5 +24,6 @@ const (
 )
 
 var (
-	outPrintUsage = fmt.Sprintf("out print for schema; %s or %s", OutPrintJsonValue, OutPrintHtmlValue)
+	outPrintStatusUsage = fmt.Sprintf("out print for status; %s", OutPrintJsonValue)
+	outPrintSchemaUsage = fmt.Sprintf("out print for schema; %s or %s", OutPrintJsonValue, OutPrintHtmlValue)
 )
