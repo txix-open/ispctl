@@ -45,7 +45,7 @@ instanceUuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 ## Использование
 ```bash
-ispctl [flag...]  status
+ispctl [flag...]  status    [local_flag]
 ispctl [flag...]  get      module_name  property_path  [local_flag]
 ispctl [flag...]  set      module_name  property_path  [new_object]
 ispctl [flag...]  delete   module_name  property_path
@@ -109,7 +109,10 @@ ispctl [flag...]  common   contain  config_name
 
 ## Пример
 ### ispctl status
-`ispctl [flag...]  status`
+`ispctl [flag...]  status [local_flag]`
+
+`[local_flag]` - локальный флаг `-o` определяет формат вывода доступных конфигураций и состояний модулей. Доступные значения: `json`.
+По умолчанию вывод осуществляется в виде таблицы.
 
 Запрос
 ```bash
