@@ -13,7 +13,8 @@ var (
 	Color  = cli.BoolFlag{Name: colorName, Usage: colorUsage}
 	Unsafe = cli.BoolFlag{Name: unsafeName, Usage: unsafeUsage}
 	//---local---
-	OutPrint         = cli.StringFlag{Name: outPrintName, Usage: outPrintUsage, Value: OutPrintJsonValue}
+	OutPrintStatus   = cli.StringFlag{Name: outPrintName, Usage: outPrintStatusUsage}
+	OutPrintSchema   = cli.StringFlag{Name: outPrintName, Usage: outPrintSchemaUsage, Value: OutPrintJsonValue}
 	WithCommonConfig = cli.BoolFlag{Name: withCommonConfigName, Usage: withCommonConfigUsage}
 )
 

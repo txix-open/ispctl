@@ -1,3 +1,5 @@
+## v2.1.0
+* add output format for `status`
 ## v2.0.1
 * print module version in `status` command
 ## v2.0.0
