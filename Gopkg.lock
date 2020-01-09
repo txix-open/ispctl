@@ -63,7 +63,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2c5074a55f97c23cd89581a5d66fa82c26ee1fa01bffad0d3f540e8d28b131e5"
+  digest = "1:9381e2bf1cde0f062353d86dc2503d62729376180938ca3b34b8d02826884db9"
   name = "github.com/integration-system/isp-lib"
   packages = [
     "backend",
@@ -74,7 +74,7 @@
     "utils",
   ]
   pruneopts = "UT"
-  revision = "5060d1348219abd8fad3628668b229779a5314c7"
+  revision = "abfa9a9776d64e6d04d495bfe00db8ca4dcbe7fc"
 
 [[projects]]
   branch = "master"
@@ -220,30 +220,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:87fe9bca786484cef53d52adeec7d1c52bc2bfbee75734eddeb75fc5c7023871"
-  name = "github.com/xeipuuv/gojsonpointer"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "02993c407bfbf5f6dae44c4f4b1cf6a39b5fc5bb"
-
-[[projects]]
-  branch = "master"
-  digest = "1:dc6a6c28ca45d38cfce9f7cb61681ee38c5b99ec1425339bfc1e1a7ba769c807"
-  name = "github.com/xeipuuv/gojsonreference"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "bd5ef7bd5415a7ac448318e64f11a24cd21e594b"
-
-[[projects]]
-  digest = "1:a8a0ed98532819a3b0dc5cf3264a14e30aba5284b793ba2850d6f381ada5f987"
-  name = "github.com/xeipuuv/gojsonschema"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "82fcdeb203eb6ab2a67d0a623d9c19e5e5a64927"
-  version = "v1.2.0"
-
-[[projects]]
-  branch = "master"
   digest = "1:c124e945335a9c62ede3a565f3198c5ae9a5ecc39fddd85871138362d128fb74"
   name = "golang.org/x/net"
   packages = [
@@ -366,7 +342,7 @@
     "github.com/tidwall/gjson",
     "github.com/tidwall/pretty",
     "github.com/tidwall/sjson",
-    "github.com/xeipuuv/gojsonschema",
+    "google.golang.org/genproto/googleapis/rpc/errdetails",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
     "google.golang.org/grpc/metadata",
