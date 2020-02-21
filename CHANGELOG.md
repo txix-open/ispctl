@@ -1,3 +1,5 @@
+## v2.1.2
+* fix output '\u0026' instead '&'
 ## v2.1.0
 * add output format for `status`
 ## v2.0.1

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
@@ -46,10 +47,14 @@ func CheckChangeObject(changeObject string) (string, error) {
 }
 
 func PrintAnswer(data interface{}) {
-	if answer, err := json.MarshalIndent(data, "", "    "); err != nil {
+	buffer := bytes.NewBuffer(make([]byte, 1024))
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", "	")
+	if err := encoder.Encode(data); err != nil {
 		PrintError(err)
 	} else {
-		service.ColorService.Print(answer)
+		service.ColorService.Print(buffer.Bytes())
 	}
 }
 
@@ -98,7 +103,7 @@ func ParseSetObject(argument string) interface{} {
 }
 
 func CheckObject(jsonObject []byte, depth string) {
-	jsonString := gjson.Get(string(jsonObject), depth)
+	jsonString := gjson.GetBytes(jsonObject, depth)
 	if jsonString.Raw == "" {
 		PrintError(errors.Errorf("path '%s' not found\n", depth))
 	} else {
