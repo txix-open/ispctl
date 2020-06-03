@@ -1,3 +1,7 @@
+## v2.2.0
+* fix json output
+* migrate to go mod
+* update libs
 ## v2.1.2
 * fix output '\u0026' instead '&'
 ## v2.1.0

@@ -2,17 +2,17 @@ package command
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/command/common_config"
 )
 
-func CommonConfig() cli.Command {
-	return cli.Command{
+func CommonConfig() *cli.Command {
+	return &cli.Command{
 		Name:         "common",
 		Usage:        "access to common configs commands",
 		Action:       cc.action,
 		BashComplete: cc.bachComplete,
-		Subcommands: []cli.Command{
+		Subcommands: []*cli.Command{
 			common_config.Get(),
 			common_config.Set(),
 			common_config.Delete(),
@@ -28,7 +28,7 @@ var cc commonConfigCommand
 
 type commonConfigCommand struct{}
 
-func (g commonConfigCommand) action(ctx *cli.Context) {
+func (g commonConfigCommand) action(ctx *cli.Context) error {
 	if ctx.Args().First() == "" {
 		fmt.Print("need use command: ")
 		for _, comm := range CommonConfig().Subcommands {
@@ -36,6 +36,7 @@ func (g commonConfigCommand) action(ctx *cli.Context) {
 		}
 		fmt.Printf("\n")
 	}
+	return nil
 }
 
 func (g commonConfigCommand) bachComplete(ctx *cli.Context) {

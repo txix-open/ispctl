@@ -2,9 +2,9 @@ package common_config
 
 import (
 	"encoding/json"
-	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/bash"
 	"isp-ctl/cfg"
 	"isp-ctl/command/utils"
@@ -12,8 +12,8 @@ import (
 	"isp-ctl/service"
 )
 
-func Set() cli.Command {
-	return cli.Command{
+func Set() *cli.Command {
+	return &cli.Command{
 		Name:         "set",
 		Usage:        "set common configurations",
 		Action:       set.action,
@@ -25,10 +25,9 @@ var set setCommand
 
 type setCommand struct{}
 
-func (g setCommand) action(ctx *cli.Context) {
+func (g setCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	configName := ctx.Args().First()
@@ -36,14 +35,12 @@ func (g setCommand) action(ctx *cli.Context) {
 	changeObject := ctx.Args().Get(2)
 
 	if configName == "" {
-		utils.PrintError(errors.New("empty config name"))
-		return
+		return errors.New("empty config name")
 	}
 
 	mapConfigByName, err := service.Config.GetMapNameCommonConfig()
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	config, ok := mapConfigByName[configName]
@@ -55,29 +52,26 @@ func (g setCommand) action(ctx *cli.Context) {
 
 	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	changeObject, err = utils.CheckChangeObject(changeObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	if pathObject == "" {
-		utils.CreateUpdateCommonConfig(changeObject, config)
+		return utils.CreateUpdateCommonConfig(changeObject, config)
 	} else {
 		jsonObject, err := json.Marshal(config.Data)
 		if err != nil {
-			utils.PrintError(err)
-			return
+			return err
 		}
 		changeArgument := utils.ParseSetObject(changeObject)
 		if stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument); err != nil {
-			utils.PrintError(err)
+			return err
 		} else {
-			utils.CreateUpdateCommonConfig(stringToChange, config)
+			return utils.CreateUpdateCommonConfig(stringToChange, config)
 		}
 	}
 }

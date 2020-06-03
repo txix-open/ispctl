@@ -3,7 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/integration-system/isp-lib/config/schema"
+	"github.com/integration-system/isp-lib/v2/config/schema"
 	"github.com/pkg/errors"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"

@@ -1,8 +1,8 @@
 package command
 
 import (
-	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
+	"github.com/urfave/cli/v2"
 	"html/template"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
@@ -12,8 +12,8 @@ import (
 	"os"
 )
 
-func Schema() cli.Command {
-	return cli.Command{
+func Schema() *cli.Command {
+	return &cli.Command{
 		Name:   "schema",
 		Usage:  "get schema configuration by module_name",
 		Action: schema.action,
@@ -28,10 +28,9 @@ var schema schemaCommand
 
 type schemaCommand struct{}
 
-func (s schemaCommand) action(ctx *cli.Context) {
+func (s schemaCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 	moduleName := ctx.Args().First()
 
@@ -45,10 +44,10 @@ func (s schemaCommand) action(ctx *cli.Context) {
 		case flag.OutPrintHtmlValue:
 			s.printHtml(schema)
 		default:
-			utils.PrintError(errors.Errorf(
-				"invalid flag value, expected [%s] or [%s]", flag.OutPrintJsonValue, flag.OutPrintHtmlValue))
+			return errors.Errorf("invalid flag value, expected [%s] or [%s]", flag.OutPrintJsonValue, flag.OutPrintHtmlValue)
 		}
 	}
+	return nil
 }
 
 func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {

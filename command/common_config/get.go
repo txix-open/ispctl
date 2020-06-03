@@ -3,16 +3,16 @@ package common_config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
 
-func Get() cli.Command {
-	return cli.Command{
+func Get() *cli.Command {
+	return &cli.Command{
 		Name:         "get",
 		Usage:        "get common configurations",
 		Action:       get.action,
@@ -24,10 +24,9 @@ var get getCommand
 
 type getCommand struct{}
 
-func (g getCommand) action(ctx *cli.Context) {
+func (g getCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	configName := ctx.Args().First()
@@ -35,8 +34,7 @@ func (g getCommand) action(ctx *cli.Context) {
 
 	commonConfigs, err := service.Config.GetMapNameCommonConfig()
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	if configName == "" {
@@ -45,26 +43,25 @@ func (g getCommand) action(ctx *cli.Context) {
 			fmt.Printf("[%s] ", name)
 		}
 		fmt.Println()
-		return
+		return nil
 	}
 
 	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	config, ok := commonConfigs[configName]
 	if !ok {
-		utils.PrintError(errors.Errorf("common config [%s] not found", configName))
-		return
+		return errors.Errorf("common config [%s] not found", configName)
 	}
 
 	if pathObject == "" {
 		utils.PrintAnswer(config.Data)
 	} else if jsonObject, err := json.Marshal(config.Data); err != nil {
-		utils.PrintError(err)
+		return err
 	} else {
 		utils.CheckObject(jsonObject, pathObject)
 	}
+	return nil
 }

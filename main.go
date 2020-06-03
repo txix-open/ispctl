@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/command"
 	"isp-ctl/flag"
 	"isp-ctl/service"
@@ -36,7 +36,7 @@ func initCommands() {
 		flag.Unsafe,
 	}
 	app.EnableBashCompletion = true
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		command.Status(),
 		command.Get(),
 		command.Set(),

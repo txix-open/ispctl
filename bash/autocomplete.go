@@ -2,8 +2,8 @@ package bash
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
 	"github.com/integration-system/bellows"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )

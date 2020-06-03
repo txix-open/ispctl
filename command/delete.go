@@ -2,16 +2,16 @@ package command
 
 import (
 	"encoding/json"
-	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
 
-func Delete() cli.Command {
-	return cli.Command{
+func Delete() *cli.Command {
+	return &cli.Command{
 		Name:         "delete",
 		Usage:        "delete configuration by module_name",
 		Action:       deleteComm.action,
@@ -23,39 +23,35 @@ var deleteComm deleteCommand
 
 type deleteCommand struct{}
 
-func (d deleteCommand) action(ctx *cli.Context) {
+func (d deleteCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
 	moduleConfiguration, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	if pathObject == "" {
-		utils.CreateUpdateConfig("", moduleConfiguration)
+		return utils.CreateUpdateConfig("", moduleConfiguration)
 	} else {
 		jsonObject, err := json.Marshal(moduleConfiguration.Data)
 		if err != nil {
-			utils.PrintError(err)
-			return
+			return err
 		}
 
 		if stringToChange, err := sjson.Delete(string(jsonObject), pathObject); err != nil {
-			utils.PrintError(err)
+			return err
 		} else {
-			utils.CreateUpdateConfig(stringToChange, moduleConfiguration)
+			return utils.CreateUpdateConfig(stringToChange, moduleConfiguration)
 		}
 	}
 }

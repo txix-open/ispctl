@@ -2,16 +2,16 @@ package command
 
 import (
 	"encoding/json"
-	"github.com/codegangsta/cli"
 	"github.com/tidwall/sjson"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
 
-func Set() cli.Command {
-	return cli.Command{
+func Set() *cli.Command {
+	return &cli.Command{
 		Name:         "set",
 		Usage:        "set configuration by module_name",
 		Action:       set.action,
@@ -23,10 +23,9 @@ var set setCommand
 
 type setCommand struct{}
 
-func (s setCommand) action(ctx *cli.Context) {
+func (s setCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	moduleName := ctx.Args().First()
@@ -35,36 +34,32 @@ func (s setCommand) action(ctx *cli.Context) {
 
 	config, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	changeObject, err = utils.CheckChangeObject(changeObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	if pathObject == "" {
-		utils.CreateUpdateConfig(changeObject, config)
+		return utils.CreateUpdateConfig(changeObject, config)
 	} else {
 		jsonObject, err := json.Marshal(config.Data)
 		if err != nil {
-			utils.PrintError(err)
-			return
+			return err
 		}
 
 		changeArgument := utils.ParseSetObject(changeObject)
 		if stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument); err != nil {
-			utils.PrintError(err)
+			return err
 		} else {
-			utils.CreateUpdateConfig(stringToChange, config)
+			return utils.CreateUpdateConfig(stringToChange, config)
 		}
 	}
 }

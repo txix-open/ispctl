@@ -47,7 +47,7 @@ func CheckChangeObject(changeObject string) (string, error) {
 }
 
 func PrintAnswer(data interface{}) {
-	buffer := bytes.NewBuffer(make([]byte, 1024))
+	buffer := bytes.NewBuffer(make([]byte, 0, 1024))
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)
 	encoder.SetIndent("", "	")

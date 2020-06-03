@@ -1,12 +1,14 @@
 package cfg
 
 import (
-	"github.com/integration-system/isp-lib/backend"
+	"github.com/integration-system/isp-lib/v2/backend"
+	"github.com/integration-system/isp-lib/v2/structure"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"net"
 )
 
 const (
@@ -16,13 +18,13 @@ const (
 
 func NewConfigClient() *configClient {
 	return &configClient{
-		cli:     &backend.InternalGrpcClient{},
+		cli:     backend.NewRxGrpcClient(backend.WithDialOptions(grpc.WithInsecure())),
 		headers: make(map[string][]string),
 	}
 }
 
 type configClient struct {
-	cli     *backend.InternalGrpcClient
+	cli     *backend.RxGrpcClient
 	headers metadata.MD
 
 	address      string
@@ -30,11 +32,11 @@ type configClient struct {
 }
 
 func (c *configClient) ReceiveConfig(address, instanceUuid string) error {
-	var err error
-	c.cli, err = backend.NewGrpcClient(address, grpc.WithInsecure())
+	host, port, err := net.SplitHostPort(address)
 	if err != nil {
 		return err
 	}
+	c.cli.ReceiveAddressList([]structure.AddressConfiguration{{IP: host, Port: port}})
 
 	c.address = address
 	c.instanceUuid = instanceUuid

@@ -3,13 +3,13 @@ package flag
 import "fmt"
 
 const (
-	hostName  = "gateHost, g"
+	hostName  = "gateHost"
 	hostUsage = "overrides gateHost"
 
-	uuidName  = "instanceUuid, u"
+	uuidName  = "instanceUuid"
 	uuidUsage = "overrides instanceUuid"
 
-	colorName  = "color, c"
+	colorName  = "color"
 	colorUsage = "colorize the json for outputing to screen"
 
 	unsafeName  = "unsafe"

@@ -5,10 +5,11 @@ import (
 	"isp-ctl/service"
 )
 
-func CreateUpdateConfig(stringToChange string, configuration *cfg.Config) {
+func CreateUpdateConfig(stringToChange string, configuration *cfg.Config) error {
 	if answer, err := service.Config.CreateUpdateConfig(stringToChange, configuration); err != nil {
-		PrintError(err)
+		return err
 	} else if answer != nil {
 		PrintAnswer(answer)
 	}
+	return nil
 }

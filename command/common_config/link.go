@@ -1,15 +1,14 @@
 package common_config
 
 import (
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/bash"
-	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
 
-func Link() cli.Command {
-	return cli.Command{
+func Link() *cli.Command {
+	return &cli.Command{
 		Name:         "link",
 		Usage:        "link common configurations to module configuration",
 		Action:       link.action,
@@ -21,16 +20,16 @@ var link linkCommand
 
 type linkCommand struct{}
 
-func (g linkCommand) action(ctx *cli.Context) {
+func (g linkCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	configName := ctx.Args().First()
 	moduleName := ctx.Args().Get(1)
 
 	if err := service.Config.LinkCommonConfigToModule(configName, moduleName); err != nil {
-		utils.PrintError(err)
+		return err
 	}
+	return nil
 }

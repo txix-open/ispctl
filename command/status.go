@@ -2,8 +2,8 @@ package command
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
 	"github.com/olekukonko/tablewriter"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
@@ -20,8 +20,8 @@ const (
 	tableConnectedStatus    = "CONNECTED"
 )
 
-func Status() cli.Command {
-	return cli.Command{
+func Status() *cli.Command {
+	return &cli.Command{
 		Name:   "status",
 		Usage:  "get available configs",
 		Action: status.action,
@@ -35,13 +35,12 @@ var status statusCommand
 
 type statusCommand struct{}
 
-func (statusCommand) action(ctx *cli.Context) {
+func (statusCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 	if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
-		utils.PrintError(err)
+		return err
 	} else {
 		switch ctx.String(flag.OutPrintStatus.Name) {
 		case flag.OutPrintJsonValue:
@@ -66,4 +65,5 @@ func (statusCommand) action(ctx *cli.Context) {
 			table.Render()
 		}
 	}
+	return nil
 }

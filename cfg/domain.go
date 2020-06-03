@@ -1,8 +1,8 @@
 package cfg
 
 import (
-	"github.com/integration-system/isp-lib/config/schema"
-	"github.com/integration-system/isp-lib/structure"
+	"github.com/integration-system/isp-lib/v2/config/schema"
+	"github.com/integration-system/isp-lib/v2/structure"
 	"time"
 )
 

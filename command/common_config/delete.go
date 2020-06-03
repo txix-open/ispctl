@@ -2,17 +2,17 @@ package common_config
 
 import (
 	"encoding/json"
-	"github.com/codegangsta/cli"
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
 
-func Delete() cli.Command {
-	return cli.Command{
+func Delete() *cli.Command {
+	return &cli.Command{
 		Name:         "delete",
 		Usage:        "set common configurations",
 		Action:       deleteComm.action,
@@ -24,44 +24,39 @@ var deleteComm deleteCommand
 
 type deleteCommand struct{}
 
-func (g deleteCommand) action(ctx *cli.Context) {
+func (g deleteCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	configName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
 	if configName == "" {
-		utils.PrintError(errors.New("empty config name"))
-		return
+		return errors.New("empty config name")
 	}
 
 	pathObject, err := utils.CheckPath(pathObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	config, err := service.Config.GetCommonConfigByName(configName)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	if pathObject == "" {
-		utils.CreateUpdateCommonConfig("", config)
+		return utils.CreateUpdateCommonConfig("", config)
 	} else {
 		jsonObject, err := json.Marshal(config.Data)
 		if err != nil {
-			utils.PrintError(err)
-			return
+			return err
 		}
 		if stringToChange, err := sjson.Delete(string(jsonObject), pathObject); err != nil {
-			utils.PrintError(err)
+			return err
 		} else {
-			utils.CreateUpdateCommonConfig(stringToChange, config)
+			return utils.CreateUpdateCommonConfig(stringToChange, config)
 		}
 	}
 }

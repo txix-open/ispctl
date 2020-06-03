@@ -2,15 +2,15 @@ package command
 
 import (
 	"encoding/json"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/bash"
 	"isp-ctl/command/utils"
 	"isp-ctl/flag"
 	"isp-ctl/service"
 )
 
-func Get() cli.Command {
-	return cli.Command{
+func Get() *cli.Command {
+	return &cli.Command{
 		Name:         "get",
 		Usage:        "get configuration by module_name",
 		Action:       get.action,
@@ -25,32 +25,28 @@ var get getCommand
 
 type getCommand struct{}
 
-func (g getCommand) action(ctx *cli.Context) {
+func (g getCommand) action(ctx *cli.Context) error {
 	if err := flag.CheckGlobal(ctx); err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
 	config, err := service.Config.GetConfigurationByModuleName(moduleName)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	data := config.Data
 	if ctx.Bool(flag.WithCommonConfig.Name) {
 		if data, err = service.Config.CompileDataWithCommonConfigs(data, config.CommonConfigs); err != nil {
-			utils.PrintError(err)
-			return
+			return err
 		}
 	}
 
 	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {
-		utils.PrintError(err)
-		return
+		return err
 	}
 
 	if pathObject == "" {
@@ -58,9 +54,9 @@ func (g getCommand) action(ctx *cli.Context) {
 	} else {
 		jsonObject, err := json.Marshal(data)
 		if err != nil {
-			utils.PrintError(err)
-			return
+			return err
 		}
 		utils.CheckObject(jsonObject, pathObject)
 	}
+	return nil
 }

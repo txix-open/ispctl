@@ -1,21 +1,21 @@
 package flag
 
 import (
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli/v2"
 	"isp-ctl/service"
 	"strings"
 )
 
 var (
 	//---global---
-	Host   = cli.StringFlag{Name: hostName, Usage: hostUsage}
-	Uuid   = cli.StringFlag{Name: uuidName, Usage: uuidUsage}
-	Color  = cli.BoolFlag{Name: colorName, Usage: colorUsage}
-	Unsafe = cli.BoolFlag{Name: unsafeName, Usage: unsafeUsage}
+	Host   = &cli.StringFlag{Name: hostName, Usage: hostUsage, Aliases: []string{"g"}}
+	Uuid   = &cli.StringFlag{Name: uuidName, Usage: uuidUsage, Aliases: []string{"u"}}
+	Color  = &cli.BoolFlag{Name: colorName, Usage: colorUsage, Aliases: []string{"c"}}
+	Unsafe = &cli.BoolFlag{Name: unsafeName, Usage: unsafeUsage}
 	//---local---
-	OutPrintStatus   = cli.StringFlag{Name: outPrintName, Usage: outPrintStatusUsage}
-	OutPrintSchema   = cli.StringFlag{Name: outPrintName, Usage: outPrintSchemaUsage, Value: OutPrintJsonValue}
-	WithCommonConfig = cli.BoolFlag{Name: withCommonConfigName, Usage: withCommonConfigUsage}
+	OutPrintStatus   = &cli.StringFlag{Name: outPrintName, Usage: outPrintStatusUsage}
+	OutPrintSchema   = &cli.StringFlag{Name: outPrintName, Usage: outPrintSchemaUsage, Value: OutPrintJsonValue}
+	WithCommonConfig = &cli.BoolFlag{Name: withCommonConfigName, Usage: withCommonConfigUsage}
 )
 
 func CheckGlobal(c *cli.Context) error {
@@ -23,27 +23,18 @@ func CheckGlobal(c *cli.Context) error {
 		uuid, host string
 		color      bool
 	)
-	colorFlag := strings.Split(Color.Name, ", ")
-	if c.GlobalBool(colorFlag[0]) != false {
+	if c.Bool(Color.Name) != false {
 		color = true
-	} else {
-		color = c.GlobalBool(colorFlag[1])
 	}
 	service.ColorService.Enable = color
-	service.Config.UnsafeEnable = c.GlobalBool(Unsafe.Name)
+	service.Config.UnsafeEnable = c.Bool(Unsafe.Name)
 
-	hostFlag := strings.Split(Host.Name, ", ")
-	if c.GlobalString(hostFlag[0]) != "" {
-		host = c.GlobalString(hostFlag[0])
-	} else {
-		host = c.GlobalString(hostFlag[1])
+	if c.String(Host.Name) != "" {
+		host = c.String(Host.Name)
 	}
 
-	uuidFlag := strings.Split(Uuid.Name, ", ")
-	if c.GlobalString(uuidFlag[0]) != "" {
-		uuid = c.GlobalString(uuidFlag[0])
-	} else {
-		uuid = c.GlobalString(uuidFlag[1])
+	if c.String(Uuid.Name) != "" {
+		uuid = c.String(Uuid.Name)
 	}
 
 	uuid = strings.Replace(uuid, "'", "", -1)
