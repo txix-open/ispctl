@@ -1,3 +1,6 @@
+### v2.2.1
+* updated isp-lib
+* updated isp-event-lib
 ## v2.2.0
 * fix json output
 * migrate to go mod
