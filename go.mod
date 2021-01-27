@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/integration-system/bellows v1.0.1
-	github.com/integration-system/isp-lib/v2 v2.7.0
+	github.com/integration-system/isp-lib/v2 v2.8.3
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/pkg/errors v0.9.1
 	github.com/tidwall/gjson v1.6.0
