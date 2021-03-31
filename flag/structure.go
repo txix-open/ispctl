@@ -1,14 +1,15 @@
 package flag
 
 import (
+	"strings"
+
 	"github.com/urfave/cli/v2"
 	"isp-ctl/service"
-	"strings"
 )
 
 var (
 	//---global---
-	Host   = &cli.StringFlag{Name: hostName, Usage: hostUsage, Aliases: []string{"g"}}
+	Host   = &cli.StringFlag{Name: hostName, Usage: hostUsage, Aliases: []string{"g", "configAddr"}}
 	Uuid   = &cli.StringFlag{Name: uuidName, Usage: uuidUsage, Aliases: []string{"u"}}
 	Color  = &cli.BoolFlag{Name: colorName, Usage: colorUsage, Aliases: []string{"c"}}
 	Unsafe = &cli.BoolFlag{Name: unsafeName, Usage: unsafeUsage}

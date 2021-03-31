@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	hostName  = "gateHost"
-	hostUsage = "overrides gateHost"
+	hostUsage = "overrides gateHost; config-service address, default '127.0.0.1:9002'"
 
 	uuidName  = "instanceUuid"
 	uuidUsage = "overrides instanceUuid"
