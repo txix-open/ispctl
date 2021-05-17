@@ -1,3 +1,5 @@
+### v2.2.3
+* updated dependencies
 ### v2.2.2
 * updated isp-lib
 ### v2.2.1
