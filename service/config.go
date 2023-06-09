@@ -3,12 +3,14 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/integration-system/isp-lib/v2/config/schema"
+	"os"
+
+	"github.com/integration-system/isp-kit/rc/schema"
 	"github.com/pkg/errors"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"isp-ctl/cfg"
+	"ispctl/cfg"
 )
 
 var Config configService
@@ -17,12 +19,12 @@ type configService struct {
 	UnsafeEnable bool
 }
 
-func (c configService) ReceiveConfiguration(host, uuid string) error {
-	return configClient.ReceiveConfig(host, uuid)
+func (c configService) ReceiveConfiguration(host string) error {
+	return ConfigClient.ReceiveConfig(host)
 }
 
 func (c configService) GetAvailableConfigs() ([]cfg.ModuleInfo, error) {
-	return configClient.GetAvailableConfigs()
+	return ConfigClient.GetAvailableConfigs()
 }
 
 func (c configService) GetConfigurationByModuleName(moduleName string) (*cfg.Config, error) {
@@ -30,7 +32,7 @@ func (c configService) GetConfigurationByModuleName(moduleName string) (*cfg.Con
 		return nil, errors.New("need module name")
 	}
 
-	if moduleConfiguration, err := configClient.GetConfigByModuleName(moduleName); err != nil {
+	if moduleConfiguration, err := ConfigClient.GetConfigByModuleName(moduleName); err != nil {
 		if errorStatus, ok := status.FromError(err); ok {
 			switch errorStatus.Code() {
 			case codes.NotFound:
@@ -44,7 +46,7 @@ func (c configService) GetConfigurationByModuleName(moduleName string) (*cfg.Con
 }
 
 func (c configService) GetSchemaByModuleId(moduleId string) (schema.Schema, error) {
-	if configSchema, err := configClient.GetSchemaByModuleId(moduleId); err != nil {
+	if configSchema, err := ConfigClient.GetSchemaByModuleId(moduleId); err != nil {
 		return nil, err
 	} else {
 		dereferenceSchema := schema.DereferenceSchema(configSchema.Schema)
@@ -62,11 +64,18 @@ func (c configService) CreateUpdateConfig(stringToChange string, configuration *
 
 	configuration.Unsafe = c.UnsafeEnable
 	configuration.Data = newData
-	if resp, err := configClient.CreateUpdateConfig(*configuration); err != nil {
+	return c.CreateUpdateConfigV2(configuration)
+}
+
+func (c configService) CreateUpdateConfigV2(configuration *cfg.Config) (map[string]interface{}, error) {
+	if resp, err := ConfigClient.CreateUpdateConfig(*configuration); err != nil {
 		if errorStatus, ok := status.FromError(err); ok {
 			switch errorStatus.Code() {
 			case codes.InvalidArgument:
 				fmt.Print("doesn't match with schema:\n")
+				defer func() {
+					os.Exit(1)
+				}()
 				for _, value := range errorStatus.Details() {
 					if a, ok := value.(*epb.BadRequest); ok {
 						for _, value := range a.FieldViolations {
@@ -86,7 +95,7 @@ func (c configService) CreateUpdateConfig(stringToChange string, configuration *
 }
 
 func (c configService) UpdateConfigAndGetLinkCommon(configuration cfg.Config) ([]string, error) {
-	if resp, err := configClient.CreateUpdateConfig(configuration); err != nil {
+	if resp, err := ConfigClient.CreateUpdateConfig(configuration); err != nil {
 		return nil, err
 	} else {
 		return resp.CommonConfigs, nil
@@ -104,7 +113,7 @@ func (c configService) GetCommonConfigByName(configName string) (cfg.CommonConfi
 }
 
 func (c configService) GetMapNameCommonConfig() (map[string]cfg.CommonConfig, error) {
-	collection, err := configClient.GetCommonConfigs([]string{})
+	collection, err := ConfigClient.GetCommonConfigs([]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +133,7 @@ func (c configService) CreateUpdateCommonConfig(stringToChange string, config cf
 	}
 
 	config.Data = newData
-	if resp, err := configClient.CreateUpdateCommonConfig(config); err != nil {
+	if resp, err := ConfigClient.CreateUpdateCommonConfig(config); err != nil {
 		return nil, err
 	} else {
 		return resp.Data, nil
@@ -132,7 +141,7 @@ func (c configService) CreateUpdateCommonConfig(stringToChange string, config cf
 }
 
 func (c configService) DeleteCommonConfig(configId string) ([]string, bool, error) {
-	deletedInfo, err := configClient.DeleteCommonConfig(configId)
+	deletedInfo, err := ConfigClient.DeleteCommonConfig(configId)
 	if err != nil {
 		return nil, false, err
 	}
@@ -144,7 +153,7 @@ func (c configService) DeleteCommonConfig(configId string) ([]string, bool, erro
 }
 
 func (c configService) GetLinksCommonConfig(configId string) ([]string, error) {
-	link, err := configClient.GetLinksCommonConfig(configId)
+	link, err := ConfigClient.GetLinksCommonConfig(configId)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +172,7 @@ func (c configService) CompileDataWithCommonConfigs(
 		CommonConfigsIdList: commonConfigs,
 	}
 	var err error
-	data, err = configClient.CompileCommonConfigs(req)
+	data, err = ConfigClient.CompileCommonConfigs(req)
 	if err != nil {
 		return nil, err
 	} else {

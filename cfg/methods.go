@@ -1,152 +1,163 @@
 package cfg
 
 import (
-	"github.com/integration-system/isp-lib/v2/backend"
-	"github.com/integration-system/isp-lib/v2/structure"
+	"context"
+	"time"
+
+	"github.com/integration-system/isp-kit/grpc/client"
 	"github.com/pkg/errors"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
-	"net"
 )
 
-const (
-	instanceIdHeader = "x-instance-identity"
-	callerId         = 1
-)
-
-func NewConfigClient() *configClient {
-	return &configClient{
-		cli:     backend.NewRxGrpcClient(backend.WithDialOptions(grpc.WithInsecure())),
-		headers: make(map[string][]string),
-	}
+type ConfigClient struct {
+	cli     *client.Client
+	address string
 }
 
-type configClient struct {
-	cli     *backend.RxGrpcClient
-	headers metadata.MD
-
-	address      string
-	instanceUuid string
+func NewConfigClient() *ConfigClient {
+	return &ConfigClient{}
 }
 
-func (c *configClient) ReceiveConfig(address, instanceUuid string) error {
-	host, port, err := net.SplitHostPort(address)
+func (c *ConfigClient) ReceiveConfig(address string) error {
+	cli, err := client.Default()
 	if err != nil {
 		return err
 	}
-	c.cli.ReceiveAddressList([]structure.AddressConfiguration{{IP: host, Port: port}})
+	c.cli = cli
+	cli.Upgrade([]string{address})
 
 	c.address = address
-	c.instanceUuid = instanceUuid
-	c.headers[instanceIdHeader] = []string{instanceUuid}
 	return nil
 }
 
-func (c *configClient) GetAvailableConfigs() ([]ModuleInfo, error) {
+func (c *ConfigClient) GetAvailableConfigs() ([]ModuleInfo, error) {
 	response := make([]ModuleInfo, 0)
-	err := c.cli.Invoke(getAvailableConfigs, callerId, nil, &response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(getAvailableConfigs).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", getAvailableConfigs)
 	}
+	return response, nil
 }
 
-func (c *configClient) GetConfigByModuleName(name string) (*Config, error) {
-	request := &getModuleByUuidAndNameRequest{ModuleName: name, Uuid: c.instanceUuid}
+func (c *ConfigClient) GetConfigByModuleName(name string) (*Config, error) {
+	request := &getModuleByUuidAndNameRequest{ModuleName: name}
 	response := new(Config)
-	err := c.cli.Invoke(getConfigByModuleName, callerId, request, response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(getConfigByModuleName).
+		JsonRequestBody(request).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", getConfigByModuleName)
 	}
+	return response, nil
 }
 
-func (c *configClient) CreateUpdateConfig(request Config) (*Config, error) {
+func (c *ConfigClient) CreateUpdateConfig(request Config) (*Config, error) {
 	response := new(Config)
-	err := c.cli.Invoke(createUpdateConfig, callerId, &request, response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(createUpdateConfig).
+		JsonRequestBody(request).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", createUpdateConfig)
 	}
+	return response, nil
 }
 
-func (c *configClient) GetSchemaByModuleId(moduleId string) (*ConfigSchema, error) {
-	request := &getSchemaByModuleIdRequest{ModuleId: moduleId}
+func (c *ConfigClient) GetSchemaByModuleId(moduleId string) (*ConfigSchema, error) {
+	request := getSchemaByModuleIdRequest{ModuleId: moduleId}
 	response := new(ConfigSchema)
-	err := c.cli.Invoke(getSchemaByModuleId, callerId, &request, response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(getSchemaByModuleId).
+		JsonRequestBody(request).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", getSchemaByModuleId)
 	}
+	return response, nil
 }
 
-func (c *configClient) GetCommonConfigs(req []string) ([]CommonConfig, error) {
+func (c *ConfigClient) GetCommonConfigs(req []string) ([]CommonConfig, error) {
 	response := make([]CommonConfig, 0)
-	err := c.cli.Invoke(getCommonConfigs, callerId, req, &response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(getCommonConfigs).
+		JsonRequestBody(req).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", getCommonConfigs)
 	}
+	return response, nil
 }
 
-func (c *configClient) CreateUpdateCommonConfig(req CommonConfig) (*CommonConfig, error) {
+func (c *ConfigClient) CreateUpdateCommonConfig(req CommonConfig) (*CommonConfig, error) {
 	response := new(CommonConfig)
-	err := c.cli.Invoke(createUpdateCommonConfig, callerId, req, response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(createUpdateCommonConfig).
+		JsonRequestBody(req).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", createUpdateCommonConfig)
 	}
+	return response, nil
 }
 
-func (c *configClient) DeleteCommonConfig(id string) (*Deleted, error) {
+func (c *ConfigClient) DeleteCommonConfig(id string) (*Deleted, error) {
 	request := identityRequest{Id: id}
 	response := new(Deleted)
-	err := c.cli.Invoke(deleteCommonConfig, callerId, request, response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(deleteCommonConfig).
+		JsonRequestBody(request).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", deleteCommonConfig)
 	}
+	return response, nil
 }
 
-func (c *configClient) GetLinksCommonConfig(id string) (*Links, error) {
+func (c *ConfigClient) GetLinksCommonConfig(id string) (*Links, error) {
 	request := identityRequest{Id: id}
 	response := new(Links)
-	err := c.cli.Invoke(getLinksCommonConfig, callerId, request, response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(getLinksCommonConfig).
+		JsonRequestBody(request).
+		ReadJsonResponse(&response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", getLinksCommonConfig)
 	}
+	return response, nil
 }
 
-func (c *configClient) CompileCommonConfigs(request CompileConfigs) (map[string]interface{}, error) {
+func (c *ConfigClient) CompileCommonConfigs(request CompileConfigs) (map[string]interface{}, error) {
 	response := make(map[string]interface{})
-	err := c.cli.Invoke(compileCommonConfigs, callerId, request, &response, backend.WithMetadata(c.headers))
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(compileCommonConfigs).
+		JsonRequestBody(request).
+		ReadJsonResponse(response).
+		Do(ctx)
 	if err != nil {
-		return nil, c.errorHandler(err)
-	} else {
-		return response, nil
+		return nil, errors.WithMessagef(err, "call %s", compileCommonConfigs)
 	}
+	return response, nil
 }
 
-func (c *configClient) errorHandler(err error) error {
-	errStatus, ok := status.FromError(err)
-	if !ok {
-		return err
-	}
-	switch errStatus.Code() {
-	case codes.Unavailable:
-		return errors.Errorf("config service didn't connection on %s", c.address)
-	default:
-		return err
-	}
+func (c *ConfigClient) errorHandler(err error) error {
+	return errors.WithMessagef(err, "isp-config-service: %s", c.address)
 }

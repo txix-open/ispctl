@@ -2,9 +2,9 @@ package common_config
 
 import (
 	"github.com/urfave/cli/v2"
-	"isp-ctl/bash"
-	"isp-ctl/flag"
-	"isp-ctl/service"
+	"ispctl/bash"
+	"ispctl/flag"
+	"ispctl/service"
 )
 
 func UnLink() *cli.Command {

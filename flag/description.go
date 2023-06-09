@@ -4,13 +4,7 @@ import "fmt"
 
 const (
 	hostName  = "gateHost"
-	hostUsage = "overrides gateHost; config-service address, default '127.0.0.1:9002'"
-
-	uuidName  = "instanceUuid"
-	uuidUsage = "overrides instanceUuid"
-
-	colorName  = "color"
-	colorUsage = "colorize the json for outputing to screen"
+	hostUsage = "isp-config-service address"
 
 	unsafeName  = "unsafe"
 	unsafeUsage = "disable checking schema for set configuration"

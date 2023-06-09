@@ -2,8 +2,9 @@ package command
 
 import (
 	"fmt"
+
 	"github.com/urfave/cli/v2"
-	"isp-ctl/command/common_config"
+	"ispctl/command/common_config"
 )
 
 func CommonConfig() *cli.Command {

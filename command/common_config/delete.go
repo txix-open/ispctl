@@ -2,13 +2,14 @@ package common_config
 
 import (
 	"encoding/json"
+
 	"github.com/pkg/errors"
 	"github.com/tidwall/sjson"
 	"github.com/urfave/cli/v2"
-	"isp-ctl/bash"
-	"isp-ctl/command/utils"
-	"isp-ctl/flag"
-	"isp-ctl/service"
+	"ispctl/bash"
+	"ispctl/command/utils"
+	"ispctl/flag"
+	"ispctl/service"
 )
 
 func Delete() *cli.Command {

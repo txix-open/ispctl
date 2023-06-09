@@ -460,7 +460,7 @@ ispctl common unlink test module_example
 
 Запрос
 ```bash
-isp-ctl common contain second_common_config
+ispctl common contain second_common_config
 ```
 Ответ
 Ответ

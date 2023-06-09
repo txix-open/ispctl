@@ -1,15 +1,16 @@
 package command
 
 import (
+	"html/template"
+	"os"
+
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
-	"html/template"
-	"isp-ctl/bash"
-	"isp-ctl/command/utils"
-	"isp-ctl/flag"
-	"isp-ctl/service"
-	"isp-ctl/tmpl"
-	"os"
+	"ispctl/bash"
+	"ispctl/command/utils"
+	"ispctl/flag"
+	"ispctl/service"
+	"ispctl/tmpl"
 )
 
 func Schema() *cli.Command {

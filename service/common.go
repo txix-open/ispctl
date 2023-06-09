@@ -1,12 +1,7 @@
 package service
 
-import "isp-ctl/cfg"
+import "ispctl/cfg"
 
 var (
-	configClient = cfg.NewConfigClient()
-	configPath   string
+	ConfigClient = cfg.NewConfigClient()
 )
-
-func SetConfigurationPath(path string) {
-	configPath = path
-}

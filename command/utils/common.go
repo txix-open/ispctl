@@ -1,15 +1,14 @@
 package utils
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
 	"io/ioutil"
-	"isp-ctl/service"
 	"os"
 	"strings"
+
+	"github.com/integration-system/isp-kit/json"
+	"github.com/pkg/errors"
+	"github.com/tidwall/gjson"
 )
 
 func CheckPath(pathObject string) (string, error) {
@@ -47,14 +46,11 @@ func CheckChangeObject(changeObject string) (string, error) {
 }
 
 func PrintAnswer(data interface{}) {
-	buffer := bytes.NewBuffer(make([]byte, 0, 1024))
-	encoder := json.NewEncoder(buffer)
+	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetEscapeHTML(false)
 	encoder.SetIndent("", "	")
 	if err := encoder.Encode(data); err != nil {
 		PrintError(err)
-	} else {
-		service.ColorService.Print(buffer.Bytes())
 	}
 }
 

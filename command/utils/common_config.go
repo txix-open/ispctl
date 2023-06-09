@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"isp-ctl/cfg"
-	"isp-ctl/service"
+	"ispctl/cfg"
+	"ispctl/service"
 )
 
 func CreateUpdateCommonConfig(stringToChange string, configuration cfg.CommonConfig) error {

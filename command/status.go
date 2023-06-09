@@ -2,13 +2,14 @@ package command
 
 import (
 	"fmt"
-	"github.com/olekukonko/tablewriter"
-	"github.com/urfave/cli/v2"
-	"isp-ctl/command/utils"
-	"isp-ctl/flag"
-	"isp-ctl/service"
 	"os"
 	"strings"
+
+	"github.com/olekukonko/tablewriter"
+	"github.com/urfave/cli/v2"
+	"ispctl/command/utils"
+	"ispctl/flag"
+	"ispctl/service"
 )
 
 const (
@@ -54,7 +55,7 @@ func (statusCommand) action(ctx *cli.Context) error {
 				connection := tableNotConnectedStatus
 				instanceList := make([]string, 0, len(module.Status))
 				for _, value := range module.Status {
-					instanceList = append(instanceList, fmt.Sprintf("%s %s", value.Address.GetAddress(), value.Version))
+					instanceList = append(instanceList, fmt.Sprintf("%s:%s %s", value.Address.IP, value.Address.Port, value.Version))
 				}
 				addresses = strings.Join(instanceList, "\n")
 				if addresses != "" {

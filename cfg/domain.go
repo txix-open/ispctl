@@ -1,9 +1,10 @@
 package cfg
 
 import (
-	"github.com/integration-system/isp-lib/v2/config/schema"
-	"github.com/integration-system/isp-lib/v2/structure"
 	"time"
+
+	"github.com/integration-system/isp-kit/cluster"
+	"github.com/integration-system/isp-kit/rc/schema"
 )
 
 type getModuleByUuidAndNameRequest struct {
@@ -23,8 +24,6 @@ type Config struct {
 	ModuleId      string
 	Version       int32
 	Active        bool
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
 	Data          map[string]interface{}
 	Unsafe        bool
 }
@@ -41,8 +40,8 @@ type CommonConfig struct {
 type Connection struct {
 	LibVersion    string
 	Version       string
-	Address       structure.AddressConfiguration
-	Endpoints     []structure.EndpointConfig `json:",omitempty"`
+	Address       cluster.AddressConfiguration
+	Endpoints     []cluster.EndpointDescriptor `json:",omitempty"`
 	EstablishedAt time.Time
 }
 

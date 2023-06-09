@@ -4,14 +4,18 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v2"
-	"isp-ctl/service"
+	"ispctl/service"
 )
 
 var (
 	//---global---
-	Host   = &cli.StringFlag{Name: hostName, Usage: hostUsage, Aliases: []string{"g", "configAddr"}}
-	Uuid   = &cli.StringFlag{Name: uuidName, Usage: uuidUsage, Aliases: []string{"u"}}
-	Color  = &cli.BoolFlag{Name: colorName, Usage: colorUsage, Aliases: []string{"c"}}
+	Host = &cli.StringFlag{
+		Name:     hostName,
+		Usage:    hostUsage,
+		Value:    "127.0.0.1:9002",
+		Required: false,
+		Aliases:  []string{"g", "configAddr"},
+	}
 	Unsafe = &cli.BoolFlag{Name: unsafeName, Usage: unsafeUsage}
 	//---local---
 	OutPrintStatus   = &cli.StringFlag{Name: outPrintName, Usage: outPrintStatusUsage}
@@ -21,36 +25,12 @@ var (
 
 func CheckGlobal(c *cli.Context) error {
 	var (
-		uuid, host string
-		color      bool
+		host string
 	)
-	if c.Bool(Color.Name) != false {
-		color = true
-	}
-	service.ColorService.Enable = color
 	service.Config.UnsafeEnable = c.Bool(Unsafe.Name)
 
-	if c.String(Host.Name) != "" {
-		host = c.String(Host.Name)
-	}
-
-	if c.String(Uuid.Name) != "" {
-		uuid = c.String(Uuid.Name)
-	}
-
-	uuid = strings.Replace(uuid, "'", "", -1)
+	host = c.String(Host.Name)
 	host = strings.Replace(host, "'", "", -1)
-	if uuid == "" || host == "" {
-		if configuration, err := service.YamlService.Parse(); err != nil {
-			return err
-		} else {
-			if uuid == "" {
-				uuid = configuration.InstanceUuid
-			}
-			if host == "" {
-				host = configuration.GateHost
-			}
-		}
-	}
-	return service.Config.ReceiveConfiguration(host, uuid)
+
+	return service.Config.ReceiveConfiguration(host)
 }

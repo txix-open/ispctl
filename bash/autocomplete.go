@@ -2,10 +2,11 @@ package bash
 
 import (
 	"fmt"
+
 	"github.com/integration-system/bellows"
 	"github.com/urfave/cli/v2"
-	"isp-ctl/flag"
-	"isp-ctl/service"
+	"ispctl/flag"
+	"ispctl/service"
 )
 
 const (

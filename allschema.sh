@@ -1,9 +1,9 @@
 #!/bin/bash
 mkdir -p schemas
 if [ -n "$*" ]; then
-  statusResponse=$(isp-ctl $* status)
+  statusResponse=$(ispctl $* status)
 else
-  statusResponse=$(isp-ctl status)
+  statusResponse=$(ispctl status)
 fi
 
 i=0
@@ -16,9 +16,9 @@ for status in $statusResponse; do
     read -ra ADDR <<<"$status"
     for module_name in "${ADDR[0]}"; do
         if [ -n "$*" ]; then
-          isp-ctl $* schema $module_name -o html > schemas/$module_name.html
+          ispctl $* schema $module_name -o html > schemas/$module_name.html
         else
-          isp-ctl schema $module_name -o html > schemas/$module_name.html
+          ispctl schema $module_name -o html > schemas/$module_name.html
         fi
       break
     done

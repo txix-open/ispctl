@@ -1,9 +1,9 @@
 #!/bin/bash
 mkdir -p configs
 if [ -n "$*" ]; then
-  statusResponse=$(isp-ctl $* status)
+  statusResponse=$(ispctl $* status)
 else
-  statusResponse=$(isp-ctl status)
+  statusResponse=$(ispctl status)
 fi
 
 i=0
@@ -16,9 +16,9 @@ for status in $statusResponse; do
     read -ra ADDR <<<"$status"
     for module_name in "${ADDR[0]}"; do
       if [ -n "$*" ]; then
-        isp-ctl $* get $module_name . > configs/$module_name.json
+        ispctl $* get $module_name . > configs/$module_name.json
       else
-        isp-ctl get $module_name . > configs/$module_name.json
+        ispctl get $module_name . > configs/$module_name.json
       fi
       break
     done

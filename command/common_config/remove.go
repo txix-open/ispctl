@@ -2,11 +2,12 @@ package common_config
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
-	"isp-ctl/bash"
-	"isp-ctl/flag"
-	"isp-ctl/service"
+	"ispctl/bash"
+	"ispctl/flag"
+	"ispctl/service"
 )
 
 func Remove() *cli.Command {
