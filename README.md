@@ -13,14 +13,8 @@
     - [ispctl set](#ispctl-set)
     - [ispctl delete](#ispctl-delete)
     - [ispctl schema](#ispctl-schema)
-    - [ispctl common](#ispctl-common)
-        * [set](#ispctl-common-set)
-        * [get](#ispctl-common-get)
-        * [delete](#ispctl-common-delete)
-        * [remove](#ispctl-common-remove)
-        * [link](#ispctl-common-link)
-        * [unlink](#ispctl-common-unlink)
-        * [contain](#ispctl-common-contain)
+    - [ispctl merge](#ispctl-merge)
+    - [ispctl gitget](#ispctl-gitget)
 
 
 ## Требования
@@ -38,7 +32,6 @@ ispctl [flag...]  get      module_name  property_path  [local_flag]
 ispctl [flag...]  set      module_name  property_path  [new_object]
 ispctl [flag...]  delete   module_name  property_path
 ispctl [flag...]  schema   module_name  [local_flag]
-ispctl [flag...]  common   sub_command
 ```
 
 ## Описание
@@ -52,7 +45,6 @@ ispctl [flag...]  common   sub_command
 | `merge`  | поблочно производит слияние конфигурации модуля с json конфигом через stdin |
 | `gitget` | скачивает из репозитория указанный файлы с указанного комита                |
 | `schema` | возвращает схему конфигурации указанного модуля                             |
-| `common` | команда для взаимодействие с общими конфигурациями                          |
 |          |                                                                             |
 
 | Флаги       | Параметры | Описание                                               |
