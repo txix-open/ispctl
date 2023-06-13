@@ -21,7 +21,6 @@
         * [link](#ispctl-common-link)
         * [unlink](#ispctl-common-unlink)
         * [contain](#ispctl-common-contain)
-    - [запрос с флагами](#Запрос-с-флагами)
 
 
 ## Требования
@@ -31,17 +30,6 @@
 ```bash
 yum install ispctl
 ```
-
-## Конфигурация
-Путь к файлу: `/etc/ispctl/config.yml`
-
-Содержимое файла:
-```yaml
-gateHost: 127.0.0.1:9002
-instanceUuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-```
-* `gateHost` - адрес и порт GRPC любого isp-config-service в кластере
-* `instanceUuid` - UUID  - идентификатор экземпляра приложений
 
 ## Использование
 ```bash
@@ -55,23 +43,23 @@ ispctl [flag...]  common   sub_command
 
 ## Описание
 
-| Команды     | Описание                                                                                    |
-|-------------|---------------------------------------------------------------------------------------------|
-| `status`    | возвращает доступные конфигурации модулей, их состояния и подключения                       |
-| `get`       | возвращает объект конфигурации указанного модуля                                            |
-| `set`       | изменяет объект конфигурации указанного модуля                                              |
-| `delete`    | удаляет объект конфигурации указанного модуля                                               |
-| `schema`    | возвращает схему конфигурации указанного модуля                                             |
-| `common`    | команда для взаимодействие с общими конфигурациями                                         |
-|             |                                                                                             |
+| Команды  | Описание                                                                    |
+|----------|-----------------------------------------------------------------------------|
+| `status` | возвращает доступные конфигурации модулей, их состояния и подключения       |
+| `get`    | возвращает объект конфигурации указанного модуля                            |
+| `set`    | изменяет объект конфигурации указанного модуля                              |
+| `delete` | удаляет объект конфигурации указанного модуля                               |
+| `merge`  | поблочно производит слияние конфигурации модуля с json конфигом через stdin |
+| `gitget` | скачивает из репозитория указанный файлы с указанного комита                |
+| `schema` | возвращает схему конфигурации указанного модуля                             |
+| `common` | команда для взаимодействие с общими конфигурациями                          |
+|          |                                                                             |
 
-| Флаги       | Параметры | Описание                                                                                                            |
-|-------------|-----------|---------------------------------------------------------------------------------------------------------------------|
-| `-g`        | string    | переопределяет gateHost из конфигурации утилиты, значение должно быть экранировано с помощью `' '`                  |
-| `-u`        | string    | переопределяет instanceUuid из конфигурации утилиты, значение должно быть экранировано с помощью `' '`              |
-| `-c`        |           | раскрашивает json перед выводом на экран                                                                            |
-| `-unsafe`   |           | отключает проверку схемы перед изменением конфигурации                                                              |
-|             |           |                                                                                                                     |
+| Флаги       | Параметры | Описание                                               |
+|-------------|-----------|--------------------------------------------------------|
+| `-g`        | string    | адрес isp-config-service                               |
+| `-unsafe`   |           | отключает проверку схемы перед изменением конфигурации |
+|             |           |                                                        |
 
 | Аргументы       | Описание                                                                                                    |
 |-----------------|-------------------------------------------------------------------------------------------------------------|
@@ -86,27 +74,6 @@ ispctl [flag...]  common   sub_command
 | `-full`         | bool      | get     | осуществляет взаимодействие с объектами конфигурации модуля с учетом объектом общих конфигураций, которые имеют связь с модулем |
 |                 |           |         |                                                                                                                                 |
 
-### sub_command
-#### common
-```bash
-ispctl [flag...]  common   set      config_name      property_path   [new_object]
-ispctl [flag...]  common   get      [config_name]    property_path
-ispctl [flag...]  common   delete   config_name      property_path
-ispctl [flag...]  common   remove   config_name
-ispctl [flag...]  common   link     config_name      module_name
-ispctl [flag...]  common   unlink   config_name      module_name
-ispctl [flag...]  common   contain  config_name
-```
-
-| Аргументы       | Описание                                                                                                    |
-|-----------------|-------------------------------------------------------------------------------------------------------------|
-| `config_name`   | Названия конфига с которым происходит взаимодействие                                                        |
-| `module_name`   | Название модуля с которым происходит взаимодействие                                                         |
-| `property_path` | Путь к объекту конфигурации, при значении `.` работа происходит со всей конфигурацией модуля                |
-| `new_object`    | Новый объект, значение должно быть экранировано с помощью `' '`, при отсутсвии ожидается ввод из stdin      |
-|                 |                                                                                                             |
-
-
 ## Пример
 ### ispctl status
 `ispctl [flag...]  status [local_flag]`
@@ -120,13 +87,13 @@ ispctl status
 ```
 Ответ
 ```bash
-       MODULE NAME       |    STATUS     |        ADDRESSES         
+       MODULE NAME       |    STATUS     |        ADDRESSES
 +------------------------+---------------+-------------------------+
-  admin                  | CONNECTED     | 127.0.0.1            
-  auth                   | NOT_CONNECTED |                          
-  config                 | CONNECTED     | 127.0.0.1  
-  converter              | CONNECTED     | 127.0.0.1       
-  journal                | NOT_CONNECTED |                     
+  admin                  | CONNECTED     | 127.0.0.1
+  auth                   | NOT_CONNECTED |
+  config                 | CONNECTED     | 127.0.0.1
+  converter              | CONNECTED     | 127.0.0.1
+  journal                | NOT_CONNECTED |
 ```
 
 ### ispctl get
@@ -187,7 +154,7 @@ ispctl get example .metrics.address
 ```bash
 ispctl set example .metrics.newField '"1000"'
 ```
-Ответ 
+Ответ
 ```bash
 {
     "journal": {
@@ -217,7 +184,7 @@ ispctl set example .metrics.newField '"1000"'
 ```bash
 ispctl set example .metrics '{"address":{"ip":"198.0.0.1","newField":"100","port":1},"gc":1,"memory":false}'
 ```
-Ответ 
+Ответ
 ```bash
 {
     "journal": {
@@ -246,7 +213,7 @@ ispctl set example .metrics '{"address":{"ip":"198.0.0.1","newField":"100","port
 ```bash
 ispctl set example . '{"journal":{"bufferSize":1111,"compress":false,"enable":true,"filename":"/var/log/example-service/runtime.log","newField":"1000"},"metrics":{"address":{"ip":"198.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
 ```
-Ответ 
+Ответ
 ```bash
 {
     "journal": {
@@ -275,7 +242,7 @@ ispctl set example . '{"journal":{"bufferSize":1111,"compress":false,"enable":tr
 ```bash
 ispctl delete example .journal
 ```
-Ответ 
+Ответ
 ```bash
 {
     "metrics": {
@@ -295,7 +262,7 @@ ispctl delete example .journal
 ```bash
 ispctl delete example .metrics.address.ip
 ```
-Ответ 
+Ответ
 ```bash
 {
     "metrics": {
@@ -314,7 +281,7 @@ ispctl delete example .metrics.address.ip
 ```bash
 ispctl delete example .
 ```
-Ответ 
+Ответ
 ```bash
 {}
 ```
@@ -364,114 +331,56 @@ ispctl schema example -o html
 </script>
 </body>
 </html>
-  
+
 ```
 
-### ispctl common
-#### ispctl common get
-Возвращает список названий общих конфигураций или, если в первом аргументе указано название общей конфигурации, возвращает объект общей конфигурации по указанному пути
-
-Запрос
-```bash
-ispctl common get 
-```
-Ответ
-```bash
-test b c 
-```
-Запрос
-```bash
-ispctl common get test .
-```
-Ответ
-```bash
+### ispctl merge
+Содержание файла `example.json`
+```json
 {
-    "test": null
+  "metrics": {
+    "gc": 1,
+    "memory": false
+  },
+  "property": "replaced"
 }
 ```
-#### ispctl common set
-Добавляет объект в общую конфигурацию по указанному пути
-
-Запрос
-```bash
-ispctl common set test .test '{"a":"a","b":"b"}'
-```
-Ответ
-```bash
+Конфигурация модуля `example`
+```json
 {
-    "test": {
-            "a": "a",
-            "b": "b"
-    }
+  "database": {
+    "host": "127.0.0.1"
+  },
+  "property": "original"
 }
 ```
-#### ispctl common delete
-Удаляет объект из общей конфигурации по указанному пути
 
-Запрос
 ```bash
-ispctl common delete test .test.a 
+ispctl merge example < example.json
 ```
-Ответ
-```bash
+Результат в конфигурации модуля
+```json
 {
-    "test": {
-            "b": "b"
-    }
+   "metrics": {
+     "gc": 1,
+     "memory": false
+   },
+   "property": "replaced",
+   "database": {
+      "host": "127.0.0.1"
+   }
 }
 ```
-#### ispctl common link
-Связывает 'common_config' к конфигурации модуля по 'module_name'. Возвращает список общих конфигураций, которые связаны с модулем
 
-Запрос
+### ispctl gitget
 ```bash
-ispctl common link test module_example
-```
-Ответ
-```bash
-[test] [second_common_config]
-```
-#### ispctl common remove
-Удаляет объект общий конфигурации, если он не связан с конфигурациями модулей. Если общая конфигурация имеет связи, выводит список модулей с которыми установлена связь
-
-Запрос
-```bash
-ispctl common remove test
-```
-Ответ
-```bash
-config [test] not deleted, need unlink in next modules:
-[module_example]
-```
-#### ispctl common unlink
-Отвязывает 'common_config' от конфигурации модуля по 'module_name'. Возвращает список общих конфигураций, которые связаны с модулем
-
-Запрос
-```bash
-ispctl common unlink test module_example
-```
-Ответ
-Ответ
-```bash
-[second_common_config]
-```
-#### ispctl common contain
-Возвращает список названий модулей, с которыми имеет связь общая конфигурация
-
-Запрос
-```bash
-ispctl common contain second_common_config
-```
-Ответ
-Ответ
-```bash
-[module_example]
+ispctl gitget git@github.com:integration-system/ispctl.git main.go d4d7c679aad47ae204c2b3a4587b032a723fe315
 ```
 
 ### Запрос с флагами
 Запрос
 ```bash
-ispctl -u '00000000-1111-2222-3333-444444444444' -g '127.0.0.1:0000' -c set example . '{"metrics":{"address":{"ip":"127.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
+ispctl -g '127.0.0.1:9002' set example . '{"metrics":{"address":{"ip":"127.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
 ```
 Ответ
 ```json
