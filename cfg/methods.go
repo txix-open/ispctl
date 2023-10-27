@@ -34,7 +34,7 @@ func (c *ConfigClient) GetAvailableConfigs() ([]ModuleInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	err := c.cli.Invoke(getAvailableConfigs).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getAvailableConfigs)
@@ -49,7 +49,7 @@ func (c *ConfigClient) GetConfigByModuleName(name string) (*Config, error) {
 	defer cancel()
 	err := c.cli.Invoke(getConfigByModuleName).
 		JsonRequestBody(request).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getConfigByModuleName)
@@ -63,7 +63,7 @@ func (c *ConfigClient) CreateUpdateConfig(request Config) (*Config, error) {
 	defer cancel()
 	err := c.cli.Invoke(createUpdateConfig).
 		JsonRequestBody(request).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", createUpdateConfig)
@@ -78,7 +78,7 @@ func (c *ConfigClient) GetSchemaByModuleId(moduleId string) (*ConfigSchema, erro
 	defer cancel()
 	err := c.cli.Invoke(getSchemaByModuleId).
 		JsonRequestBody(request).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getSchemaByModuleId)
@@ -92,7 +92,7 @@ func (c *ConfigClient) GetCommonConfigs(req []string) ([]CommonConfig, error) {
 	defer cancel()
 	err := c.cli.Invoke(getCommonConfigs).
 		JsonRequestBody(req).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getCommonConfigs)
@@ -106,7 +106,7 @@ func (c *ConfigClient) CreateUpdateCommonConfig(req CommonConfig) (*CommonConfig
 	defer cancel()
 	err := c.cli.Invoke(createUpdateCommonConfig).
 		JsonRequestBody(req).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", createUpdateCommonConfig)
@@ -121,7 +121,7 @@ func (c *ConfigClient) DeleteCommonConfig(id string) (*Deleted, error) {
 	defer cancel()
 	err := c.cli.Invoke(deleteCommonConfig).
 		JsonRequestBody(request).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", deleteCommonConfig)
@@ -136,7 +136,7 @@ func (c *ConfigClient) GetLinksCommonConfig(id string) (*Links, error) {
 	defer cancel()
 	err := c.cli.Invoke(getLinksCommonConfig).
 		JsonRequestBody(request).
-		ReadJsonResponse(&response).
+		JsonResponseBody(&response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getLinksCommonConfig)
@@ -150,7 +150,7 @@ func (c *ConfigClient) CompileCommonConfigs(request CompileConfigs) (map[string]
 	defer cancel()
 	err := c.cli.Invoke(compileCommonConfigs).
 		JsonRequestBody(request).
-		ReadJsonResponse(response).
+		JsonResponseBody(response).
 		Do(ctx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", compileCommonConfigs)

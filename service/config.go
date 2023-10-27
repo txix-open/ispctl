@@ -62,12 +62,12 @@ func (c configService) CreateUpdateConfig(stringToChange string, configuration *
 		}
 	}
 
-	configuration.Unsafe = c.UnsafeEnable
 	configuration.Data = newData
 	return c.CreateUpdateConfigV2(configuration)
 }
 
 func (c configService) CreateUpdateConfigV2(configuration *cfg.Config) (map[string]interface{}, error) {
+	configuration.Unsafe = c.UnsafeEnable
 	if resp, err := ConfigClient.CreateUpdateConfig(*configuration); err != nil {
 		if errorStatus, ok := status.FromError(err); ok {
 			switch errorStatus.Code() {
