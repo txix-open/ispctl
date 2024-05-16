@@ -46,15 +46,12 @@ type Connection struct {
 }
 
 type ModuleInfo struct {
-	Id                 string
-	Name               string
-	Active             bool
-	CreatedAt          time.Time
-	LastConnectedAt    time.Time
-	LastDisconnectedAt time.Time
-	Configs            []Config       `json:",omitempty"`
-	ConfigSchema       *schema.Schema `json:",omitempty"`
-	Status             []Connection   `json:",omitempty"`
+	Id           string
+	Name         string
+	Active       bool
+	CreatedAt    time.Time
+	ConfigSchema *schema.Schema `json:",omitempty"`
+	Status       []Connection   `json:",omitempty"`
 }
 
 type ConfigSchema struct {

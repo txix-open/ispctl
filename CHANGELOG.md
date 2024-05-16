@@ -1,3 +1,5 @@
+### v3.1.1
+* добавлена совместимость isp-config-service 3.x.x
 ### v2.2.3
 * updated dependencies
 ### v2.2.2
