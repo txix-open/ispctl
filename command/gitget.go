@@ -20,8 +20,8 @@ var (
 func GitGet() *cli.Command {
 	return &cli.Command{
 		Name:        "gitget",
-		Usage:       "gitget [repository] [file] (commit)",
-		Description: "clone and print specified file from specified repository and specified commit hash",
+		Usage:       "gitget [repository] [file] (commit|tag)",
+		Description: "clone and print specified file from specified repository and specified commit hash or tag",
 		Action: func(context *cli.Context) error {
 			storage := memory.NewStorage()
 			repo := context.Args().Get(0)
