@@ -3,6 +3,7 @@ package command
 import (
 	"io"
 	"os"
+	"regexp"
 
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
@@ -10,6 +11,10 @@ import (
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
+)
+
+var (
+	semverRegexp = regexp.MustCompile("v([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$")
 )
 
 func GitGet() *cli.Command {
@@ -36,9 +41,13 @@ func GitGet() *cli.Command {
 			}
 
 			if commit != "" {
-				err = tree.Checkout(&git.CheckoutOptions{
-					Hash: plumbing.NewHash(commit),
-				})
+				checkoutOpts := git.CheckoutOptions{}
+				if semverRegexp.MatchString(commit) {
+					checkoutOpts.Branch = plumbing.NewTagReferenceName(commit)
+				} else {
+					checkoutOpts.Hash = plumbing.NewHash(commit)
+				}
+				err = tree.Checkout(&checkoutOpts)
 				if err != nil {
 					return errors.WithMessagef(err, "checkout: %s", commit)
 				}
