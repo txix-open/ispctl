@@ -3,8 +3,8 @@ package cfg
 import (
 	"time"
 
-	"github.com/integration-system/isp-kit/cluster"
-	"github.com/integration-system/isp-kit/rc/schema"
+	"github.com/txix-open/isp-kit/cluster"
+	"github.com/txix-open/isp-kit/rc/schema"
 )
 
 type getModuleByUuidAndNameRequest struct {

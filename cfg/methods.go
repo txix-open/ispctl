@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/integration-system/isp-kit/grpc/client"
 	"github.com/pkg/errors"
+	"github.com/txix-open/isp-kit/grpc/client"
 )
 
 type ConfigClient struct {

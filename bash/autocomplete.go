@@ -2,9 +2,9 @@ package bash
 
 import (
 	"fmt"
-
-	"github.com/integration-system/bellows"
 	"github.com/urfave/cli/v2"
+
+	"github.com/txix-open/bellows"
 	"ispctl/flag"
 	"ispctl/service"
 )
