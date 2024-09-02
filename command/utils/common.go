@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/integration-system/isp-kit/json"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
+	"github.com/txix-open/isp-kit/json"
 )
 
 func CheckPath(pathObject string) (string, error) {

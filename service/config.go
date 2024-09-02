@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/integration-system/isp-kit/rc/schema"
 	"github.com/pkg/errors"
+	"github.com/txix-open/isp-kit/rc/schema"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -49,8 +49,7 @@ func (c configService) GetSchemaByModuleId(moduleId string) (schema.Schema, erro
 	if configSchema, err := ConfigClient.GetSchemaByModuleId(moduleId); err != nil {
 		return nil, err
 	} else {
-		dereferenceSchema := schema.DereferenceSchema(configSchema.Schema)
-		return dereferenceSchema, nil
+		return configSchema.Schema, nil
 	}
 }
 
