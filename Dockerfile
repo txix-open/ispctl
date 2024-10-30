@@ -23,6 +23,6 @@ ARG app_name
 ENV app_name_env=$app_name
 COPY --from=builder main /usr/bin/$app_name_env
 COPY /conf/config.yml /etc/$app_name_env/config.yml
-COPY /static/autocomplete /etc/etc/bash_completion.d/$app_name_env
+COPY /static/autocomplete /etc/bash_completion.d/$app_name_env
 
-CMD ["$app_name_env"]
+CMD ["exec $app_name_env"]
