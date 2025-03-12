@@ -11,7 +11,6 @@ import (
 
 const (
 	CommonConfigName bashArg = "config_name"
-	CommonConfigData bashArg = "config_data"
 	ModuleName       bashArg = "module_name"
 	ModuleData       bashArg = "module_data"
 	Empty            bashArg = "empty"
@@ -35,10 +34,6 @@ func (c bashCommand) Complete(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		return
 	}
-	commonConfigs, err := service.Config.GetMapNameCommonConfig()
-	if err != nil {
-		return
-	}
 	switch ctx.NArg() {
 	case 0:
 		switch c.first {
@@ -50,19 +45,9 @@ func (c bashCommand) Complete(ctx *cli.Context) {
 					fmt.Println(module.Name)
 				}
 			}
-		case CommonConfigName:
-			for _, config := range commonConfigs {
-				fmt.Println(config.Name)
-			}
 		}
 	case 1:
 		switch c.second {
-		case CommonConfigData:
-			if config, ok := commonConfigs[ctx.Args().First()]; ok {
-				for key, _ := range bellows.Flatten(config.Data) {
-					fmt.Printf(".%v\n", key)
-				}
-			}
 		case ModuleName:
 			if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
 				return

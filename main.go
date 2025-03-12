@@ -32,7 +32,6 @@ func initCommands() {
 		command.Set(),
 		command.Delete(),
 		command.Schema(),
-		command.CommonConfig(),
 		command.Merge(),
 		command.GitGet(),
 	}

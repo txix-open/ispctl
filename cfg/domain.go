@@ -62,19 +62,3 @@ type ConfigSchema struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
-
-type Deleted struct {
-	Deleted bool
-	Links   Links
-}
-
-type Links map[string][]string
-
-type identityRequest struct {
-	Id string
-}
-
-type CompileConfigs struct {
-	Data                map[string]interface{}
-	CommonConfigsIdList []string
-}

@@ -16,9 +16,6 @@ func Get() *cli.Command {
 		Usage:        "get configuration by module_name",
 		Action:       get.action,
 		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
-		Flags: []cli.Flag{
-			flag.WithCommonConfig,
-		},
 	}
 }
 
@@ -39,11 +36,6 @@ func (g getCommand) action(ctx *cli.Context) error {
 	}
 
 	data := config.Data
-	if ctx.Bool(flag.WithCommonConfig.Name) {
-		if data, err = service.Config.CompileDataWithCommonConfigs(data, config.CommonConfigs); err != nil {
-			return err
-		}
-	}
 
 	pathObject, err = utils.CheckPath(pathObject)
 	if err != nil {

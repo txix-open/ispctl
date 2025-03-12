@@ -18,9 +18,8 @@ var (
 	}
 	Unsafe = &cli.BoolFlag{Name: unsafeName, Usage: unsafeUsage}
 	//---local---
-	OutPrintStatus   = &cli.StringFlag{Name: outPrintName, Usage: outPrintStatusUsage}
-	OutPrintSchema   = &cli.StringFlag{Name: outPrintName, Usage: outPrintSchemaUsage, Value: OutPrintJsonValue}
-	WithCommonConfig = &cli.BoolFlag{Name: withCommonConfigName, Usage: withCommonConfigUsage}
+	OutPrintStatus = &cli.StringFlag{Name: outPrintName, Usage: outPrintStatusUsage}
+	OutPrintSchema = &cli.StringFlag{Name: outPrintName, Usage: outPrintSchemaUsage, Value: OutPrintJsonValue}
 )
 
 func CheckGlobal(c *cli.Context) error {
