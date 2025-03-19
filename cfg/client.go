@@ -85,3 +85,56 @@ func (c *ConfigClient) GetSchemaByModuleId(moduleId string) (*ConfigSchema, erro
 	}
 	return response, nil
 }
+
+func (c *ConfigClient) GetAllVariables() ([]Variable, error) {
+	response := make([]Variable, 0)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(getAllVariables).
+		JsonResponseBody(&response).
+		Do(ctx)
+	if err != nil {
+		return nil, errors.WithMessagef(err, "call %s", getAllVariables)
+	}
+	return response, nil
+}
+
+func (c *ConfigClient) GetVariableByName(variableName string) (*Variable, error) {
+	request := VariableByNameRequest{Name: variableName}
+	response := new(Variable)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(getVariableByName).
+		JsonRequestBody(request).
+		JsonResponseBody(&response).
+		Do(ctx)
+	if err != nil {
+		return nil, errors.WithMessagef(err, "call %s", getVariableByName)
+	}
+	return response, nil
+}
+
+func (c *ConfigClient) UpsertVariables(request []UpsertVariableRequest) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(upsertVariable).
+		JsonRequestBody(request).
+		Do(ctx)
+	if err != nil {
+		return errors.WithMessagef(err, "call %s", upsertVariable)
+	}
+	return nil
+}
+
+func (c *ConfigClient) DeleteVariable(variableName string) error {
+	request := VariableByNameRequest{Name: variableName}
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	err := c.cli.Invoke(deleteVariable).
+		JsonRequestBody(request).
+		Do(ctx)
+	if err != nil {
+		return errors.WithMessagef(err, "call %s", deleteVariable)
+	}
+	return nil
+}

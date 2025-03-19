@@ -3,8 +3,9 @@ package flag
 import (
 	"strings"
 
-	"github.com/urfave/cli/v2"
 	"ispctl/service"
+
+	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -20,6 +21,8 @@ var (
 	//---local---
 	OutPrintStatus = &cli.StringFlag{Name: outPrintName, Usage: outPrintStatusUsage}
 	OutPrintSchema = &cli.StringFlag{Name: outPrintName, Usage: outPrintSchemaUsage, Value: OutPrintJsonValue}
+
+	SetVariableSecretType = &cli.BoolFlag{Name: secretVariableName, Usage: secretVariableUsage}
 )
 
 func CheckGlobal(c *cli.Context) error {

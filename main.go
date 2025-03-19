@@ -34,6 +34,7 @@ func initCommands() {
 		command.Schema(),
 		command.Merge(),
 		command.GitGet(),
+		command.VariablesCommands(),
 	}
 	app.BashComplete = func(context *cli.Context) {
 		for _, appCommand := range app.Commands {

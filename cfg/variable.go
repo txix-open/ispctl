@@ -1,5 +1,12 @@
 package cfg
 
+const (
+	SecretVariableType = "SECRET"
+	TextVariableType   = "TEXT"
+
+	ErrCodeVariableNotFound = 2006
+)
+
 type Variable struct {
 	Name              string
 	Description       string
@@ -16,7 +23,7 @@ type LinkedConfig struct {
 
 type UpsertVariableRequest struct {
 	Name        string `validate:"required"`
-	Description string `validate:"required"`
+	Description string
 	Type        string `validate:"required,oneof=SECRET TEXT"`
 	Value       string `validate:"required"`
 }

@@ -13,7 +13,9 @@ const (
 	CommonConfigName bashArg = "config_name"
 	ModuleName       bashArg = "module_name"
 	ModuleData       bashArg = "module_data"
-	Empty            bashArg = "empty"
+
+	VariableName bashArg = "variable_name"
+	Empty        bashArg = "empty"
 )
 
 type bashArg string
@@ -34,36 +36,59 @@ func (c bashCommand) Complete(ctx *cli.Context) {
 	if err := flag.CheckGlobal(ctx); err != nil {
 		return
 	}
+
 	switch ctx.NArg() {
 	case 0:
-		switch c.first {
-		case ModuleName:
-			if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
-				return
-			} else {
-				for _, module := range arrayOfModules {
-					fmt.Println(module.Name)
-				}
-			}
-		}
+		c.completeFirstArg(ctx)
 	case 1:
-		switch c.second {
-		case ModuleName:
-			if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
-				return
-			} else {
-				for _, module := range arrayOfModules {
-					fmt.Println(module.Name)
-				}
-			}
-		case ModuleData:
-			if moduleConfiguration, err := service.Config.GetConfigurationByModuleName(ctx.Args().First()); err != nil {
-				return
-			} else {
-				for key, _ := range bellows.Flatten(moduleConfiguration.Data) {
-					fmt.Printf(".%v\n", key)
-				}
-			}
-		}
+		c.completeSecondArg(ctx)
+	}
+}
+
+func (c bashCommand) completeFirstArg(ctx *cli.Context) {
+	switch c.first {
+	case ModuleName:
+		printAvailableModules()
+	case VariableName:
+		printAvailableVariables()
+	}
+}
+
+func (c bashCommand) completeSecondArg(ctx *cli.Context) {
+	switch c.second {
+	case ModuleName:
+		printAvailableModules()
+	case ModuleData:
+		printModuleData(ctx.Args().First())
+	}
+}
+
+func printAvailableVariables() {
+	vars, err := service.Config.GetAllVariables()
+	if err != nil {
+		return
+	}
+	for _, v := range vars {
+		fmt.Println(v.Name)
+	}
+}
+
+func printAvailableModules() {
+	modules, err := service.Config.GetAvailableConfigs()
+	if err != nil {
+		return
+	}
+	for _, module := range modules {
+		fmt.Println(module.Name)
+	}
+}
+
+func printModuleData(moduleName string) {
+	config, err := service.Config.GetConfigurationByModuleName(moduleName)
+	if err != nil {
+		return
+	}
+	for key := range bellows.Flatten(config.Data) {
+		fmt.Printf(".%v\n", key)
 	}
 }

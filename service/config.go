@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 
+	"ispctl/cfg"
+
 	"github.com/pkg/errors"
+	"github.com/txix-open/isp-kit/grpc/apierrors"
 	"github.com/txix-open/isp-kit/rc/schema"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"ispctl/cfg"
 )
 
 var Config configService
@@ -91,4 +93,34 @@ func (c configService) CreateUpdateConfigV2(configuration *cfg.Config) (map[stri
 	} else {
 		return resp.Data, nil
 	}
+}
+
+func (configService) GetAllVariables() ([]cfg.Variable, error) {
+	return ConfigClient.GetAllVariables()
+}
+
+func (configService) GetVariableByName(variableName string) (*cfg.Variable, error) {
+	variable, err := ConfigClient.GetVariableByName(variableName)
+	if err == nil {
+		return variable, nil
+	}
+
+	apiError := apierrors.FromError(err)
+	if apiError != nil && apiError.ErrorCode == cfg.ErrCodeVariableNotFound {
+		return nil, errors.Errorf("variable [%s] not found", variableName)
+	}
+	return nil, err
+}
+
+func (configService) DeleteVariable(variableName string) error {
+	err := ConfigClient.DeleteVariable(variableName)
+	apiError := apierrors.FromError(err)
+	if apiError != nil && apiError.ErrorCode == cfg.ErrCodeVariableNotFound {
+		return errors.Errorf("variable [%s] not found", variableName)
+	}
+	return err
+}
+
+func (configService) UpsertVariables(vars []cfg.UpsertVariableRequest) error {
+	return ConfigClient.UpsertVariables(vars)
 }
