@@ -7,7 +7,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 	"ispctl/command"
-	"ispctl/flag"
+	"ispctl/command/flag"
 )
 
 var version = "1.1.0"

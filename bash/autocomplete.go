@@ -5,7 +5,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/txix-open/bellows"
-	"ispctl/flag"
+	"ispctl/command/flag"
 	"ispctl/service"
 )
 

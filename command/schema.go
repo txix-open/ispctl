@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"ispctl/bash"
+	"ispctl/command/flag"
 	"ispctl/command/utils"
-	"ispctl/flag"
 	"ispctl/service"
 	"ispctl/tmpl"
 )

@@ -7,8 +7,8 @@ import (
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli/v2"
+	"ispctl/command/flag"
 	"ispctl/command/utils"
-	"ispctl/flag"
 	"ispctl/service"
 )
 

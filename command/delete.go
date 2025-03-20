@@ -6,8 +6,8 @@ import (
 	"github.com/tidwall/sjson"
 	"github.com/urfave/cli/v2"
 	"ispctl/bash"
+	"ispctl/command/flag"
 	"ispctl/command/utils"
-	"ispctl/flag"
 	"ispctl/service"
 )
 
