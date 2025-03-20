@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
-	"ispctl/entity"
+	"ispctl/model"
 	"strings"
 	"time"
 
@@ -39,8 +39,8 @@ func NewConfig(cli *client.Client) Config {
 	}
 }
 
-func (c Config) GetAvailableConfigs() ([]entity.ModuleInfo, error) {
-	response := make([]entity.ModuleInfo, 0)
+func (c Config) GetAvailableConfigs() ([]model.ModuleInfo, error) {
+	response := make([]model.ModuleInfo, 0)
 	err := c.cli.Invoke(getAvailableConfigs).
 		JsonResponseBody(&response).
 		Timeout(time.Second).
@@ -51,9 +51,9 @@ func (c Config) GetAvailableConfigs() ([]entity.ModuleInfo, error) {
 	return response, nil
 }
 
-func (c Config) GetConfigByModuleName(name string) (*entity.Config, error) {
-	request := &entity.GetModuleByUuidAndNameRequest{ModuleName: name}
-	response := new(entity.Config)
+func (c Config) GetConfigByModuleName(name string) (*model.Config, error) {
+	request := &model.GetModuleByUuidAndNameRequest{ModuleName: name}
+	response := new(model.Config)
 	err := c.cli.Invoke(getConfigByModuleName).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
@@ -61,7 +61,7 @@ func (c Config) GetConfigByModuleName(name string) (*entity.Config, error) {
 		Do(c.baseCtx)
 	switch {
 	case status.Code(err) == codes.NotFound:
-		return nil, entity.ErrModuleNotFound
+		return nil, model.ErrModuleNotFound
 	case err != nil:
 		return nil, errors.WithMessagef(err, "call %s", getConfigByModuleName)
 	default:
@@ -69,8 +69,8 @@ func (c Config) GetConfigByModuleName(name string) (*entity.Config, error) {
 	}
 }
 
-func (c Config) CreateUpdateConfig(request entity.Config) (*entity.Config, error) {
-	response := new(entity.Config)
+func (c Config) CreateUpdateConfig(request model.Config) (*model.Config, error) {
+	response := new(model.Config)
 	err := c.cli.Invoke(createUpdateConfig).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
@@ -82,9 +82,9 @@ func (c Config) CreateUpdateConfig(request entity.Config) (*entity.Config, error
 	return response, nil
 }
 
-func (c Config) GetSchemaByModuleId(moduleId string) (*entity.ConfigSchema, error) {
-	request := entity.GetSchemaByModuleIdRequest{ModuleId: moduleId}
-	response := new(entity.ConfigSchema)
+func (c Config) GetSchemaByModuleId(moduleId string) (*model.ConfigSchema, error) {
+	request := model.GetSchemaByModuleIdRequest{ModuleId: moduleId}
+	response := new(model.ConfigSchema)
 	err := c.cli.Invoke(getSchemaByModuleId).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
@@ -96,8 +96,8 @@ func (c Config) GetSchemaByModuleId(moduleId string) (*entity.ConfigSchema, erro
 	return response, nil
 }
 
-func (c Config) GetAllVariables() ([]entity.Variable, error) {
-	response := make([]entity.Variable, 0)
+func (c Config) GetAllVariables() ([]model.Variable, error) {
+	response := make([]model.Variable, 0)
 	err := c.cli.Invoke(getAllVariables).
 		JsonResponseBody(&response).
 		Timeout(time.Second).
@@ -108,9 +108,9 @@ func (c Config) GetAllVariables() ([]entity.Variable, error) {
 	return response, nil
 }
 
-func (c Config) GetVariableByName(variableName string) (*entity.Variable, error) {
-	request := entity.VariableByNameRequest{Name: variableName}
-	response := new(entity.Variable)
+func (c Config) GetVariableByName(variableName string) (*model.Variable, error) {
+	request := model.VariableByNameRequest{Name: variableName}
+	response := new(model.Variable)
 	err := c.cli.Invoke(getVariableByName).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
@@ -122,7 +122,7 @@ func (c Config) GetVariableByName(variableName string) (*entity.Variable, error)
 	return response, nil
 }
 
-func (c Config) UpsertVariables(request []entity.UpsertVariableRequest) error {
+func (c Config) UpsertVariables(request []model.UpsertVariableRequest) error {
 	err := c.cli.Invoke(upsertVariable).
 		JsonRequestBody(request).
 		Timeout(time.Second).
@@ -134,7 +134,7 @@ func (c Config) UpsertVariables(request []entity.UpsertVariableRequest) error {
 }
 
 func (c Config) DeleteVariable(variableName string) error {
-	request := entity.VariableByNameRequest{Name: variableName}
+	request := model.VariableByNameRequest{Name: variableName}
 	err := c.cli.Invoke(deleteVariable).
 		JsonRequestBody(request).
 		Timeout(time.Second).
@@ -151,8 +151,8 @@ func (c Config) handleVariableError(err error, endpoint string) error {
 		return errors.WithMessagef(err, "call %s", endpoint)
 	}
 	switch {
-	case apiError.ErrorCode == entity.ErrCodeVariableNotFound:
-		return entity.ErrVariableNotFound
+	case apiError.ErrorCode == model.ErrCodeVariableNotFound:
+		return model.ErrVariableNotFound
 	default:
 		return errors.WithMessagef(err, "call %s", endpoint)
 	}

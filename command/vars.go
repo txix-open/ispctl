@@ -6,7 +6,7 @@ import (
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
-	"ispctl/entity"
+	"ispctl/model"
 	"ispctl/service"
 	"os"
 	"strings"
@@ -97,11 +97,11 @@ func (g varsCommands) getByName(ctx *cli.Context) error {
 func (g varsCommands) set(ctx *cli.Context) error {
 	variableName := ctx.Args().Get(0)
 	variableValue := ctx.Args().Get(1)
-	variableType := entity.TextVariableType
+	variableType := model.TextVariableType
 	if ctx.Bool(flag.SetVariableSecretType.Name) {
-		variableType = entity.SecretVariableType
+		variableType = model.SecretVariableType
 	}
-	return service.Config.UpsertVariables([]entity.UpsertVariableRequest{{
+	return service.Config.UpsertVariables([]model.UpsertVariableRequest{{
 		Name:  variableName,
 		Value: variableValue,
 		Type:  variableType,
@@ -120,7 +120,7 @@ func (g varsCommands) upload(ctx *cli.Context) error {
 	return service.Config.UpsertVariables(variables)
 }
 
-func (g varsCommands) readVariablesFromCsv(filepath string) ([]entity.UpsertVariableRequest, error) {
+func (g varsCommands) readVariablesFromCsv(filepath string) ([]model.UpsertVariableRequest, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file %s: %w", filepath, err)
@@ -140,9 +140,9 @@ func (g varsCommands) readVariablesFromCsv(filepath string) ([]entity.UpsertVari
 	for i, col := range header {
 		columnIndexes[strings.ToLower(col)] = i
 	}
-	variables := make([]entity.UpsertVariableRequest, 0, len(records)-1)
+	variables := make([]model.UpsertVariableRequest, 0, len(records)-1)
 	for _, row := range records[1:] {
-		variables = append(variables, entity.UpsertVariableRequest{
+		variables = append(variables, model.UpsertVariableRequest{
 			Name:        row[columnIndexes["name"]],
 			Type:        row[columnIndexes["type"]],
 			Value:       row[columnIndexes["value"]],
