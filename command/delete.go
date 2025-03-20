@@ -15,6 +15,7 @@ func Delete() *cli.Command {
 	return &cli.Command{
 		Name:         "delete",
 		Usage:        "delete configuration by module_name",
+		Before:       flag.CheckGlobal,
 		Action:       deleteComm.action,
 		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}
@@ -25,9 +26,6 @@ var deleteComm deleteCommand
 type deleteCommand struct{}
 
 func (d deleteCommand) action(ctx *cli.Context) error {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return err
-	}
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 

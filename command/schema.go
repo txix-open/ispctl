@@ -17,6 +17,7 @@ func Schema() *cli.Command {
 	return &cli.Command{
 		Name:   "schema",
 		Usage:  "get schema configuration by module_name",
+		Before: flag.CheckGlobal,
 		Action: schema.action,
 		Flags: []cli.Flag{
 			flag.OutPrintSchema,
@@ -30,23 +31,21 @@ var schema schemaCommand
 type schemaCommand struct{}
 
 func (s schemaCommand) action(ctx *cli.Context) error {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return err
-	}
 	moduleName := ctx.Args().First()
-
-	if schemaConfig := s.getSchemaConfig(moduleName); schemaConfig != nil {
-		schema := make(map[string]any)
-		schema["title"] = moduleName
-		schema["schema"] = schemaConfig
-		switch ctx.String(flag.OutPrintSchema.Name) {
-		case flag.OutPrintJsonValue:
-			utils.PrintAnswer(schema)
-		case flag.OutPrintHtmlValue:
-			s.printHtml(schema)
-		default:
-			return errors.Errorf("invalid flag value, expected [%s] or [%s]", flag.OutPrintJsonValue, flag.OutPrintHtmlValue)
-		}
+	schemaConfig := s.getSchemaConfig(moduleName)
+	if schemaConfig == nil {
+		return nil
+	}
+	schema := make(map[string]any)
+	schema["title"] = moduleName
+	schema["schema"] = schemaConfig
+	switch ctx.String(flag.OutPrintSchema.Name) {
+	case flag.OutPrintJsonValue:
+		utils.PrintAnswer(schema)
+	case flag.OutPrintHtmlValue:
+		s.printHtml(schema)
+	default:
+		return errors.Errorf("invalid flag value, expected [%s] or [%s]", flag.OutPrintJsonValue, flag.OutPrintHtmlValue)
 	}
 	return nil
 }

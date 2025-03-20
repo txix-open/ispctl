@@ -17,11 +17,8 @@ func Merge() *cli.Command {
 		Name:         "merge",
 		Usage:        "merge actual config with config from stdin",
 		BashComplete: bash.Get(bash.CommonConfigName, bash.Empty).Complete,
+		Before:       flag.CheckGlobal,
 		Action: func(context *cli.Context) error {
-			err := flag.CheckGlobal(context)
-			if err != nil {
-				return err
-			}
 			moduleName := context.Args().First()
 			config, err := service.Config.GetConfigurationByModuleName(moduleName)
 			if err != nil {

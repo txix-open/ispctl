@@ -25,6 +25,7 @@ func Status() *cli.Command {
 	return &cli.Command{
 		Name:   "status",
 		Usage:  "get available configs",
+		Before: flag.CheckGlobal,
 		Action: status.action,
 		Flags: []cli.Flag{
 			flag.OutPrintStatus,
@@ -37,9 +38,6 @@ var status statusCommand
 type statusCommand struct{}
 
 func (statusCommand) action(ctx *cli.Context) error {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return err
-	}
 	if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
 		return err
 	} else {

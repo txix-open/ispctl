@@ -14,6 +14,7 @@ func Get() *cli.Command {
 	return &cli.Command{
 		Name:         "get",
 		Usage:        "get configuration by module_name",
+		Before:       flag.CheckGlobal,
 		Action:       get.action,
 		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}

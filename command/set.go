@@ -15,6 +15,7 @@ func Set() *cli.Command {
 	return &cli.Command{
 		Name:         "set",
 		Usage:        "set configuration by module_name",
+		Before:       flag.CheckGlobal,
 		Action:       set.action,
 		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}
@@ -25,10 +26,6 @@ var set setCommand
 type setCommand struct{}
 
 func (s setCommand) action(ctx *cli.Context) error {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return err
-	}
-
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 	changeObject := ctx.Args().Get(2)
