@@ -22,7 +22,7 @@ func CheckPath(pathObject string) (string, error) {
 			continue
 		}
 		if key == 1 {
-			pathObject = fmt.Sprintf("%s", value)
+			pathObject = value
 			continue
 		}
 		pathObject = fmt.Sprintf("%s.%s", pathObject, value)
