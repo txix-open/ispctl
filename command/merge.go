@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/service"
+
+	"github.com/pkg/errors"
+	"github.com/urfave/cli/v2"
 )
 
 func Merge() *cli.Command {
@@ -17,7 +18,7 @@ func Merge() *cli.Command {
 		Name:         "merge",
 		Usage:        "merge actual config with config from stdin",
 		BashComplete: bash.Get(bash.CommonConfigName, bash.Empty).Complete,
-		Before:       flag.CheckGlobal,
+		Before:       flag.ApplyGlobalFlags,
 		Action: func(context *cli.Context) error {
 			moduleName := context.Args().First()
 			config, err := service.Config.GetConfigurationByModuleName(moduleName)

@@ -2,11 +2,13 @@ package bash
 
 import (
 	"fmt"
+
 	"github.com/urfave/cli/v2"
 
-	"github.com/txix-open/bellows"
 	"ispctl/command/flag"
 	"ispctl/service"
+
+	"github.com/txix-open/bellows"
 )
 
 const (
@@ -33,7 +35,8 @@ func Get(first bashArg, second bashArg) *bashCommand {
 }
 
 func (c bashCommand) Complete(ctx *cli.Context) {
-	if err := flag.CheckGlobal(ctx); err != nil {
+	err := flag.ApplyGlobalFlags(ctx)
+	if err != nil {
 		return
 	}
 

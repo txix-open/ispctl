@@ -3,18 +3,19 @@ package command
 import (
 	"encoding/json"
 
-	"github.com/urfave/cli/v2"
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/service"
+
+	"github.com/urfave/cli/v2"
 )
 
 func Get() *cli.Command {
 	return &cli.Command{
 		Name:         "get",
 		Usage:        "get configuration by module_name",
-		Before:       flag.CheckGlobal,
+		Before:       flag.ApplyGlobalFlags,
 		Action:       get.action,
 		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}
@@ -25,7 +26,7 @@ var get getCommand
 type getCommand struct{}
 
 func (g getCommand) action(ctx *cli.Context) error {
-	if err := flag.CheckGlobal(ctx); err != nil {
+	if err := flag.ApplyGlobalFlags(ctx); err != nil {
 		return err
 	}
 	moduleName := ctx.Args().First()

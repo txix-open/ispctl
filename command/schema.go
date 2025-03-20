@@ -4,20 +4,21 @@ import (
 	"html/template"
 	"os"
 
-	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/service"
 	"ispctl/tmpl"
+
+	"github.com/pkg/errors"
+	"github.com/urfave/cli/v2"
 )
 
 func Schema() *cli.Command {
 	return &cli.Command{
 		Name:   "schema",
 		Usage:  "get schema configuration by module_name",
-		Before: flag.CheckGlobal,
+		Before: flag.ApplyGlobalFlags,
 		Action: schema.action,
 		Flags: []cli.Flag{
 			flag.OutPrintSchema,

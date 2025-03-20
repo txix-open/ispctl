@@ -25,10 +25,8 @@ var (
 	SetVariableSecretType = &cli.BoolFlag{Name: secretVariableName, Usage: secretVariableUsage}
 )
 
-func CheckGlobal(c *cli.Context) error {
-	var (
-		host string
-	)
+func ApplyGlobalFlags(c *cli.Context) error {
+	var host string
 	service.Config.UnsafeEnable = c.Bool(Unsafe.Name)
 
 	host = c.String(Host.Name)

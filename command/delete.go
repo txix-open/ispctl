@@ -3,19 +3,20 @@ package command
 import (
 	"encoding/json"
 
-	"github.com/tidwall/sjson"
-	"github.com/urfave/cli/v2"
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/service"
+
+	"github.com/tidwall/sjson"
+	"github.com/urfave/cli/v2"
 )
 
 func Delete() *cli.Command {
 	return &cli.Command{
 		Name:         "delete",
 		Usage:        "delete configuration by module_name",
-		Before:       flag.CheckGlobal,
+		Before:       flag.ApplyGlobalFlags,
 		Action:       deleteComm.action,
 		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}

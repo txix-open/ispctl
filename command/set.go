@@ -3,19 +3,20 @@ package command
 import (
 	"encoding/json"
 
-	"github.com/tidwall/sjson"
-	"github.com/urfave/cli/v2"
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/service"
+
+	"github.com/tidwall/sjson"
+	"github.com/urfave/cli/v2"
 )
 
 func Set() *cli.Command {
 	return &cli.Command{
 		Name:         "set",
 		Usage:        "set configuration by module_name",
-		Before:       flag.CheckGlobal,
+		Before:       flag.ApplyGlobalFlags,
 		Action:       set.action,
 		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
 	}

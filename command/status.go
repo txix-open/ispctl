@@ -5,11 +5,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/olekukonko/tablewriter"
-	"github.com/urfave/cli/v2"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/service"
+
+	"github.com/olekukonko/tablewriter"
+	"github.com/urfave/cli/v2"
 )
 
 const (
@@ -25,7 +26,7 @@ func Status() *cli.Command {
 	return &cli.Command{
 		Name:   "status",
 		Usage:  "get available configs",
-		Before: flag.CheckGlobal,
+		Before: flag.ApplyGlobalFlags,
 		Action: status.action,
 		Flags: []cli.Flag{
 			flag.OutPrintStatus,

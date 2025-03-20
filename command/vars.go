@@ -3,8 +3,6 @@ package command
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/olekukonko/tablewriter"
-	"github.com/urfave/cli/v2"
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
@@ -12,6 +10,9 @@ import (
 	"ispctl/service"
 	"os"
 	"strings"
+
+	"github.com/olekukonko/tablewriter"
+	"github.com/urfave/cli/v2"
 )
 
 func VariablesCommands() *cli.Command {
@@ -22,20 +23,20 @@ func VariablesCommands() *cli.Command {
 			{
 				Name:         "get",
 				Usage:        "vars get <name>",
-				Before:       flag.CheckGlobal,
+				Before:       flag.ApplyGlobalFlags,
 				Action:       varsComm.getByName,
 				BashComplete: bash.Get(bash.VariableName, bash.Empty).Complete,
 			},
 			{
 				Name:   "list",
 				Usage:  "list all variables",
-				Before: flag.CheckGlobal,
+				Before: flag.ApplyGlobalFlags,
 				Action: varsComm.list,
 			},
 			{
 				Name:   "set",
 				Usage:  "vars set <name> <value>",
-				Before: flag.CheckGlobal,
+				Before: flag.ApplyGlobalFlags,
 				Action: varsComm.set,
 				Flags: []cli.Flag{
 					flag.SetVariableSecretType,
@@ -45,14 +46,14 @@ func VariablesCommands() *cli.Command {
 			{
 				Name:         "delete",
 				Usage:        "vars delete <name>",
-				Before:       flag.CheckGlobal,
+				Before:       flag.ApplyGlobalFlags,
 				Action:       varsComm.delete,
 				BashComplete: bash.Get(bash.VariableName, bash.Empty).Complete,
 			},
 			{
 				Name:   "upload",
 				Usage:  "vars upload <filepath>",
-				Before: flag.CheckGlobal,
+				Before: flag.ApplyGlobalFlags,
 				Action: varsComm.upload,
 			},
 		},
