@@ -6,7 +6,8 @@ import (
 )
 
 func CreateUpdateConfig(stringToChange string, configuration *cfg.Config) error {
-	if answer, err := service.Config.CreateUpdateConfig(stringToChange, configuration); err != nil {
+	answer, err := service.Config.CreateUpdateConfig(stringToChange, configuration)
+	if err != nil {
 		return err
 	} else if answer != nil {
 		PrintAnswer(answer)

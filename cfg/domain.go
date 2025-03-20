@@ -24,7 +24,7 @@ type Config struct {
 	ModuleId      string
 	Version       int32
 	Active        bool
-	Data          map[string]interface{}
+	Data          map[string]any
 	Unsafe        bool
 }
 
@@ -34,7 +34,7 @@ type CommonConfig struct {
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Data        map[string]interface{}
+	Data        map[string]any
 }
 
 type Connection struct {

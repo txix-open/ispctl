@@ -36,7 +36,7 @@ func (s schemaCommand) action(ctx *cli.Context) error {
 	moduleName := ctx.Args().First()
 
 	if schemaConfig := s.getSchemaConfig(moduleName); schemaConfig != nil {
-		schema := make(map[string]interface{})
+		schema := make(map[string]any)
 		schema["title"] = moduleName
 		schema["schema"] = schemaConfig
 		switch ctx.String(flag.OutPrintSchema.Name) {
@@ -51,7 +51,7 @@ func (s schemaCommand) action(ctx *cli.Context) error {
 	return nil
 }
 
-func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {
+func (s schemaCommand) getSchemaConfig(moduleName string) any {
 	if configuration, err := service.Config.GetConfigurationByModuleName(moduleName); err != nil {
 		utils.PrintError(err)
 		return nil
@@ -63,7 +63,7 @@ func (s schemaCommand) getSchemaConfig(moduleName string) interface{} {
 	}
 }
 
-func (s schemaCommand) printHtml(schema map[string]interface{}) {
+func (s schemaCommand) printHtml(schema map[string]any) {
 	if temp, err := template.New("template").Parse(tmpl.HtmlFile); err != nil {
 		utils.PrintError(err)
 		return

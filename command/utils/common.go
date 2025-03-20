@@ -45,7 +45,7 @@ func CheckChangeObject(changeObject string) (string, error) {
 	}
 }
 
-func PrintAnswer(data interface{}) {
+func PrintAnswer(data any) {
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetEscapeHTML(false)
 	encoder.SetIndent("", "	")
@@ -59,7 +59,7 @@ func PrintError(err error) {
 	os.Exit(-1)
 }
 
-func ParseSetObject(argument string) interface{} {
+func ParseSetObject(argument string) any {
 	tryParse := []byte(argument)
 	if tryParse[0] == '"' && tryParse[len(tryParse)-1] == '"' {
 		tryParse = tryParse[1 : len(tryParse)-1]
@@ -70,12 +70,12 @@ func ParseSetObject(argument string) interface{} {
 		return nil
 	}
 
-	mapStringInterface := make(map[string]interface{})
+	mapStringInterface := make(map[string]any)
 	if err := json.Unmarshal(tryParse, &mapStringInterface); err == nil {
 		return mapStringInterface
 	}
 
-	arrayOfObject := make([]interface{}, 0)
+	arrayOfObject := make([]any, 0)
 	if err := json.Unmarshal(tryParse, &arrayOfObject); err == nil {
 		return arrayOfObject
 	}
@@ -103,7 +103,7 @@ func CheckObject(jsonObject []byte, depth string) {
 	if jsonString.Raw == "" {
 		PrintError(errors.Errorf("path '%s' not found\n", depth))
 	} else {
-		var data interface{}
+		var data any
 		if err := json.Unmarshal([]byte(jsonString.Raw), &data); err != nil {
 			PrintError(err)
 		} else {
