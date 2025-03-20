@@ -2,10 +2,17 @@ package repository
 
 import (
 	"context"
-	"github.com/pkg/errors"
-	"github.com/txix-open/isp-kit/grpc/client"
+	"fmt"
+	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"ispctl/entity"
+	"strings"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/txix-open/isp-kit/grpc/apierrors"
+	"github.com/txix-open/isp-kit/grpc/client"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -52,10 +59,14 @@ func (c Config) GetConfigByModuleName(name string) (*entity.Config, error) {
 		JsonResponseBody(&response).
 		Timeout(time.Second).
 		Do(c.baseCtx)
-	if err != nil {
+	switch {
+	case status.Code(err) == codes.NotFound:
+		return nil, entity.ErrModuleNotFound
+	case err != nil:
 		return nil, errors.WithMessagef(err, "call %s", getConfigByModuleName)
+	default:
+		return response, nil
 	}
-	return response, nil
 }
 
 func (c Config) CreateUpdateConfig(request entity.Config) (*entity.Config, error) {
@@ -66,7 +77,7 @@ func (c Config) CreateUpdateConfig(request entity.Config) (*entity.Config, error
 		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
-		return nil, errors.WithMessagef(err, "call %s", createUpdateConfig)
+		return nil, c.handleCreateUpdateConfigError(err)
 	}
 	return response, nil
 }
@@ -106,7 +117,7 @@ func (c Config) GetVariableByName(variableName string) (*entity.Variable, error)
 		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
-		return nil, errors.WithMessagef(err, "call %s", getVariableByName)
+		return nil, c.handleVariableError(err, getVariableByName)
 	}
 	return response, nil
 }
@@ -129,7 +140,40 @@ func (c Config) DeleteVariable(variableName string) error {
 		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
-		return errors.WithMessagef(err, "call %s", deleteVariable)
+		return c.handleVariableError(err, deleteVariable)
 	}
 	return nil
+}
+
+func (c Config) handleVariableError(err error, endpoint string) error {
+	apiError := apierrors.FromError(err)
+	if apiError == nil {
+		return errors.WithMessagef(err, "call %s", endpoint)
+	}
+	switch {
+	case apiError.ErrorCode == entity.ErrCodeVariableNotFound:
+		return entity.ErrVariableNotFound
+	default:
+		return errors.WithMessagef(err, "call %s", endpoint)
+	}
+}
+
+func (c Config) handleCreateUpdateConfigError(err error) error {
+	errorStatus, ok := status.FromError(err)
+	if !ok || errorStatus.Code() != codes.InvalidArgument {
+		return errors.WithMessagef(err, "call %s", createUpdateConfig)
+	}
+	stringBuilder := strings.Builder{}
+	stringBuilder.WriteString("doesn't match with schema:\n")
+	for _, value := range errorStatus.Details() {
+		switch errorDetails := value.(type) {
+		case *epb.BadRequest:
+			for _, value := range errorDetails.FieldViolations {
+				stringBuilder.WriteString(fmt.Sprintf("%s | %s\n", value.Field, value.Description))
+			}
+		default:
+			stringBuilder.WriteString(fmt.Sprint(value))
+		}
+	}
+	return errors.New(stringBuilder.String())
 }

@@ -1,5 +1,12 @@
 package entity
 
+import "github.com/pkg/errors"
+
+var (
+	ErrModuleNotFound   = errors.New("module not found")
+	ErrVariableNotFound = errors.New("variable not found")
+)
+
 const (
 	SecretVariableType = "SECRET"
 	TextVariableType   = "TEXT"
