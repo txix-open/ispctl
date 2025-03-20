@@ -34,31 +34,30 @@ func (c configService) GetConfigurationByModuleName(moduleName string) (*cfg.Con
 		return nil, errors.New("need module name")
 	}
 
-	if moduleConfiguration, err := ConfigClient.GetConfigByModuleName(moduleName); err != nil {
-		if errorStatus, ok := status.FromError(err); ok {
-			switch errorStatus.Code() {
-			case codes.NotFound:
-				return nil, errors.Errorf("module [%s] not found", moduleName)
-			}
-		}
-		return nil, err
-	} else {
+	moduleConfiguration, err := ConfigClient.GetConfigByModuleName(moduleName)
+	if err == nil {
 		return moduleConfiguration, nil
 	}
+	errorStatus, ok := status.FromError(err)
+	if ok && errorStatus.Code() == codes.NotFound {
+		return nil, errors.Errorf("module [%s] not found", moduleName)
+	}
+	return nil, err
 }
 
 func (c configService) GetSchemaByModuleId(moduleId string) (schema.Schema, error) {
-	if configSchema, err := ConfigClient.GetSchemaByModuleId(moduleId); err != nil {
+	configSchema, err := ConfigClient.GetSchemaByModuleId(moduleId)
+	if err != nil {
 		return nil, err
-	} else {
-		return configSchema.Schema, nil
 	}
+	return configSchema.Schema, nil
 }
 
-func (c configService) CreateUpdateConfig(stringToChange string, configuration *cfg.Config) (map[string]interface{}, error) {
-	newData := make(map[string]interface{})
+func (c configService) CreateUpdateConfig(stringToChange string, configuration *cfg.Config) (map[string]any, error) {
+	newData := make(map[string]any)
 	if stringToChange != "" {
-		if err := json.Unmarshal([]byte(stringToChange), &newData); err != nil {
+		err := json.Unmarshal([]byte(stringToChange), &newData)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -67,32 +66,30 @@ func (c configService) CreateUpdateConfig(stringToChange string, configuration *
 	return c.CreateUpdateConfigV2(configuration)
 }
 
-func (c configService) CreateUpdateConfigV2(configuration *cfg.Config) (map[string]interface{}, error) {
+func (c configService) CreateUpdateConfigV2(configuration *cfg.Config) (map[string]any, error) {
 	configuration.Unsafe = c.UnsafeEnable
-	if resp, err := ConfigClient.CreateUpdateConfig(*configuration); err != nil {
-		if errorStatus, ok := status.FromError(err); ok {
-			switch errorStatus.Code() {
-			case codes.InvalidArgument:
-				fmt.Print("doesn't match with schema:\n")
-				defer func() {
-					os.Exit(1)
-				}()
-				for _, value := range errorStatus.Details() {
-					if a, ok := value.(*epb.BadRequest); ok {
-						for _, value := range a.FieldViolations {
-							fmt.Printf("%s | %s\n", value.Field, value.Description)
-						}
-					} else {
-						fmt.Println(value)
-					}
-					return nil, nil
-				}
-			}
-		}
-		return nil, err
-	} else {
+	resp, err := ConfigClient.CreateUpdateConfig(*configuration)
+	if err == nil {
 		return resp.Data, nil
 	}
+	errorStatus, ok := status.FromError(err)
+	if ok && errorStatus.Code() == codes.InvalidArgument {
+		fmt.Print("doesn't match with schema:\n")
+		defer func() {
+			os.Exit(1)
+		}()
+		for _, value := range errorStatus.Details() {
+			if a, ok := value.(*epb.BadRequest); ok {
+				for _, value := range a.FieldViolations {
+					fmt.Printf("%s | %s\n", value.Field, value.Description)
+				}
+			} else {
+				fmt.Println(value)
+			}
+			return nil, nil
+		}
+	}
+	return nil, err
 }
 
 func (configService) GetAllVariables() ([]cfg.Variable, error) {
@@ -100,6 +97,10 @@ func (configService) GetAllVariables() ([]cfg.Variable, error) {
 }
 
 func (configService) GetVariableByName(variableName string) (*cfg.Variable, error) {
+	if variableName == "" {
+		return nil, errors.New("need variable name")
+	}
+
 	variable, err := ConfigClient.GetVariableByName(variableName)
 	if err == nil {
 		return variable, nil
@@ -113,6 +114,10 @@ func (configService) GetVariableByName(variableName string) (*cfg.Variable, erro
 }
 
 func (configService) DeleteVariable(variableName string) error {
+	if variableName == "" {
+		return errors.New("need variable name")
+	}
+
 	err := ConfigClient.DeleteVariable(variableName)
 	apiError := apierrors.FromError(err)
 	if apiError != nil && apiError.ErrorCode == cfg.ErrCodeVariableNotFound {
