@@ -15,7 +15,12 @@
     - [ispctl schema](#ispctl-schema)
     - [ispctl merge](#ispctl-merge)
     - [ispctl gitget](#ispctl-gitget)
-
+    - [ispctl vars](#ispctl-vars)
+        - [ispctl vars get](#ispctl-vars-get)
+        - [ispctl vars list](#ispctl-vars-list)
+        - [ispctl vars set](#ispctl-vars-set)
+        - [ispctl vars delete](#ispctl-vars-delete)
+        - [ispctl vars upload](#ispctl-vars-upload)
 
 ## Требования
 * Linux
@@ -32,41 +37,56 @@ ispctl [flag...]  get      module_name  property_path  [local_flag]
 ispctl [flag...]  set      module_name  property_path  [new_object]
 ispctl [flag...]  delete   module_name  property_path
 ispctl [flag...]  schema   module_name  [local_flag]
+ispctl [flag...]  vars get variable_name
+ispctl [flag...]  vars list
+ispctl [flag...]  vars set [local_flag] variable_name variable_value
+ispctl [flag...]  vars delete variable_name
+ispctl [flag...]  vars upload csv_filepath
 ```
 
 ## Описание
 
-| Команды  | Описание                                                                    |
-|----------|-----------------------------------------------------------------------------|
-| `status` | возвращает доступные конфигурации модулей, их состояния и подключения       |
-| `get`    | возвращает объект конфигурации указанного модуля                            |
-| `set`    | изменяет объект конфигурации указанного модуля                              |
-| `delete` | удаляет объект конфигурации указанного модуля                               |
-| `merge`  | поблочно производит слияние конфигурации модуля с json конфигом через stdin |
-| `gitget` | скачивает из репозитория указанный файлы с указанного комита                |
-| `schema` | возвращает схему конфигурации указанного модуля                             |
-|          |                                                                             |
+| Команды       | Описание                                                                    |
+| ------------- | --------------------------------------------------------------------------- |
+| `status`      | возвращает доступные конфигурации модулей, их состояния и подключения       |
+| `get`         | возвращает объект конфигурации указанного модуля                            |
+| `set`         | изменяет объект конфигурации указанного модуля                              |
+| `delete`      | удаляет объект конфигурации указанного модуля                               |
+| `merge`       | поблочно производит слияние конфигурации модуля с json конфигом через stdin |
+| `gitget`      | скачивает из репозитория указанный файлы с указанного комита                |
+| `schema`      | возвращает схему конфигурации указанного модуля                             |
+| `vars get`    | выводит информацию о переменной в json формате                              |
+| `vars list`   | выводит список переменных в виде ASCII-таблицы                              |
+| `vars set`    | изменяет значение переменной                                                |
+| `vars delete` | удаляет переменную по имени                                                 |
+| `vars upload` | загружает переменные из csv файла                                           |
+|               |                                                                             |
 
-| Флаги       | Параметры | Описание                                               |
-|-------------|-----------|--------------------------------------------------------|
-| `-g`        | string    | адрес isp-config-service                               |
-| `-unsafe`   |           | отключает проверку схемы перед изменением конфигурации |
-|             |           |                                                        |
+| Флаги     | Параметры | Описание                                               |
+| --------- | --------- | ------------------------------------------------------ |
+| `-g`      | string    | адрес isp-config-service                               |
+| `-unsafe` |           | отключает проверку схемы перед изменением конфигурации |
+|           |           |                                                        |
 
-| Аргументы       | Описание                                                                                                    |
-|-----------------|-------------------------------------------------------------------------------------------------------------|
-| `module_name`   | Название модуля с которым происходит взаимодействие                                                         |
-| `property_path` | Путь к объекту конфигурации, при значении `.` работа происходит со всей конфигурацией модуля                |
-| `new_object`    | Новый объект, значение должно быть экранировано с помощью `' '`, при отсутсвии ожидается ввод из stdin      |
-|                 |                                                                                                             |
+| Аргументы         | Описание                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `module_name`     | Название модуля с которым происходит взаимодействие                                                    |
+| `property_path`   | Путь к объекту конфигурации, при значении `.` работа происходит со всей конфигурацией модуля           |
+| `new_object`      | Новый объект, значение должно быть экранировано с помощью `' '`, при отсутсвии ожидается ввод из stdin |
+| `variable_name`   | Название переменной с которой происходит взаимодействие                                                |
+| `variable_value`  | Значение переменной                                                                                    |
+| `csv_filepath`    | Путь к csv файлу с переменными для загрузки                                                            |
+|                   |                                                                                                        |
 
-| Локальные флаги | Параметры | Команды | Описание                                                                                                                        |
-|-----------------|-----------|---------|---------------------------------------------------------------------------------------------------------------------------------|
-| `-o`            | string    | schema  | определяет формат вывода схемы в stdout; по умолчанию `json`; возможные значения `json`, `html`                                 |
-| `-full`         | bool      | get     | осуществляет взаимодействие с объектами конфигурации модуля с учетом объектом общих конфигураций, которые имеют связь с модулем |
-|                 |           |         |                                                                                                                                 |
+| Локальные флаги | Параметры | Команды | Описание |
+| --------------- | --------- | -------- |------------------------------------------------------------------------------------------------------------------------------- |
+| `-o` | string | schema | определяет формат вывода схемы в stdout; по умолчанию `json`; возможные значения `json`, `html` |
+| `-full` | bool | get | осуществляет взаимодействие с объектами конфигурации модуля с учетом объектом общих конфигураций, которые имеют связь с модулем |
+| `-secret` | bool | vars set | устанавливает тип переменной в SECRET |
+| | | | |
 
 ## Пример
+
 ### ispctl status
 `ispctl [flag...]  status [local_flag]`
 
@@ -353,14 +373,14 @@ ispctl merge example < example.json
 Результат в конфигурации модуля
 ```json
 {
-   "metrics": {
-     "gc": 1,
-     "memory": false
-   },
-   "property": "replaced",
-   "database": {
-      "host": "127.0.0.1"
-   }
+  "metrics": {
+    "gc": 1,
+    "memory": false
+  },
+  "property": "replaced",
+  "database": {
+    "host": "127.0.0.1"
+  }
 }
 ```
 
@@ -369,22 +389,120 @@ ispctl merge example < example.json
 ispctl gitget git@github.com:integration-system/ispctl.git main.go d4d7c679aad47ae204c2b3a4587b032a723fe315
 ```
 
-### Запрос с флагами
+### ispctl vars
+#### ispctl vars get
+
+`ispctl [flag...] vars get variable_name`
+
 Запрос
+
+```bash
+ispctl vars get example_variable
+```
+
+Ответ
+
+```json
+{
+  "name": "example_variable",
+  "description": "example description text",
+  "type": "TEXT",
+  "value": "some variable value",
+  "containsInConfigs": []
+}
+```
+
+#### ispctl vars list
+
+`ispctl [flag...] vars list`
+
+Запрос
+
+```bash
+ispctl vars list
+```
+
+Ответ
+
+```bash
++--------+-------------+--------+-----------------+---------+
+|  NAME  | DESCRIPTION |  TYPE  |      VALUE      | CONFIGS |
++--------+-------------+--------+-----------------+---------+
+| var-99 | описание    | SECRET |                 |         |
++--------+-------------+--------+-----------------+---------+
+| var-6  | описание    | SECRET |                 |         |
++--------+-------------+--------+-----------------+---------+
+| var-2  | описание    | TEXT   | 1131231-2131231 |         |
++--------+-------------+--------+-----------------+---------+
+| var-1  | описание    | SECRET |                 |         |
++--------+-------------+--------+-----------------+---------+
+```
+
+#### ispctl vars set
+
+`ispctl [flag...] vars set variable_name variable_value`
+
+Запрос на изменение значения переменной и установку типа TEXT
+
+```bash
+ispctl vars set example_variable value
+```
+
+Запрос на изменение значения переменной и установку типа SECRET
+
+```bash
+ispctl vars set -secret example_variable value
+```
+
+#### ispctl vars delete
+
+`ispctl [flag...] vars delete variable_name`
+
+Запрос
+
+```bash
+ispctl vars delete example_variable
+```
+
+#### ispctl vars upload
+
+`ispctl [flag...] vars upload csv_filepath`
+
+Запрос
+
+```bash
+ispctl vars upload example.csv
+```
+
+CSV должен иметь поля `name`, `type`, `value`, `description`
+пример CSV файла:
+
+```csv
+name,type,value,description
+variable-1,SECRET,var 1 value,Описание 1 переменной
+variable-2,TEXT,plaintext value,Описание 2 переменной
+```
+
+### Запрос с флагами
+
+Запрос
+
 ```bash
 ispctl -g '127.0.0.1:9002' set example . '{"metrics":{"address":{"ip":"127.0.0.1","newField":"100","port":1},"gc":1,"memory":false}}'
 ```
+
 Ответ
+
 ```json
 {
-    "metrics": {
-        "address": {
-            "ip": "127.0.0.1",
-            "newField": "100",
-            "port": 1
-        },
-        "gc": 1,
-        "memory": false
-    }
+  "metrics": {
+    "address": {
+      "ip": "127.0.0.1",
+      "newField": "100",
+      "port": 1
+    },
+    "gc": 1,
+    "memory": false
+  }
 }
 ```
