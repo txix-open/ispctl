@@ -1,11 +1,11 @@
 package utils
 
 import (
-	"ispctl/cfg"
+	"ispctl/entity"
 	"ispctl/service"
 )
 
-func CreateUpdateConfig(stringToChange string, configuration *cfg.Config) error {
+func CreateUpdateConfig(stringToChange string, configuration *entity.Config) error {
 	answer, err := service.Config.CreateUpdateConfig(stringToChange, configuration)
 	if err != nil {
 		return err

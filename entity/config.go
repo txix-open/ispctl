@@ -1,4 +1,4 @@
-package cfg
+package entity
 
 import (
 	"time"
@@ -7,12 +7,12 @@ import (
 	"github.com/txix-open/isp-kit/rc/schema"
 )
 
-type getModuleByUuidAndNameRequest struct {
+type GetModuleByUuidAndNameRequest struct {
 	ModuleName string
 	Uuid       string
 }
 
-type getSchemaByModuleIdRequest struct {
+type GetSchemaByModuleIdRequest struct {
 	ModuleId string
 }
 

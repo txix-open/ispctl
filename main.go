@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli/v2"
 	"ispctl/command"
 	"ispctl/command/flag"
+
+	"github.com/urfave/cli/v2"
 )
 
 var version = "1.1.0"
@@ -26,16 +27,7 @@ func initCommands() {
 		flag.Unsafe,
 	}
 	app.EnableBashCompletion = true
-	app.Commands = []*cli.Command{
-		command.Status(),
-		command.Get(),
-		command.Set(),
-		command.Delete(),
-		command.Schema(),
-		command.Merge(),
-		command.GitGet(),
-		command.VariablesCommands(),
-	}
+	app.Commands = command.AllCommands()
 	app.BashComplete = func(context *cli.Context) {
 		for _, appCommand := range app.Commands {
 			fmt.Println(appCommand.Name)

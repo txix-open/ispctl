@@ -1,4 +1,4 @@
-package cfg
+package entity
 
 const (
 	SecretVariableType = "SECRET"

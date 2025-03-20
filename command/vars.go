@@ -4,9 +4,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"ispctl/bash"
-	"ispctl/cfg"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
+	"ispctl/entity"
 	"ispctl/service"
 	"os"
 	"strings"
@@ -106,12 +106,12 @@ func (g varsCommands) set(ctx *cli.Context) error {
 
 	variableName := ctx.Args().Get(0)
 	variableValue := ctx.Args().Get(1)
-	variableType := cfg.TextVariableType
+	variableType := entity.TextVariableType
 
 	if ctx.Bool(flag.SetVariableSecretType.Name) {
-		variableType = cfg.SecretVariableType
+		variableType = entity.SecretVariableType
 	}
-	return service.Config.UpsertVariables([]cfg.UpsertVariableRequest{{
+	return service.Config.UpsertVariables([]entity.UpsertVariableRequest{{
 		Name:  variableName,
 		Value: variableValue,
 		Type:  variableType,
@@ -141,7 +141,7 @@ func (g varsCommands) upload(ctx *cli.Context) error {
 	return service.Config.UpsertVariables(variables)
 }
 
-func (g varsCommands) readVariablesFromCsv(filepath string) ([]cfg.UpsertVariableRequest, error) {
+func (g varsCommands) readVariablesFromCsv(filepath string) ([]entity.UpsertVariableRequest, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file %s: %w", filepath, err)
@@ -157,15 +157,16 @@ func (g varsCommands) readVariablesFromCsv(filepath string) ([]cfg.UpsertVariabl
 	if len(records) < 2 {
 		return nil, fmt.Errorf("CSV file must have a header and at least one data row")
 	}
+
 	header := records[0]
 	columnIndexes := map[string]int{}
 	for i, col := range header {
 		columnIndexes[strings.ToLower(col)] = i
 	}
 
-	variables := make([]cfg.UpsertVariableRequest, 0, len(records)-1)
+	variables := make([]entity.UpsertVariableRequest, 0, len(records)-1)
 	for _, row := range records[1:] {
-		variables = append(variables, cfg.UpsertVariableRequest{
+		variables = append(variables, entity.UpsertVariableRequest{
 			Name:        row[columnIndexes["name"]],
 			Type:        row[columnIndexes["type"]],
 			Value:       row[columnIndexes["value"]],

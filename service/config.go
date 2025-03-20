@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"ispctl/cfg"
+	"ispctl/entity"
+	"ispctl/repository"
 
 	"github.com/pkg/errors"
 	"github.com/txix-open/isp-kit/grpc/apierrors"
@@ -15,26 +16,32 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var Config configService
+var Config = &ConfigService{}
 
-type configService struct {
+type ConfigService struct {
 	UnsafeEnable bool
+	configRepo   repository.Config
 }
 
-func (c configService) ReceiveConfiguration(host string) error {
-	return ConfigClient.ReceiveConfig(host)
+func (c *ConfigService) ReceiveConfiguration(host string) error {
+	cli, err := repository.NewClientFromHost(host)
+	if err != nil {
+		return err
+	}
+	c.configRepo = repository.NewConfig(cli)
+	return nil
 }
 
-func (c configService) GetAvailableConfigs() ([]cfg.ModuleInfo, error) {
-	return ConfigClient.GetAvailableConfigs()
+func (c *ConfigService) GetAvailableConfigs() ([]entity.ModuleInfo, error) {
+	return c.configRepo.GetAvailableConfigs()
 }
 
-func (c configService) GetConfigurationByModuleName(moduleName string) (*cfg.Config, error) {
+func (c *ConfigService) GetConfigurationByModuleName(moduleName string) (*entity.Config, error) {
 	if moduleName == "" {
 		return nil, errors.New("need module name")
 	}
 
-	moduleConfiguration, err := ConfigClient.GetConfigByModuleName(moduleName)
+	moduleConfiguration, err := c.configRepo.GetConfigByModuleName(moduleName)
 	if err == nil {
 		return moduleConfiguration, nil
 	}
@@ -45,15 +52,15 @@ func (c configService) GetConfigurationByModuleName(moduleName string) (*cfg.Con
 	return nil, err
 }
 
-func (c configService) GetSchemaByModuleId(moduleId string) (schema.Schema, error) {
-	configSchema, err := ConfigClient.GetSchemaByModuleId(moduleId)
+func (c *ConfigService) GetSchemaByModuleId(moduleId string) (schema.Schema, error) {
+	configSchema, err := c.configRepo.GetSchemaByModuleId(moduleId)
 	if err != nil {
 		return nil, err
 	}
 	return configSchema.Schema, nil
 }
 
-func (c configService) CreateUpdateConfig(stringToChange string, configuration *cfg.Config) (map[string]any, error) {
+func (c *ConfigService) CreateUpdateConfig(stringToChange string, configuration *entity.Config) (map[string]any, error) {
 	newData := make(map[string]any)
 	if stringToChange != "" {
 		err := json.Unmarshal([]byte(stringToChange), &newData)
@@ -66,12 +73,13 @@ func (c configService) CreateUpdateConfig(stringToChange string, configuration *
 	return c.CreateUpdateConfigV2(configuration)
 }
 
-func (c configService) CreateUpdateConfigV2(configuration *cfg.Config) (map[string]any, error) {
+func (c *ConfigService) CreateUpdateConfigV2(configuration *entity.Config) (map[string]any, error) {
 	configuration.Unsafe = c.UnsafeEnable
-	resp, err := ConfigClient.CreateUpdateConfig(*configuration)
+	resp, err := c.configRepo.CreateUpdateConfig(*configuration)
 	if err == nil {
 		return resp.Data, nil
 	}
+
 	errorStatus, ok := status.FromError(err)
 	if ok && errorStatus.Code() == codes.InvalidArgument {
 		fmt.Print("doesn't match with schema:\n")
@@ -79,53 +87,54 @@ func (c configService) CreateUpdateConfigV2(configuration *cfg.Config) (map[stri
 			os.Exit(1)
 		}()
 		for _, value := range errorStatus.Details() {
-			if a, ok := value.(*epb.BadRequest); ok {
-				for _, value := range a.FieldViolations {
+			switch errorDetails := value.(type) {
+			case *epb.BadRequest:
+				for _, value := range errorDetails.FieldViolations {
 					fmt.Printf("%s | %s\n", value.Field, value.Description)
 				}
-			} else {
+			default:
 				fmt.Println(value)
 			}
-			return nil, nil
 		}
+		return nil, nil
 	}
 	return nil, err
 }
 
-func (configService) GetAllVariables() ([]cfg.Variable, error) {
-	return ConfigClient.GetAllVariables()
+func (c *ConfigService) GetAllVariables() ([]entity.Variable, error) {
+	return c.configRepo.GetAllVariables()
 }
 
-func (configService) GetVariableByName(variableName string) (*cfg.Variable, error) {
+func (c *ConfigService) GetVariableByName(variableName string) (*entity.Variable, error) {
 	if variableName == "" {
 		return nil, errors.New("need variable name")
 	}
 
-	variable, err := ConfigClient.GetVariableByName(variableName)
+	variable, err := c.configRepo.GetVariableByName(variableName)
 	if err == nil {
 		return variable, nil
 	}
 
 	apiError := apierrors.FromError(err)
-	if apiError != nil && apiError.ErrorCode == cfg.ErrCodeVariableNotFound {
+	if apiError != nil && apiError.ErrorCode == entity.ErrCodeVariableNotFound {
 		return nil, errors.Errorf("variable [%s] not found", variableName)
 	}
 	return nil, err
 }
 
-func (configService) DeleteVariable(variableName string) error {
+func (c *ConfigService) DeleteVariable(variableName string) error {
 	if variableName == "" {
 		return errors.New("need variable name")
 	}
 
-	err := ConfigClient.DeleteVariable(variableName)
+	err := c.configRepo.DeleteVariable(variableName)
 	apiError := apierrors.FromError(err)
-	if apiError != nil && apiError.ErrorCode == cfg.ErrCodeVariableNotFound {
+	if apiError != nil && apiError.ErrorCode == entity.ErrCodeVariableNotFound {
 		return errors.Errorf("variable [%s] not found", variableName)
 	}
 	return err
 }
 
-func (configService) UpsertVariables(vars []cfg.UpsertVariableRequest) error {
-	return ConfigClient.UpsertVariables(vars)
+func (c *ConfigService) UpsertVariables(vars []entity.UpsertVariableRequest) error {
+	return c.configRepo.UpsertVariables(vars)
 }
