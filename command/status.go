@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/model"
 
@@ -40,7 +39,7 @@ func (c Status) Command() *cli.Command {
 		Usage:  "get available configs",
 		Action: c.action,
 		Flags: []cli.Flag{
-			flag.OutPrintStatus,
+			&cli.StringFlag{Name: OutPrintFlagName, Usage: outPrintStatusUsage},
 		},
 	}
 }
@@ -50,8 +49,8 @@ func (c Status) action(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	switch ctx.String(flag.OutPrintStatus.Name) {
-	case flag.OutPrintJsonValue:
+	switch ctx.String(OutPrintFlagName) {
+	case OutPrintJsonValue:
 		utils.PrintAnswer(arrayOfModules)
 	default:
 		table := tablewriter.NewWriter(os.Stdout)

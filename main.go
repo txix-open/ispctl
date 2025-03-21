@@ -8,7 +8,6 @@ import (
 
 	"ispctl/bash"
 	"ispctl/command"
-	"ispctl/command/flag"
 	"ispctl/repository"
 	"ispctl/service"
 
@@ -27,8 +26,17 @@ func initCommands() {
 
 	app.Version = version
 	app.Flags = []cli.Flag{
-		flag.Host,
-		flag.Unsafe,
+		&cli.StringFlag{
+			Name:     command.HostFlagName,
+			Usage:    command.HostFlagUsage,
+			Value:    "127.0.0.1:9002",
+			Required: false,
+			Aliases:  []string{"g", "configAddr"},
+		},
+		&cli.BoolFlag{
+			Name:  command.UnsafeFlagName,
+			Usage: command.UnsafeFlagUsage,
+		},
 	}
 	app.EnableBashCompletion = true
 
@@ -58,9 +66,9 @@ func initCommands() {
 }
 
 func configServiceFromGlobalFlags(ctx *cli.Context) (service.Config, error) {
-	enableUnsafe := ctx.Bool(flag.Unsafe.Name)
+	enableUnsafe := ctx.Bool(command.UnsafeFlagName)
 
-	host := ctx.String(flag.Host.Name)
+	host := ctx.String(command.HostFlagName)
 	host = strings.Replace(host, "'", "", -1)
 
 	configCli, err := repository.NewGrpcClientWithHost(host)

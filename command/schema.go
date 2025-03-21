@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"ispctl/bash"
-	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/model"
 	"ispctl/tmpl"
@@ -38,7 +37,7 @@ func (c Schema) Command() *cli.Command {
 		Usage:  "get schema configuration by module_name",
 		Action: c.action,
 		Flags: []cli.Flag{
-			flag.OutPrintSchema,
+			&cli.StringFlag{Name: OutPrintFlagName, Usage: outPrintSchemaUsage, Value: OutPrintJsonValue},
 		},
 		BashComplete: c.autoComplete.Complete(bash.ModuleName, bash.Empty),
 	}
@@ -54,13 +53,13 @@ func (c Schema) action(ctx *cli.Context) error {
 	schema := make(map[string]any)
 	schema["title"] = moduleName
 	schema["schema"] = schemaConfig
-	switch ctx.String(flag.OutPrintSchema.Name) {
-	case flag.OutPrintJsonValue:
+	switch ctx.String(OutPrintFlagName) {
+	case OutPrintJsonValue:
 		utils.PrintAnswer(schema)
-	case flag.OutPrintHtmlValue:
+	case OutPrintHtmlValue:
 		return c.printHtml(schema)
 	default:
-		return errors.Errorf("invalid flag value, expected [%s] or [%s]", flag.OutPrintJsonValue, flag.OutPrintHtmlValue)
+		return errors.Errorf("invalid flag value, expected [%s] or [%s]", OutPrintJsonValue, OutPrintHtmlValue)
 	}
 	return nil
 }

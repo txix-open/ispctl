@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"ispctl/bash"
-	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/model"
 	"os"
@@ -54,7 +53,7 @@ func (c Variables) Command() *cli.Command {
 				Usage:  "vars set <name> <value>",
 				Action: c.set,
 				Flags: []cli.Flag{
-					flag.SetVariableSecretType,
+					&cli.BoolFlag{Name: SecretFlagName, Usage: secretVariableFlagUsage},
 				},
 				BashComplete: c.autoComplete.Complete(bash.VariableName, bash.Empty),
 			},
@@ -107,7 +106,7 @@ func (c Variables) set(ctx *cli.Context) error {
 	variableName := ctx.Args().Get(0)
 	variableValue := ctx.Args().Get(1)
 	variableType := model.TextVariableType
-	if ctx.Bool(flag.SetVariableSecretType.Name) {
+	if ctx.Bool(SecretFlagName) {
 		variableType = model.SecretVariableType
 	}
 	return c.service.UpsertVariables([]model.UpsertVariableRequest{{
