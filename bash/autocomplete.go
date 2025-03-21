@@ -2,72 +2,82 @@ package bash
 
 import (
 	"fmt"
+	"ispctl/model"
+	"ispctl/service"
 
 	"github.com/urfave/cli/v2"
-
-	"ispctl/command/flag"
-	"ispctl/service"
 
 	"github.com/txix-open/bellows"
 )
 
 const (
-	CommonConfigName bashArg = "config_name"
-	ModuleName       bashArg = "module_name"
-	ModuleData       bashArg = "module_data"
+	CommonConfigName = "config_name"
+	ModuleName       = "module_name"
+	ModuleData       = "module_data"
 
-	VariableName bashArg = "variable_name"
-	Empty        bashArg = "empty"
+	VariableName = "variable_name"
+	Empty        = "empty"
 )
 
-type bashArg string
-
-type bashCommand struct {
-	first  bashArg
-	second bashArg
+type BashService interface {
+	GetAllVariables() ([]model.Variable, error)
+	GetAvailableConfigs() ([]model.ModuleInfo, error)
+	GetConfigurationByModuleName(moduleName string) (*model.Config, error)
 }
 
-func Get(first bashArg, second bashArg) *bashCommand {
-	return &bashCommand{
-		first:  first,
-		second: second,
+type BeforeComplete func(ctx *cli.Context) (service.Config, error)
+
+type Autocomplete struct {
+	beforeComplete BeforeComplete
+	service        BashService
+}
+
+func NewAutocomplete(beforeComplete BeforeComplete) Autocomplete {
+	return Autocomplete{
+		beforeComplete: beforeComplete,
 	}
 }
 
-func (c bashCommand) Complete(ctx *cli.Context) {
-	err := flag.ApplyGlobalFlags(ctx)
-	if err != nil {
-		return
+func (c Autocomplete) Complete(first string, second string) cli.BashCompleteFunc {
+	return func(ctx *cli.Context) {
+		cfgService, err := c.beforeComplete(ctx)
+		if err != nil {
+			return
+		}
+		c.service = cfgService
+		c.complete(ctx, first, second)
 	}
+}
 
+func (c Autocomplete) complete(ctx *cli.Context, first string, second string) {
 	switch ctx.NArg() {
 	case 0:
-		c.completeFirstArg(ctx)
+		c.completeFirstArg(ctx, first)
 	case 1:
-		c.completeSecondArg(ctx)
+		c.completeSecondArg(ctx, second)
 	}
 }
 
-func (c bashCommand) completeFirstArg(ctx *cli.Context) {
-	switch c.first {
+func (c Autocomplete) completeFirstArg(ctx *cli.Context, first string) {
+	switch first {
 	case ModuleName:
-		printAvailableModules()
+		c.printAvailableModules()
 	case VariableName:
-		printAvailableVariables()
+		c.printAvailableVariables()
 	}
 }
 
-func (c bashCommand) completeSecondArg(ctx *cli.Context) {
-	switch c.second {
+func (c Autocomplete) completeSecondArg(ctx *cli.Context, second string) {
+	switch second {
 	case ModuleName:
-		printAvailableModules()
+		c.printAvailableModules()
 	case ModuleData:
-		printModuleData(ctx.Args().First())
+		c.printModuleData(ctx.Args().First())
 	}
 }
 
-func printAvailableVariables() {
-	vars, err := service.Config.GetAllVariables()
+func (c Autocomplete) printAvailableVariables() {
+	vars, err := c.service.GetAllVariables()
 	if err != nil {
 		return
 	}
@@ -76,8 +86,8 @@ func printAvailableVariables() {
 	}
 }
 
-func printAvailableModules() {
-	modules, err := service.Config.GetAvailableConfigs()
+func (c Autocomplete) printAvailableModules() {
+	modules, err := c.service.GetAvailableConfigs()
 	if err != nil {
 		return
 	}
@@ -86,8 +96,8 @@ func printAvailableModules() {
 	}
 }
 
-func printModuleData(moduleName string) {
-	config, err := service.Config.GetConfigurationByModuleName(moduleName)
+func (c Autocomplete) printModuleData(moduleName string) {
+	config, err := c.service.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		return
 	}

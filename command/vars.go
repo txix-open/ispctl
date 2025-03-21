@@ -7,7 +7,6 @@ import (
 	"ispctl/command/flag"
 	"ispctl/command/utils"
 	"ispctl/model"
-	"ispctl/service"
 	"os"
 	"strings"
 
@@ -15,7 +14,26 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func VariablesCommands() *cli.Command {
+type VariablesService interface {
+	GetAllVariables() ([]model.Variable, error)
+	GetVariableByName(variableName string) (*model.Variable, error)
+	DeleteVariable(variableName string) error
+	UpsertVariables(vars []model.UpsertVariableRequest) error
+}
+
+type Variables struct {
+	service      VariablesService
+	autoComplete AutoComplete
+}
+
+func NewVariables(service VariablesService, autoComplete AutoComplete) Variables {
+	return Variables{
+		service:      service,
+		autoComplete: autoComplete,
+	}
+}
+
+func (c Variables) Command() *cli.Command {
 	return &cli.Command{
 		Name:  "vars",
 		Usage: "manage variables",
@@ -23,49 +41,40 @@ func VariablesCommands() *cli.Command {
 			{
 				Name:         "get",
 				Usage:        "vars get <name>",
-				Before:       flag.ApplyGlobalFlags,
-				Action:       varsComm.getByName,
-				BashComplete: bash.Get(bash.VariableName, bash.Empty).Complete,
+				Action:       c.getByName,
+				BashComplete: c.autoComplete.Complete(bash.VariableName, bash.Empty),
 			},
 			{
 				Name:   "list",
 				Usage:  "list all variables",
-				Before: flag.ApplyGlobalFlags,
-				Action: varsComm.list,
+				Action: c.list,
 			},
 			{
 				Name:   "set",
 				Usage:  "vars set <name> <value>",
-				Before: flag.ApplyGlobalFlags,
-				Action: varsComm.set,
+				Action: c.set,
 				Flags: []cli.Flag{
 					flag.SetVariableSecretType,
 				},
-				BashComplete: bash.Get(bash.VariableName, bash.Empty).Complete,
+				BashComplete: c.autoComplete.Complete(bash.VariableName, bash.Empty),
 			},
 			{
 				Name:         "delete",
 				Usage:        "vars delete <name>",
-				Before:       flag.ApplyGlobalFlags,
-				Action:       varsComm.delete,
-				BashComplete: bash.Get(bash.VariableName, bash.Empty).Complete,
+				Action:       c.delete,
+				BashComplete: c.autoComplete.Complete(bash.VariableName, bash.Empty),
 			},
 			{
 				Name:   "upload",
 				Usage:  "vars upload <filepath>",
-				Before: flag.ApplyGlobalFlags,
-				Action: varsComm.upload,
+				Action: c.upload,
 			},
 		},
 	}
 }
 
-var varsComm varsCommands
-
-type varsCommands struct{}
-
-func (g varsCommands) list(ctx *cli.Context) error {
-	vars, err := service.Config.GetAllVariables()
+func (c Variables) list(ctx *cli.Context) error {
+	vars, err := c.service.GetAllVariables()
 	if err != nil {
 		return err
 	}
@@ -84,9 +93,9 @@ func (g varsCommands) list(ctx *cli.Context) error {
 	return nil
 }
 
-func (g varsCommands) getByName(ctx *cli.Context) error {
+func (c Variables) getByName(ctx *cli.Context) error {
 	variableName := ctx.Args().Get(0)
-	variable, err := service.Config.GetVariableByName(variableName)
+	variable, err := c.service.GetVariableByName(variableName)
 	if err != nil {
 		return err
 	}
@@ -94,33 +103,33 @@ func (g varsCommands) getByName(ctx *cli.Context) error {
 	return nil
 }
 
-func (g varsCommands) set(ctx *cli.Context) error {
+func (c Variables) set(ctx *cli.Context) error {
 	variableName := ctx.Args().Get(0)
 	variableValue := ctx.Args().Get(1)
 	variableType := model.TextVariableType
 	if ctx.Bool(flag.SetVariableSecretType.Name) {
 		variableType = model.SecretVariableType
 	}
-	return service.Config.UpsertVariables([]model.UpsertVariableRequest{{
+	return c.service.UpsertVariables([]model.UpsertVariableRequest{{
 		Name:  variableName,
 		Value: variableValue,
 		Type:  variableType,
 	}})
 }
 
-func (g varsCommands) delete(ctx *cli.Context) error {
-	return service.Config.DeleteVariable(ctx.Args().Get(0))
+func (c Variables) delete(ctx *cli.Context) error {
+	return c.service.DeleteVariable(ctx.Args().Get(0))
 }
 
-func (g varsCommands) upload(ctx *cli.Context) error {
-	variables, err := g.readVariablesFromCsv(ctx.Args().First())
+func (c Variables) upload(ctx *cli.Context) error {
+	variables, err := c.readVariablesFromCsv(ctx.Args().First())
 	if err != nil {
 		return err
 	}
-	return service.Config.UpsertVariables(variables)
+	return c.service.UpsertVariables(variables)
 }
 
-func (g varsCommands) readVariablesFromCsv(filepath string) ([]model.UpsertVariableRequest, error) {
+func (c Variables) readVariablesFromCsv(filepath string) ([]model.UpsertVariableRequest, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file %s: %w", filepath, err)

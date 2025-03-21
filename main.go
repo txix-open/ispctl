@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
+	"ispctl/bash"
 	"ispctl/command"
 	"ispctl/command/flag"
+	"ispctl/repository"
+	"ispctl/service"
 
 	"github.com/urfave/cli/v2"
 )
@@ -27,7 +31,20 @@ func initCommands() {
 		flag.Unsafe,
 	}
 	app.EnableBashCompletion = true
-	app.Commands = command.AllCommands()
+
+	var configService service.Config
+	var autoComplete bash.Autocomplete
+	app.Before = func(ctx *cli.Context) error {
+		service, err := configServiceFromGlobalFlags(ctx)
+		if err != nil {
+			return err
+		}
+		configService = service
+		return nil
+	}
+	autoComplete = bash.NewAutocomplete(configServiceFromGlobalFlags)
+	app.Commands = command.AllCommands(&configService, autoComplete)
+
 	app.BashComplete = func(context *cli.Context) {
 		for _, appCommand := range app.Commands {
 			fmt.Println(appCommand.Name)
@@ -38,4 +55,18 @@ func initCommands() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func configServiceFromGlobalFlags(ctx *cli.Context) (service.Config, error) {
+	enableUnsafe := ctx.Bool(flag.Unsafe.Name)
+
+	host := ctx.String(flag.Host.Name)
+	host = strings.Replace(host, "'", "", -1)
+
+	configCli, err := repository.NewGrpcClientWithHost(host)
+	if err != nil {
+		return service.Config{}, err
+	}
+	configRepo := repository.NewConfig(configCli)
+	return service.NewConfig(enableUnsafe, configRepo), nil
 }

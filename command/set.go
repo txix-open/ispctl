@@ -4,34 +4,45 @@ import (
 	"encoding/json"
 
 	"ispctl/bash"
-	"ispctl/command/flag"
 	"ispctl/command/utils"
-	"ispctl/service"
+	"ispctl/model"
 
 	"github.com/tidwall/sjson"
 	"github.com/urfave/cli/v2"
 )
 
-func Set() *cli.Command {
-	return &cli.Command{
-		Name:         "set",
-		Usage:        "set configuration by module_name",
-		Before:       flag.ApplyGlobalFlags,
-		Action:       set.action,
-		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
+type SetService interface {
+	GetConfigurationByModuleName(moduleName string) (*model.Config, error)
+	CreateUpdateConfig(stringToChange string, configuration *model.Config) (map[string]any, error)
+}
+
+type Set struct {
+	service      SetService
+	autoComplete AutoComplete
+}
+
+func NewSet(service SetService, autoComplete AutoComplete) Set {
+	return Set{
+		service:      service,
+		autoComplete: autoComplete,
 	}
 }
 
-var set setCommand
+func (c Set) Command() *cli.Command {
+	return &cli.Command{
+		Name:         "set",
+		Usage:        "set configuration by module_name",
+		Action:       c.action,
+		BashComplete: c.autoComplete.Complete(bash.ModuleName, bash.ModuleData),
+	}
+}
 
-type setCommand struct{}
-
-func (s setCommand) action(ctx *cli.Context) error {
+func (c Set) action(ctx *cli.Context) error {
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 	changeObject := ctx.Args().Get(2)
 
-	config, err := service.Config.GetConfigurationByModuleName(moduleName)
+	config, err := c.service.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		return err
 	}
@@ -47,18 +58,17 @@ func (s setCommand) action(ctx *cli.Context) error {
 	}
 
 	if pathObject == "" {
-		return utils.CreateUpdateConfig(changeObject, config)
-	} else {
-		jsonObject, err := json.Marshal(config.Data)
-		if err != nil {
-			return err
-		}
-
-		changeArgument := utils.ParseSetObject(changeObject)
-		if stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument); err != nil {
-			return err
-		} else {
-			return utils.CreateUpdateConfig(stringToChange, config)
-		}
+		return utils.CreateUpdateConfig(changeObject, config, c.service)
 	}
+	jsonObject, err := json.Marshal(config.Data)
+	if err != nil {
+		return err
+	}
+
+	changeArgument := utils.ParseSetObject(changeObject)
+	stringToChange, err := sjson.Set(string(jsonObject), pathObject, changeArgument)
+	if err != nil {
+		return err
+	}
+	return utils.CreateUpdateConfig(stringToChange, config, c.service)
 }

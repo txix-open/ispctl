@@ -4,35 +4,42 @@ import (
 	"encoding/json"
 
 	"ispctl/bash"
-	"ispctl/command/flag"
 	"ispctl/command/utils"
-	"ispctl/service"
+	"ispctl/model"
 
 	"github.com/urfave/cli/v2"
 )
 
-func Get() *cli.Command {
-	return &cli.Command{
-		Name:         "get",
-		Usage:        "get configuration by module_name",
-		Before:       flag.ApplyGlobalFlags,
-		Action:       get.action,
-		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
+type GetService interface {
+	GetConfigurationByModuleName(moduleName string) (*model.Config, error)
+}
+
+type Get struct {
+	service      SetService
+	autoComplete AutoComplete
+}
+
+func NewGet(service SetService, autoComplete AutoComplete) Get {
+	return Get{
+		service:      service,
+		autoComplete: autoComplete,
 	}
 }
 
-var get getCommand
-
-type getCommand struct{}
-
-func (g getCommand) action(ctx *cli.Context) error {
-	if err := flag.ApplyGlobalFlags(ctx); err != nil {
-		return err
+func (c Get) Command() *cli.Command {
+	return &cli.Command{
+		Name:         "get",
+		Usage:        "get configuration by module_name",
+		Action:       c.action,
+		BashComplete: c.autoComplete.Complete(bash.ModuleName, bash.ModuleData),
 	}
+}
+
+func (c Get) action(ctx *cli.Context) error {
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
-	config, err := service.Config.GetConfigurationByModuleName(moduleName)
+	config, err := c.service.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		return err
 	}

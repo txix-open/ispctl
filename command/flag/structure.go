@@ -1,10 +1,6 @@
 package flag
 
 import (
-	"strings"
-
-	"ispctl/service"
-
 	"github.com/urfave/cli/v2"
 )
 
@@ -24,13 +20,3 @@ var (
 
 	SetVariableSecretType = &cli.BoolFlag{Name: secretVariableName, Usage: secretVariableUsage}
 )
-
-func ApplyGlobalFlags(c *cli.Context) error {
-	var host string
-	service.Config.UnsafeEnable = c.Bool(Unsafe.Name)
-
-	host = c.String(Host.Name)
-	host = strings.Replace(host, "'", "", -1)
-
-	return service.Config.ReceiveConfiguration(host)
-}

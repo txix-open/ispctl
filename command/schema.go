@@ -7,36 +7,50 @@ import (
 	"ispctl/bash"
 	"ispctl/command/flag"
 	"ispctl/command/utils"
-	"ispctl/service"
+	"ispctl/model"
 	"ispctl/tmpl"
 
 	"github.com/pkg/errors"
+	"github.com/txix-open/isp-kit/rc/schema"
 	"github.com/urfave/cli/v2"
 )
 
-func Schema() *cli.Command {
-	return &cli.Command{
-		Name:   "schema",
-		Usage:  "get schema configuration by module_name",
-		Before: flag.ApplyGlobalFlags,
-		Action: schema.action,
-		Flags: []cli.Flag{
-			flag.OutPrintSchema,
-		},
-		BashComplete: bash.Get(bash.ModuleName, bash.Empty).Complete,
+type SchemaService interface {
+	GetConfigurationByModuleName(moduleName string) (*model.Config, error)
+	GetSchemaByModuleId(moduleId string) (schema.Schema, error)
+}
+
+type Schema struct {
+	service      SchemaService
+	autoComplete AutoComplete
+}
+
+func NewSchema(service SchemaService, autoComplete AutoComplete) Schema {
+	return Schema{
+		service:      service,
+		autoComplete: autoComplete,
 	}
 }
 
-var schema schemaCommand
-
-type schemaCommand struct{}
-
-func (s schemaCommand) action(ctx *cli.Context) error {
-	moduleName := ctx.Args().First()
-	schemaConfig := s.getSchemaConfig(moduleName)
-	if schemaConfig == nil {
-		return nil
+func (c Schema) Command() *cli.Command {
+	return &cli.Command{
+		Name:   "schema",
+		Usage:  "get schema configuration by module_name",
+		Action: c.action,
+		Flags: []cli.Flag{
+			flag.OutPrintSchema,
+		},
+		BashComplete: c.autoComplete.Complete(bash.ModuleName, bash.Empty),
 	}
+}
+
+func (c Schema) action(ctx *cli.Context) error {
+	moduleName := ctx.Args().First()
+	schemaConfig, err := c.getSchemaConfig(moduleName)
+	if err != nil {
+		return err
+	}
+
 	schema := make(map[string]any)
 	schema["title"] = moduleName
 	schema["schema"] = schemaConfig
@@ -44,33 +58,29 @@ func (s schemaCommand) action(ctx *cli.Context) error {
 	case flag.OutPrintJsonValue:
 		utils.PrintAnswer(schema)
 	case flag.OutPrintHtmlValue:
-		s.printHtml(schema)
+		return c.printHtml(schema)
 	default:
 		return errors.Errorf("invalid flag value, expected [%s] or [%s]", flag.OutPrintJsonValue, flag.OutPrintHtmlValue)
 	}
 	return nil
 }
 
-func (s schemaCommand) getSchemaConfig(moduleName string) any {
-	if configuration, err := service.Config.GetConfigurationByModuleName(moduleName); err != nil {
-		utils.PrintError(err)
-		return nil
-	} else if schema, err := service.Config.GetSchemaByModuleId(configuration.ModuleId); err != nil {
-		utils.PrintError(err)
-		return nil
-	} else {
-		return schema
+func (c Schema) getSchemaConfig(moduleName string) (schema.Schema, error) {
+	configuration, err := c.service.GetConfigurationByModuleName(moduleName)
+	if err != nil {
+		return nil, err
 	}
+	schema, err := c.service.GetSchemaByModuleId(configuration.ModuleId)
+	if err != nil {
+		return nil, err
+	}
+	return schema, nil
 }
 
-func (s schemaCommand) printHtml(schema map[string]any) {
-	if temp, err := template.New("template").Parse(tmpl.HtmlFile); err != nil {
-		utils.PrintError(err)
-		return
-	} else {
-		if err := temp.ExecuteTemplate(os.Stdout, "template", schema); err != nil {
-			utils.PrintError(err)
-			return
-		}
+func (c Schema) printHtml(schema map[string]any) error {
+	temp, err := template.New("template").Parse(tmpl.HtmlFile)
+	if err != nil {
+		return err
 	}
+	return temp.ExecuteTemplate(os.Stdout, "template", schema)
 }

@@ -10,27 +10,23 @@ import (
 	"github.com/txix-open/isp-kit/rc/schema"
 )
 
-var Config = &ConfigService{}
-
-type ConfigService struct {
-	UnsafeEnable bool
+type Config struct {
+	enableUnsafe bool
 	configRepo   repository.Config
 }
 
-func (c *ConfigService) ReceiveConfiguration(host string) error {
-	cli, err := repository.NewClientFromHost(host)
-	if err != nil {
-		return err
+func NewConfig(enableUnsafe bool, configRepo repository.Config) Config {
+	return Config{
+		enableUnsafe: enableUnsafe,
+		configRepo:   configRepo,
 	}
-	c.configRepo = repository.NewConfig(cli)
-	return nil
 }
 
-func (c *ConfigService) GetAvailableConfigs() ([]model.ModuleInfo, error) {
+func (c Config) GetAvailableConfigs() ([]model.ModuleInfo, error) {
 	return c.configRepo.GetAvailableConfigs()
 }
 
-func (c *ConfigService) GetConfigurationByModuleName(moduleName string) (*model.Config, error) {
+func (c Config) GetConfigurationByModuleName(moduleName string) (*model.Config, error) {
 	if moduleName == "" {
 		return nil, errors.New("need module name")
 	}
@@ -44,7 +40,7 @@ func (c *ConfigService) GetConfigurationByModuleName(moduleName string) (*model.
 	}
 }
 
-func (c *ConfigService) GetSchemaByModuleId(moduleId string) (schema.Schema, error) {
+func (c Config) GetSchemaByModuleId(moduleId string) (schema.Schema, error) {
 	configSchema, err := c.configRepo.GetSchemaByModuleId(moduleId)
 	if err != nil {
 		return nil, err
@@ -52,7 +48,7 @@ func (c *ConfigService) GetSchemaByModuleId(moduleId string) (schema.Schema, err
 	return configSchema.Schema, nil
 }
 
-func (c *ConfigService) CreateUpdateConfig(stringToChange string, configuration *model.Config) (map[string]any, error) {
+func (c Config) CreateUpdateConfig(stringToChange string, configuration *model.Config) (map[string]any, error) {
 	newData := make(map[string]any)
 	if stringToChange != "" {
 		err := json.Unmarshal([]byte(stringToChange), &newData)
@@ -65,8 +61,8 @@ func (c *ConfigService) CreateUpdateConfig(stringToChange string, configuration 
 	return c.CreateUpdateConfigV2(configuration)
 }
 
-func (c *ConfigService) CreateUpdateConfigV2(configuration *model.Config) (map[string]any, error) {
-	configuration.Unsafe = c.UnsafeEnable
+func (c Config) CreateUpdateConfigV2(configuration *model.Config) (map[string]any, error) {
+	configuration.Unsafe = c.enableUnsafe
 	resp, err := c.configRepo.CreateUpdateConfig(*configuration)
 	if err != nil {
 		return nil, err
@@ -74,11 +70,11 @@ func (c *ConfigService) CreateUpdateConfigV2(configuration *model.Config) (map[s
 	return resp.Data, nil
 }
 
-func (c *ConfigService) GetAllVariables() ([]model.Variable, error) {
+func (c Config) GetAllVariables() ([]model.Variable, error) {
 	return c.configRepo.GetAllVariables()
 }
 
-func (c *ConfigService) GetVariableByName(variableName string) (*model.Variable, error) {
+func (c Config) GetVariableByName(variableName string) (*model.Variable, error) {
 	if variableName == "" {
 		return nil, errors.New("need variable name")
 	}
@@ -94,7 +90,7 @@ func (c *ConfigService) GetVariableByName(variableName string) (*model.Variable,
 	}
 }
 
-func (c *ConfigService) DeleteVariable(variableName string) error {
+func (c Config) DeleteVariable(variableName string) error {
 	if variableName == "" {
 		return errors.New("need variable name")
 	}
@@ -108,6 +104,6 @@ func (c *ConfigService) DeleteVariable(variableName string) error {
 	}
 }
 
-func (c *ConfigService) UpsertVariables(vars []model.UpsertVariableRequest) error {
+func (c Config) UpsertVariables(vars []model.UpsertVariableRequest) error {
 	return c.configRepo.UpsertVariables(vars)
 }

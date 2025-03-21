@@ -2,11 +2,14 @@ package utils
 
 import (
 	"ispctl/model"
-	"ispctl/service"
 )
 
-func CreateUpdateConfig(stringToChange string, configuration *model.Config) error {
-	answer, err := service.Config.CreateUpdateConfig(stringToChange, configuration)
+type UpdateConfigService interface {
+	CreateUpdateConfig(stringToChange string, configuration *model.Config) (map[string]any, error)
+}
+
+func CreateUpdateConfig(stringToChange string, configuration *model.Config, service UpdateConfigService) error {
+	answer, err := service.CreateUpdateConfig(stringToChange, configuration)
 	if err != nil {
 		return err
 	} else if answer != nil {
