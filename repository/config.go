@@ -163,17 +163,27 @@ func (c Config) handleCreateUpdateConfigError(err error) error {
 	if !ok || errorStatus.Code() != codes.InvalidArgument {
 		return errors.WithMessagef(err, "call %s", createUpdateConfig)
 	}
+
 	stringBuilder := strings.Builder{}
 	stringBuilder.WriteString("doesn't match with schema:\n")
-	for _, value := range errorStatus.Details() {
-		switch errorDetails := value.(type) {
-		case *epb.BadRequest:
-			for _, value := range errorDetails.FieldViolations {
-				stringBuilder.WriteString(fmt.Sprintf("%s | %s\n", value.Field, value.Description))
+
+	apiErr := apierrors.FromError(err)
+	if apiErr != nil {
+		for field, desc := range apiErr.Details {
+			stringBuilder.WriteString(fmt.Sprintf("%s | %s\n", field, desc))
+		}
+	} else {
+		for _, detail := range errorStatus.Details() {
+			switch d := detail.(type) {
+			case *epb.BadRequest:
+				for _, violation := range d.FieldViolations {
+					stringBuilder.WriteString(fmt.Sprintf("%s | %s\n", violation.Field, violation.Description))
+				}
+			default:
+				stringBuilder.WriteString(fmt.Sprint(d))
 			}
-		default:
-			stringBuilder.WriteString(fmt.Sprint(value))
 		}
 	}
+
 	return errors.New(stringBuilder.String())
 }
