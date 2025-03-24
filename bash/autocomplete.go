@@ -2,83 +2,106 @@ package bash
 
 import (
 	"fmt"
+	"ispctl/model"
+	"ispctl/service"
+
 	"github.com/urfave/cli/v2"
 
 	"github.com/txix-open/bellows"
-	"ispctl/flag"
-	"ispctl/service"
 )
 
 const (
-	CommonConfigName bashArg = "config_name"
-	CommonConfigData bashArg = "config_data"
-	ModuleName       bashArg = "module_name"
-	ModuleData       bashArg = "module_data"
-	Empty            bashArg = "empty"
+	CommonConfigName = "config_name"
+	ModuleName       = "module_name"
+	ModuleData       = "module_data"
+
+	VariableName = "variable_name"
+	Empty        = "empty"
 )
 
-type bashArg string
-
-type bashCommand struct {
-	first  bashArg
-	second bashArg
+type BashService interface {
+	GetAllVariables() ([]model.Variable, error)
+	GetAvailableConfigs() ([]model.ModuleInfo, error)
+	GetConfigurationByModuleName(moduleName string) (*model.Config, error)
 }
 
-func Get(first bashArg, second bashArg) *bashCommand {
-	return &bashCommand{
-		first:  first,
-		second: second,
+type BeforeComplete func(ctx *cli.Context) (service.Config, error)
+
+type Autocomplete struct {
+	beforeComplete BeforeComplete
+	service        BashService
+}
+
+func NewAutocomplete(beforeComplete BeforeComplete) Autocomplete {
+	return Autocomplete{
+		beforeComplete: beforeComplete,
 	}
 }
 
-func (c bashCommand) Complete(ctx *cli.Context) {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return
+func (c Autocomplete) Complete(first string, second string) cli.BashCompleteFunc {
+	return func(ctx *cli.Context) {
+		cfgService, err := c.beforeComplete(ctx)
+		if err != nil {
+			return
+		}
+		c.service = cfgService
+		c.complete(ctx, first, second)
 	}
-	commonConfigs, err := service.Config.GetMapNameCommonConfig()
+}
+
+func (c Autocomplete) complete(ctx *cli.Context, first string, second string) {
+	switch ctx.NArg() {
+	case 0:
+		c.completeFirstArg(ctx, first)
+	case 1:
+		c.completeSecondArg(ctx, second)
+	}
+}
+
+func (c Autocomplete) completeFirstArg(ctx *cli.Context, first string) {
+	switch first {
+	case ModuleName:
+		c.printAvailableModules()
+	case VariableName:
+		c.printAvailableVariables()
+	}
+}
+
+func (c Autocomplete) completeSecondArg(ctx *cli.Context, second string) {
+	switch second {
+	case ModuleName:
+		c.printAvailableModules()
+	case ModuleData:
+		c.printModuleData(ctx.Args().First())
+	}
+}
+
+func (c Autocomplete) printAvailableVariables() {
+	vars, err := c.service.GetAllVariables()
 	if err != nil {
 		return
 	}
-	switch ctx.NArg() {
-	case 0:
-		switch c.first {
-		case ModuleName:
-			if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
-				return
-			} else {
-				for _, module := range arrayOfModules {
-					fmt.Println(module.Name)
-				}
-			}
-		case CommonConfigName:
-			for _, config := range commonConfigs {
-				fmt.Println(config.Name)
-			}
-		}
-	case 1:
-		switch c.second {
-		case CommonConfigData:
-			if config, ok := commonConfigs[ctx.Args().First()]; ok {
-				for key, _ := range bellows.Flatten(config.Data) {
-					fmt.Printf(".%v\n", key)
-				}
-			}
-		case ModuleName:
-			if arrayOfModules, err := service.Config.GetAvailableConfigs(); err != nil {
-				return
-			} else {
-				for _, module := range arrayOfModules {
-					fmt.Println(module.Name)
-				}
-			}
-		case ModuleData:
-			if moduleConfiguration, err := service.Config.GetConfigurationByModuleName(ctx.Args().First()); err != nil {
-				return
-			} else {
-				for key, _ := range bellows.Flatten(moduleConfiguration.Data) {
-					fmt.Printf(".%v\n", key)
-				}
-			}
-		}
+	for _, v := range vars {
+		fmt.Println(v.Name)
+	}
+}
+
+func (c Autocomplete) printAvailableModules() {
+	modules, err := c.service.GetAvailableConfigs()
+	if err != nil {
+		return
+	}
+	for _, module := range modules {
+		fmt.Println(module.Name)
+	}
+}
+
+func (c Autocomplete) printModuleData(moduleName string) {
+	config, err := c.service.GetConfigurationByModuleName(moduleName)
+	if err != nil {
+		return
+	}
+	for key := range bellows.Flatten(config.Data) {
+		fmt.Printf(".%v\n", key)
 	}
 }

@@ -3,35 +3,45 @@ package command
 import (
 	"encoding/json"
 
-	"github.com/tidwall/sjson"
-	"github.com/urfave/cli/v2"
 	"ispctl/bash"
 	"ispctl/command/utils"
-	"ispctl/flag"
-	"ispctl/service"
+	"ispctl/model"
+
+	"github.com/tidwall/sjson"
+	"github.com/urfave/cli/v2"
 )
 
-func Delete() *cli.Command {
-	return &cli.Command{
-		Name:         "delete",
-		Usage:        "delete configuration by module_name",
-		Action:       deleteComm.action,
-		BashComplete: bash.Get(bash.ModuleName, bash.ModuleData).Complete,
+type DeleteService interface {
+	GetConfigurationByModuleName(moduleName string) (*model.Config, error)
+	CreateUpdateConfig(stringToChange string, configuration *model.Config) (map[string]any, error)
+}
+
+type Delete struct {
+	service      DeleteService
+	autoComplete AutoComplete
+}
+
+func NewDelete(service DeleteService, autoComplete AutoComplete) Delete {
+	return Delete{
+		service:      service,
+		autoComplete: autoComplete,
 	}
 }
 
-var deleteComm deleteCommand
-
-type deleteCommand struct{}
-
-func (d deleteCommand) action(ctx *cli.Context) error {
-	if err := flag.CheckGlobal(ctx); err != nil {
-		return err
+func (c Delete) Command() *cli.Command {
+	return &cli.Command{
+		Name:         "delete",
+		Usage:        "delete configuration by module_name",
+		Action:       c.action,
+		BashComplete: c.autoComplete.Complete(bash.ModuleName, bash.ModuleData),
 	}
+}
+
+func (c Delete) action(ctx *cli.Context) error {
 	moduleName := ctx.Args().First()
 	pathObject := ctx.Args().Get(1)
 
-	moduleConfiguration, err := service.Config.GetConfigurationByModuleName(moduleName)
+	moduleConfiguration, err := c.service.GetConfigurationByModuleName(moduleName)
 	if err != nil {
 		return err
 	}
@@ -40,19 +50,18 @@ func (d deleteCommand) action(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-
 	if pathObject == "" {
-		return utils.CreateUpdateConfig("", moduleConfiguration)
-	} else {
-		jsonObject, err := json.Marshal(moduleConfiguration.Data)
-		if err != nil {
-			return err
-		}
-
-		if stringToChange, err := sjson.Delete(string(jsonObject), pathObject); err != nil {
-			return err
-		} else {
-			return utils.CreateUpdateConfig(stringToChange, moduleConfiguration)
-		}
+		return CreateUpdateConfig("", moduleConfiguration, c.service)
 	}
+
+	jsonObject, err := json.Marshal(moduleConfiguration.Data)
+	if err != nil {
+		return err
+	}
+	stringToChange, err := sjson.Delete(string(jsonObject), pathObject)
+	if err != nil {
+		return err
+	}
+
+	return CreateUpdateConfig(stringToChange, moduleConfiguration, c.service)
 }

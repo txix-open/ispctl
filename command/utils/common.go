@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 
@@ -22,7 +22,7 @@ func CheckPath(pathObject string) (string, error) {
 			continue
 		}
 		if key == 1 {
-			pathObject = fmt.Sprintf("%s", value)
+			pathObject = value
 			continue
 		}
 		pathObject = fmt.Sprintf("%s.%s", pathObject, value)
@@ -32,7 +32,7 @@ func CheckPath(pathObject string) (string, error) {
 
 func CheckChangeObject(changeObject string) (string, error) {
 	if changeObject == "" {
-		bytes, err := ioutil.ReadAll(os.Stdin)
+		bytes, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return "", err
 		}
@@ -40,26 +40,18 @@ func CheckChangeObject(changeObject string) (string, error) {
 	}
 	if changeObject == "" {
 		return "", errors.New("expected argument")
-	} else {
-		return changeObject, nil
 	}
+	return changeObject, nil
 }
 
-func PrintAnswer(data interface{}) {
+func PrintAnswer(data any) error {
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetEscapeHTML(false)
 	encoder.SetIndent("", "	")
-	if err := encoder.Encode(data); err != nil {
-		PrintError(err)
-	}
+	return encoder.Encode(data)
 }
 
-func PrintError(err error) {
-	fmt.Println("ERROR:", err)
-	os.Exit(-1)
-}
-
-func ParseSetObject(argument string) interface{} {
+func ParseSetObject(argument string) any {
 	tryParse := []byte(argument)
 	if tryParse[0] == '"' && tryParse[len(tryParse)-1] == '"' {
 		tryParse = tryParse[1 : len(tryParse)-1]
@@ -70,12 +62,12 @@ func ParseSetObject(argument string) interface{} {
 		return nil
 	}
 
-	mapStringInterface := make(map[string]interface{})
+	mapStringInterface := make(map[string]any)
 	if err := json.Unmarshal(tryParse, &mapStringInterface); err == nil {
 		return mapStringInterface
 	}
 
-	arrayOfObject := make([]interface{}, 0)
+	arrayOfObject := make([]any, 0)
 	if err := json.Unmarshal(tryParse, &arrayOfObject); err == nil {
 		return arrayOfObject
 	}
@@ -98,16 +90,15 @@ func ParseSetObject(argument string) interface{} {
 	return argument
 }
 
-func CheckObject(jsonObject []byte, depth string) {
+func CheckObject(jsonObject []byte, depth string) error {
 	jsonString := gjson.GetBytes(jsonObject, depth)
 	if jsonString.Raw == "" {
-		PrintError(errors.Errorf("path '%s' not found\n", depth))
-	} else {
-		var data interface{}
-		if err := json.Unmarshal([]byte(jsonString.Raw), &data); err != nil {
-			PrintError(err)
-		} else {
-			PrintAnswer(data)
-		}
+		return errors.Errorf("path '%s' not found\n", depth)
 	}
+	var data any
+	err := json.Unmarshal([]byte(jsonString.Raw), &data)
+	if err != nil {
+		return err
+	}
+	return PrintAnswer(data)
 }
