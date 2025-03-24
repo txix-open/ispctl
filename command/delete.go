@@ -51,7 +51,7 @@ func (c Delete) action(ctx *cli.Context) error {
 		return err
 	}
 	if pathObject == "" {
-		return utils.CreateUpdateConfig("", moduleConfiguration, c.service)
+		return CreateUpdateConfig("", moduleConfiguration, c.service)
 	}
 
 	jsonObject, err := json.Marshal(moduleConfiguration.Data)
@@ -63,5 +63,5 @@ func (c Delete) action(ctx *cli.Context) error {
 		return err
 	}
 
-	return utils.CreateUpdateConfig(stringToChange, moduleConfiguration, c.service)
+	return CreateUpdateConfig(stringToChange, moduleConfiguration, c.service)
 }

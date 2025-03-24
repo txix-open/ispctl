@@ -52,13 +52,12 @@ func (c Get) action(ctx *cli.Context) error {
 	}
 
 	if pathObject == "" {
-		utils.PrintAnswer(data)
-	} else {
-		jsonObject, err := json.Marshal(data)
-		if err != nil {
-			return err
-		}
-		utils.CheckObject(jsonObject, pathObject)
+		return utils.PrintAnswer(data)
 	}
-	return nil
+
+	jsonObject, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return utils.CheckObject(jsonObject, pathObject)
 }

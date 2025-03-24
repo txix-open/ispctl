@@ -51,7 +51,7 @@ func (c Status) action(ctx *cli.Context) error {
 	}
 	switch ctx.String(OutPrintFlagName) {
 	case OutPrintJsonValue:
-		utils.PrintAnswer(arrayOfModules)
+		return utils.PrintAnswer(arrayOfModules)
 	default:
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})

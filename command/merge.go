@@ -58,7 +58,6 @@ func (c Merge) action(ctx *cli.Context) error {
 	if err != nil {
 		return errors.WithMessagef(err, "update module config '%s'", moduleName)
 	}
-	utils.PrintAnswer(result)
 
-	return nil
+	return utils.PrintAnswer(result)
 }

@@ -1,6 +1,7 @@
 package command
 
 import (
+	"ispctl/command/utils"
 	"ispctl/model"
 
 	"github.com/txix-open/isp-kit/rc/schema"
@@ -23,6 +24,10 @@ type ConfigService interface {
 	UpsertVariables(vars []model.UpsertVariableRequest) error
 }
 
+type UpdateConfigService interface {
+	CreateUpdateConfig(stringToChange string, configuration *model.Config) (map[string]any, error)
+}
+
 func AllCommands(configService ConfigService, autoComplete AutoComplete) []*cli.Command {
 	status := NewStatus(configService)
 	get := NewGet(configService, autoComplete)
@@ -42,4 +47,15 @@ func AllCommands(configService ConfigService, autoComplete AutoComplete) []*cli.
 		gitGet.Command(),
 		variables.Command(),
 	}
+}
+
+func CreateUpdateConfig(stringToChange string, configuration *model.Config, service UpdateConfigService) error {
+	answer, err := service.CreateUpdateConfig(stringToChange, configuration)
+	if err != nil {
+		return err
+	}
+	if answer != nil {
+		return utils.PrintAnswer(answer)
+	}
+	return nil
 }

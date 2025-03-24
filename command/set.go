@@ -58,7 +58,7 @@ func (c Set) action(ctx *cli.Context) error {
 	}
 
 	if pathObject == "" {
-		return utils.CreateUpdateConfig(changeObject, config, c.service)
+		return CreateUpdateConfig(changeObject, config, c.service)
 	}
 	jsonObject, err := json.Marshal(config.Data)
 	if err != nil {
@@ -70,5 +70,5 @@ func (c Set) action(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	return utils.CreateUpdateConfig(stringToChange, config, c.service)
+	return CreateUpdateConfig(stringToChange, config, c.service)
 }

@@ -55,13 +55,12 @@ func (c Schema) action(ctx *cli.Context) error {
 	schema["schema"] = schemaConfig
 	switch ctx.String(OutPrintFlagName) {
 	case OutPrintJsonValue:
-		utils.PrintAnswer(schema)
+		return utils.PrintAnswer(schema)
 	case OutPrintHtmlValue:
 		return c.printHtml(schema)
 	default:
 		return errors.Errorf("invalid flag value, expected [%s] or [%s]", OutPrintJsonValue, OutPrintHtmlValue)
 	}
-	return nil
 }
 
 func (c Schema) getSchemaConfig(moduleName string) (schema.Schema, error) {

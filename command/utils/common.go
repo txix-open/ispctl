@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 
@@ -32,7 +32,7 @@ func CheckPath(pathObject string) (string, error) {
 
 func CheckChangeObject(changeObject string) (string, error) {
 	if changeObject == "" {
-		bytes, err := ioutil.ReadAll(os.Stdin)
+		bytes, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return "", err
 		}
@@ -40,23 +40,15 @@ func CheckChangeObject(changeObject string) (string, error) {
 	}
 	if changeObject == "" {
 		return "", errors.New("expected argument")
-	} else {
-		return changeObject, nil
 	}
+	return changeObject, nil
 }
 
-func PrintAnswer(data any) {
+func PrintAnswer(data any) error {
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetEscapeHTML(false)
 	encoder.SetIndent("", "	")
-	if err := encoder.Encode(data); err != nil {
-		PrintError(err)
-	}
-}
-
-func PrintError(err error) {
-	fmt.Println("ERROR:", err)
-	os.Exit(-1)
+	return encoder.Encode(data)
 }
 
 func ParseSetObject(argument string) any {
@@ -98,16 +90,15 @@ func ParseSetObject(argument string) any {
 	return argument
 }
 
-func CheckObject(jsonObject []byte, depth string) {
+func CheckObject(jsonObject []byte, depth string) error {
 	jsonString := gjson.GetBytes(jsonObject, depth)
 	if jsonString.Raw == "" {
-		PrintError(errors.Errorf("path '%s' not found\n", depth))
-	} else {
-		var data any
-		if err := json.Unmarshal([]byte(jsonString.Raw), &data); err != nil {
-			PrintError(err)
-		} else {
-			PrintAnswer(data)
-		}
+		return errors.Errorf("path '%s' not found\n", depth)
 	}
+	var data any
+	err := json.Unmarshal([]byte(jsonString.Raw), &data)
+	if err != nil {
+		return err
+	}
+	return PrintAnswer(data)
 }

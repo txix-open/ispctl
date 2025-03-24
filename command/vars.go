@@ -98,8 +98,7 @@ func (c Variables) getByName(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	utils.PrintAnswer(variable)
-	return nil
+	return utils.PrintAnswer(variable)
 }
 
 func (c Variables) set(ctx *cli.Context) error {
