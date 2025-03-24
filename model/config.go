@@ -1,4 +1,4 @@
-package cfg
+package model
 
 import (
 	"time"
@@ -7,12 +7,12 @@ import (
 	"github.com/txix-open/isp-kit/rc/schema"
 )
 
-type getModuleByUuidAndNameRequest struct {
+type GetModuleByUuidAndNameRequest struct {
 	ModuleName string
 	Uuid       string
 }
 
-type getSchemaByModuleIdRequest struct {
+type GetSchemaByModuleIdRequest struct {
 	ModuleId string
 }
 
@@ -24,7 +24,7 @@ type Config struct {
 	ModuleId      string
 	Version       int32
 	Active        bool
-	Data          map[string]interface{}
+	Data          map[string]any
 	Unsafe        bool
 }
 
@@ -34,7 +34,7 @@ type CommonConfig struct {
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Data        map[string]interface{}
+	Data        map[string]any
 }
 
 type Connection struct {
@@ -61,20 +61,4 @@ type ConfigSchema struct {
 	Schema    schema.Schema
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-type Deleted struct {
-	Deleted bool
-	Links   Links
-}
-
-type Links map[string][]string
-
-type identityRequest struct {
-	Id string
-}
-
-type CompileConfigs struct {
-	Data                map[string]interface{}
-	CommonConfigsIdList []string
 }
