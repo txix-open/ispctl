@@ -2,7 +2,6 @@ package command
 
 import (
 	"encoding/csv"
-	"fmt"
 	"ispctl/bash"
 	"ispctl/command/utils"
 	"ispctl/model"
@@ -10,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 )
 
@@ -131,23 +131,33 @@ func (c Variables) upload(ctx *cli.Context) error {
 func (c Variables) readVariablesFromCsv(filepath string) ([]model.UpsertVariableRequest, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open file %s: %w", filepath, err)
+		return nil, errors.WithMessagef(err, "failed to open file %s", filepath)
 	}
 	defer file.Close()
+
 	reader := csv.NewReader(file)
 	reader.TrimLeadingSpace = true
 	records, err := reader.ReadAll()
 	if err != nil {
-		return nil, fmt.Errorf("failed to read CSV file: %w", err)
+		return nil, errors.WithMessage(err, "failed to read CSV file")
 	}
 	if len(records) < 2 {
-		return nil, fmt.Errorf("CSV file must have a header and at least one data row")
+		return nil, errors.New("CSV file must have a header and at least one data row")
 	}
+
 	header := records[0]
 	columnIndexes := map[string]int{}
 	for i, col := range header {
 		columnIndexes[strings.ToLower(col)] = i
 	}
+
+	for _, columnName := range []string{"name", "type", "value", "description"} {
+		_, ok := columnIndexes[columnName]
+		if !ok {
+			return nil, errors.Errorf("column '%s' is required", columnName)
+		}
+	}
+
 	variables := make([]model.UpsertVariableRequest, 0, len(records)-1)
 	for _, row := range records[1:] {
 		variables = append(variables, model.UpsertVariableRequest{
