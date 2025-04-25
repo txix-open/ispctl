@@ -506,3 +506,4 @@ ispctl -g '127.0.0.1:9002' set example . '{"metrics":{"address":{"ip":"127.0.0.1
   }
 }
 ```
+1
