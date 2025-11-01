@@ -69,7 +69,7 @@ func configServiceFromGlobalFlags(ctx *cli.Context) (service.Config, error) {
 	enableUnsafe := ctx.Bool(command.UnsafeFlagName)
 
 	host := ctx.String(command.HostFlagName)
-	host = strings.Replace(host, "'", "", -1)
+	host = strings.ReplaceAll(host, "'", "")
 
 	configCli, err := repository.NewGrpcClientWithHost(host)
 	if err != nil {
