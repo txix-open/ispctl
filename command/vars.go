@@ -132,7 +132,9 @@ func (c Variables) readVariablesFromCsv(filepath string) ([]model.UpsertVariable
 	if err != nil {
 		return nil, errors.WithMessagef(err, "failed to open file %s", filepath)
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	reader := csv.NewReader(file)
 	reader.TrimLeadingSpace = true

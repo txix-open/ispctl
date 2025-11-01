@@ -16,9 +16,9 @@ for status in $statusResponse; do
     read -ra ADDR <<<"$status"
     for module_name in "${ADDR[0]}"; do
         if [ -n "$*" ]; then
-          ispctl $* schema $module_name -o html > schemas/$module_name.html
+          ispctl $* schema -o html $module_name > schemas/$module_name.html
         else
-          ispctl schema $module_name -o html > schemas/$module_name.html
+          ispctl schema -o html $module_name > schemas/$module_name.html
         fi
       break
     done

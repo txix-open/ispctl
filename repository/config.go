@@ -3,10 +3,11 @@ package repository
 import (
 	"context"
 	"fmt"
-	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"ispctl/model"
 	"strings"
 	"time"
+
+	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 
 	"github.com/pkg/errors"
 	"github.com/txix-open/isp-kit/grpc/apierrors"
@@ -150,8 +151,8 @@ func (c Config) handleVariableError(err error, endpoint string) error {
 	if apiError == nil {
 		return errors.WithMessagef(err, "call %s", endpoint)
 	}
-	switch {
-	case apiError.ErrorCode == model.ErrCodeVariableNotFound:
+	switch apiError.ErrorCode {
+	case model.ErrCodeVariableNotFound:
 		return model.ErrVariableNotFound
 	default:
 		return errors.WithMessagef(err, "call %s", endpoint)
