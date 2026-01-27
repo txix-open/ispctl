@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"ispctl/model"
 	"strings"
-	"time"
 
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 
@@ -44,7 +43,6 @@ func (c Config) GetAvailableConfigs() ([]model.ModuleInfo, error) {
 	response := make([]model.ModuleInfo, 0)
 	err := c.cli.Invoke(getAvailableConfigs).
 		JsonResponseBody(&response).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getAvailableConfigs)
@@ -58,7 +56,6 @@ func (c Config) GetConfigByModuleName(name string) (*model.Config, error) {
 	err := c.cli.Invoke(getConfigByModuleName).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	switch {
 	case status.Code(err) == codes.NotFound:
@@ -75,7 +72,6 @@ func (c Config) CreateUpdateConfig(request model.Config) (*model.Config, error) 
 	err := c.cli.Invoke(createUpdateConfig).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
 		return nil, c.handleCreateUpdateConfigError(err)
@@ -89,7 +85,6 @@ func (c Config) GetSchemaByModuleId(moduleId string) (*model.ConfigSchema, error
 	err := c.cli.Invoke(getSchemaByModuleId).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getSchemaByModuleId)
@@ -101,7 +96,6 @@ func (c Config) GetAllVariables() ([]model.Variable, error) {
 	response := make([]model.Variable, 0)
 	err := c.cli.Invoke(getAllVariables).
 		JsonResponseBody(&response).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
 		return nil, errors.WithMessagef(err, "call %s", getAllVariables)
@@ -115,7 +109,6 @@ func (c Config) GetVariableByName(variableName string) (*model.Variable, error) 
 	err := c.cli.Invoke(getVariableByName).
 		JsonRequestBody(request).
 		JsonResponseBody(&response).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
 		return nil, c.handleVariableError(err, getVariableByName)
@@ -126,7 +119,6 @@ func (c Config) GetVariableByName(variableName string) (*model.Variable, error) 
 func (c Config) UpsertVariables(request []model.UpsertVariableRequest) error {
 	err := c.cli.Invoke(upsertVariable).
 		JsonRequestBody(request).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
 		return errors.WithMessagef(err, "call %s", upsertVariable)
@@ -138,7 +130,6 @@ func (c Config) DeleteVariable(variableName string) error {
 	request := model.VariableByNameRequest{Name: variableName}
 	err := c.cli.Invoke(deleteVariable).
 		JsonRequestBody(request).
-		Timeout(time.Second).
 		Do(c.baseCtx)
 	if err != nil {
 		return c.handleVariableError(err, deleteVariable)

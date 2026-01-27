@@ -1,3 +1,5 @@
+### v3.3.1
+* увеличены таймауты обращения к `isp-config-service`
 ### v3.3.0
 * Добавлены команды `vars get`, `vars list`, `vars set`, `vars delete`, `vars upload`
 * Обновлены зависимости
